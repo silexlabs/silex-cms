@@ -1,0 +1,40 @@
+{
+  "name": "@silexlabs/silex-plugin-starter",
+  "version": "0.0.0",
+  "description": "Silex plugin",
+  "main": "dist/server.js",
+  "module": "dist/client.js",
+  "files": [
+    "dist",
+    "src",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "silex --client-config ./dist/client.js --server-config `pwd`/dist/server.js",
+    "dev": "SILEX_CLIENT_CONFIG=./dist/client.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3000 SILEX_DEBUG=true nodemon ../../node_modules/@silexlabs/silex",
+    "build": "$npm_execpath run build:client && $npm_execpath run build:server",
+    "build:watch": "nodemon -e ts,js --watch src -x \"$npm_execpath run build\"",
+    "build:client": "rollup -c rollup.client.config.mjs",
+    "build:server": "rollup -c rollup.server.config.mjs",
+    "lint": "eslint src/**/*.[jt]s",
+    "lint:fix": "$npm_execpath run lint -- --fix",
+    "test": "jest --rootDir src"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-eslint": "^9.0.5",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "rollup": "^4.2.0",
+    "ts-jest": "^29.1.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@silexlabs/silex": "^3.0.0-alpha.122"
+  }
+}
