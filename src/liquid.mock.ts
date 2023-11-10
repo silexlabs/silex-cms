@@ -110,3 +110,72 @@ export const expressionWithFirst = {
     }
   ]
 } as StoredState
+
+export const expressionList = {
+  expression: [
+    {
+      "type": "property",
+      "propType": "field",
+      "fieldId": "continent",
+      "label": "continent",
+      "typeIds": [
+        "Continent"
+      ],
+      "dataSourceId": "countries",
+      "kind": "object",
+      "options": {
+        "code": "TR",
+      }
+    },
+    {
+      "type": "property",
+      "propType": "field",
+      "fieldId": "countries",
+      "label": "countries",
+      "typeIds": [
+        "Country"
+      ],
+      "dataSourceId": "countries",
+      "kind": "list"
+    },
+  ]
+} as StoredState
+
+export const expressionListWithWhere = {
+  expression: [
+    {
+      "type": "property",
+      "propType": "field",
+      "fieldId": "continent",
+      "label": "continent",
+      "typeIds": [
+        "Continent"
+      ],
+      "dataSourceId": "countries",
+      "kind": "object",
+      "options": {
+        "code": "TR",
+      }
+    },
+    {
+      "type": "property",
+      "propType": "field",
+      "fieldId": "countries",
+      "label": "countries",
+      "typeIds": [
+        "Country"
+      ],
+      "dataSourceId": "countries",
+      "kind": "list"
+    },
+    {
+      "type": "filter",
+      "id": "where",
+      "label": "where",
+      "options": {
+        "key": "lang",
+        "value": "FR"
+      }
+    }
+  ]
+} as StoredState

@@ -1,9 +1,9 @@
 /*
  * @jest-environment jsdom
  */
-import { Field, Filter, Property, State } from "@silexlabs/grapesjs-data-source"
-import { getLiquidStatement, getLiquidStatementFilters, getLiquidStatementProperties } from "./liquid"
-import { expressionWithFirst, expressionWithState, simpleExpression } from "./liquid.mock"
+import { Field, Filter, Property, State, getOrCreatePersistantId } from "@silexlabs/grapesjs-data-source"
+import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidStatementProperties, ifBlock, loopBlock } from "./liquid"
+import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from "./liquid.mock"
 import grapesjs, { Component } from "grapesjs"
 
 test('get liquid statements for properties', () => {
@@ -114,34 +114,95 @@ test('malformed expressions', () => {
   .toThrow('A filter cannot be followed by a property or state')
 })
 
-//test('get first liquid statement with state', () => {
-//  const { expression } = expressionWithState
-//  const editor = grapesjs.init({headless: true})
-//  const component = editor.addComponents('test')[0]
-//  expect(firstLiquidStatement(component, expression[0]))
-//  .toMatch(/assign \w+ = \w+/)
-//})
-//test('get next liquid statement', () => {
-//  const { expression } = simpleExpression
-//  const editor = grapesjs.init({headless: true})
-//  const component = editor.addComponents('test')[0]
-//  expect(nextLiquidStatement(component, [expression[0]], expression[1]))
-//  .toMatch(/assign \w+ = countries\.language\.name/)
-//})
-//
-//test('simple expression', () => {
-//  const { expression } = simpleExpression
-//  const editor = grapesjs.init({headless: true})
-//  const component = editor.addComponents('test')[0]
-//  expect(toLiquid(component, expression))
-//  .toMatch(/^\{\% assign \w+ = countries\.language\.countries\.name \%\}\{\{ \w+ \}\}/)
-//})
-//
-//test('expression with "first" filter', () => {
-//  const { expression } = expressionWithFirst
-//  const editor = grapesjs.init({headless: true})
-//  const component = editor.addComponents('test')[0]
-//  expect(toLiquid(component, expression))
-//  .toMatch(/^\{\% assign \w+ = countries\.continent\.countries \| first \%\}\{\{ \w+\.name \}\}/)
-//})
-//
+test('get liquid bloc', () => {
+  const { expression } = simpleExpression
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  const result = getLiquidBlock(component, expression)
+  expect(result).toHaveLength(1)
+  expect(result[0].variableName).toMatch(/var_\w+_0/)
+  expect(result[0].liquid).toMatch(/assign \w+ = countries\.language/)
+})
+
+test('get liquid bloc', () => {
+  const { expression } = expressionWithFirst
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  const result = getLiquidBlock(component, expression)
+  expect(result).toHaveLength(2)
+  expect(result[0].variableName).toMatch(/var_\w+_0/)
+  expect(result[0].liquid).toMatch(/assign \w+ = countries\.continent.countries \| first/)
+})
+
+test('echo blok', () => {
+  const { expression } = expressionWithFirst
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  const result = echoBlock(component, expression)
+    .split('\n')
+  expect(result).toHaveLength(5)
+  expect(result[0]).toBe('{% liquid')
+  expect(result[1])
+  .toMatch(/assign \w+ = countries\.continent\.countries \| first/)
+  expect(result[2])
+  .toMatch(/assign \w+ = \w+\.name/)
+  expect(result[3])
+  .toMatch(/echo \w+/)
+  expect(result[4]).toBe('  %}')
+})
+
+test('assign block', () => {
+  const { expression } = expressionWithFirst
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  getOrCreatePersistantId(component)
+  const result = assignBlock('testStateId', component, expression)
+    .split('\n')
+  expect(result).toHaveLength(5)
+  expect(result[0]).toBe('{% liquid')
+  expect(result[1])
+  .toMatch(/assign \w+ = countries\.continent\.countries \| first/)
+  expect(result[2])
+  .toMatch(/assign \w+ = \w+\.name/)
+  expect(result[3])
+  .toMatch(/assign state_\w+_testStateId = \w+/)
+  expect(result[4]).toBe('  %}')
+})
+
+test('loop block', () => {
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  getOrCreatePersistantId(component)
+  const { expression } = expressionList
+  const [start, end] = loopBlock('testStateId', component, expression)
+  expect(start.split('\n')).toHaveLength(5)
+  expect(start.split('\n')[0]).toBe('{% liquid')
+  expect(start.split('\n')[1])
+  .toMatch(/assign \w+ = countries\.continent/)
+  expect(start.split('\n')[3])
+  .toMatch(/{% for state_\w+___data in var_\w+ %}/)
+
+  const [start1, end1] = loopBlock('testStateId', component, expressionListWithWhere.expression)
+  expect(start1.split('\n')).toHaveLength(5)
+  expect(end1).toMatch(/{% endfor %}/)
+
+  const [start2, end2] = loopBlock('testStateId', component, [
+    ...expressionWithFirst.expression,
+    ...expressionListWithWhere.expression,
+  ])
+  expect(start2.split('\n')).toHaveLength(6)
+  expect(end2).toMatch(/{% endfor %}/)
+})
+
+test('if block', () => {
+  const editor = grapesjs.init({headless: true})
+  const component = editor.addComponents('test')[0]
+  const { expression } = expressionList
+  const [start, end] = ifBlock(component, expression)
+  expect(start.split('\n')).toHaveLength(5)
+  expect(start.split('\n')[0]).toBe('{% liquid')
+  expect(start.split('\n')[1])
+  .toMatch(/assign \w+ = countries\.continent/)
+  expect(start.split('\n')[3])
+  .toMatch(/{% if var_\w+ %}/)
+})
