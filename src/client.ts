@@ -1,6 +1,6 @@
 import { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { getDataSourceConfig } from './client/panel'
+import { getDataSourceConfig } from './client/data-source-config'
 import { getPublicationTransformer } from './client/publication'
 
 export default function (config: ClientConfig, options: DataSourceEditorOptions) {
@@ -8,7 +8,7 @@ export default function (config: ClientConfig, options: DataSourceEditorOptions)
   config.addPublicationTransformers(getPublicationTransformer())
 
   // Get the config for the data source plugin
-  const dataSourceConfig = getDataSourceConfig(config)
+  const dataSourceConfig = getDataSourceConfig(config, options)
 
   // Merge the two configs
   return {

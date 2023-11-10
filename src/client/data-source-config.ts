@@ -1,10 +1,10 @@
 /**
- * @fileoverview DataSource panel configuration
+ * @fileoverview DataSource configuration with defaults
  */
 
-import DataSourcePlugin from '@silexlabs/grapesjs-data-source';
+import DataSourcePlugin, { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 
-export function getDataSourceConfig(config) {
+export function getDataSourceConfig(config, options: DataSourceEditorOptions) {
   return {
     grapesJsConfig: {
       plugins: [
@@ -12,6 +12,7 @@ export function getDataSourceConfig(config) {
       ],
       pluginsOpts: {
         [DataSourcePlugin.toString()]: {
+          // Defaults
           dataSources: [{
             id: 'countries',
             type: 'graphql',
@@ -27,8 +28,10 @@ export function getDataSourceConfig(config) {
             button: () => config.getEditor().Panels.getPanel('views')?.get('buttons')?.get('open-tm'),
           },
           filters: 'liquid',
+          // Override
+          ...options,
         },
       },
     },
-  };
+  }
 }
