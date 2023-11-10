@@ -2,7 +2,7 @@
  * @fileoverview DataSource panel configuration
  */
 
-import DataSourcePlugin from '@silexlabs/grapesjs-data-source'
+import DataSourcePlugin from '@silexlabs/grapesjs-data-source';
 
 export function getDataSourceConfig(config) {
   return {
@@ -30,5 +30,5 @@ export function getDataSourceConfig(config) {
         },
       },
     },
-  }
+  };
 }

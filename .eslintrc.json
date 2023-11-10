@@ -4,7 +4,7 @@
     "node": true,
     "es6": true
   },
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parserOptions": {
     "sourceType": "module"
   },
@@ -14,5 +14,9 @@
     "quotes": ["error", "single"],
     "semi": ["error", "always"]
   },
-  "ignorePatterns": ["*.test.*"]
+  "ignorePatterns": ["*.test.*"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "root": true
+
 }
