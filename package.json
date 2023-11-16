@@ -42,7 +42,7 @@
     "grapesjs": "^0.21.7"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.20"
+    "@silexlabs/grapesjs-data-source": "^0.0.21"
   },
   "author": "lexoyo",
   "license": "MIT",
