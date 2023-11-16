@@ -1,6 +1,6 @@
 import { Component, Page } from 'grapesjs'
 import { DataSourceEditor, StoredState, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
-import { echoBlock, ifBlock } from '../liquid'
+import { echoBlock, ifBlock, loopBlock } from '../liquid'
 import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -88,9 +88,9 @@ function queryToDataFile(dataSource, queryStr) {
   }
   const url = dataSource.get('url')
   const method = dataSource.get('method')
-  const headers = dataSource.has('headers') ? Object.entries(dataSource.get('headers')).map(([key, value]) => `${key}: ${value}`).join('\n') : ''
+  const headers = dataSource.has('headers') ? Object.entries(dataSource.get('headers')).map(([key, value]) => `'${key}': '${value}'`).join('\n') : ''
   return `
-  resutl['${dataSource.id}'] = (await EleventyFetch('${url}', {
+  result['${dataSource.id}'] = (await EleventyFetch('${url}', {
     duration: '2s',
     type: 'json',
     fetchOptions: {
@@ -141,11 +141,12 @@ export function renderComponent(component: Component, toHtml: () => string): str
       const innerHtml = component.getInnerHTML()
         + statesObj.innerHtml && statesObj.innerHtml?.expression.length ? echoBlock(component, statesObj.innerHtml.expression) : ''
       const [ifStart, ifEnd] = statesObj.condition?.expression.length ? ifBlock(component, statesObj.condition.expression) : []
-      const [forStart, forEnd] = statesObj.___data?.expression.length ? ifBlock(component, statesObj.___data.expression) : []
+      const [forStart, forEnd] = statesObj.__data?.expression.length ? loopBlock('__data', component, statesObj.__data.expression) : []
       const before = (ifStart ?? '') + (forStart ?? '')
 
       const after = (ifEnd ?? '') + (forEnd ?? '')
       // TODO: src, href, alt
+      console.log('render component', statesObj.__data, before)
       return `${before
       }<${tagName}
                 ${attributes}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}
