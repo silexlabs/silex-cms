@@ -49,14 +49,13 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     })
     if(Object.keys(query).length > 0) {
       data.files?.push({
-        type: 'other',
-        path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, 'other'),
+        type: ClientSideFileType.OTHER,
+        path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, ClientSideFileType.OTHER),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
         content: getDataFile(editor, page, query),
       })
-      console.log('Create page', page.getName())
     } else {
-      console.log('no query for page', page)
+      // console.log('no query for page', page)
     }
   })
 }
@@ -134,25 +133,24 @@ export function renderComponent(component: Component, toHtml: () => string): str
     if (tagName) {
       const className = component.getClasses().join(' ')
         + statesObj.className && statesObj.className?.expression.length ? ` ${echoBlock(component, statesObj.className.expression)}` : ''
+      // Initial attributes
       const attributes = Object.entries(component.get('attributes') as object).map(([key, value]) => makeAttribute(key, value)).join(' ')
-      // TODO: + statesObj.attributes
+        // Attributes from attributes state
+        + statesObj.attributes && statesObj.attributes?.expression.length ? ` ${echoBlock(component, statesObj.attributes.expression)}` : ''
+        // SRC state
+        + statesObj.src && statesObj.src?.expression.length ? ` src="${echoBlock(component, statesObj.src.expression)}"` : ''
+        // HREF state
+        + statesObj.href && statesObj.href?.expression.length ? ` href="${echoBlock(component, statesObj.href.expression)}"` : ''
+        // Title state
+        + statesObj.title && statesObj.title?.expression.length ? ` title="${echoBlock(component, statesObj.title.expression)}"` : ''
       const style = Object.entries(component.getStyle()).map(([key, value]) => makeStyle(key, value)).join(' ')
         + statesObj.style && statesObj.style?.expression.length ? ` ${echoBlock(component, statesObj.style.expression)}` : ''
-      const innerHtml = component.getInnerHTML()
-        + statesObj.innerHtml && statesObj.innerHtml?.expression.length ? echoBlock(component, statesObj.innerHtml.expression) : ''
+      const innerHtml = statesObj.innerHTML && statesObj.innerHTML?.expression.length ? echoBlock(component, statesObj.innerHTML.expression) : component.getInnerHTML()
       const [ifStart, ifEnd] = statesObj.condition?.expression.length ? ifBlock(component, statesObj.condition.expression) : []
       const [forStart, forEnd] = statesObj.__data?.expression.length ? loopBlock('__data', component, statesObj.__data.expression) : []
       const before = (ifStart ?? '') + (forStart ?? '')
-
       const after = (ifEnd ?? '') + (forEnd ?? '')
-      // TODO: src, href, alt
-      console.log('render component', statesObj.__data, before)
-      return `${before
-      }<${tagName}
-                ${attributes}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}
-              >${innerHtml
-}</${tagName}>${after
-}`
+      return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
       // FIXME: understand why

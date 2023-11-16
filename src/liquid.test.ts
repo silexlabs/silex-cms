@@ -120,7 +120,7 @@ test('get liquid bloc', () => {
   const component = editor.addComponents('test')[0]
   const result = getLiquidBlock(component, expression)
   expect(result).toHaveLength(1)
-  expect(result[0].variableName).toMatch(/var_\w+_0/)
+  expect(result[0].variableName).toMatch(/var_\w+_[09]*/)
   expect(result[0].liquid).toMatch(/assign \w+ = countries\.language/)
 })
 
@@ -130,7 +130,7 @@ test('get liquid bloc', () => {
   const component = editor.addComponents('test')[0]
   const result = getLiquidBlock(component, expression)
   expect(result).toHaveLength(2)
-  expect(result[0].variableName).toMatch(/var_\w+_0/)
+  expect(result[0].variableName).toMatch(/var_\w+_[09]*/)
   expect(result[0].liquid).toMatch(/assign \w+ = countries\.continent.countries \| first/)
 })
 

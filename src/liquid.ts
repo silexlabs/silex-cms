@@ -87,6 +87,7 @@ export function ifBlock(component: Component, expression: Expression): [start: s
   `, `{% endif %}`]
 }
 
+let numNextVar = 0
 /**
  * Convert an expression to liquid code
  */
@@ -94,7 +95,6 @@ export function getLiquidBlock(component: Component, expression: Expression): { 
   if(expression.length === 0) return []
   const rest = [...expression]
   const result = []
-  let numNextVar = 0
   const firstToken = expression[0]
   if(firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
   let lastVariableName = firstToken.type === 'property' ? firstToken.dataSourceId.toString() : ''
