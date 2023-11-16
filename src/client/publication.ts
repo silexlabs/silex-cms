@@ -102,7 +102,7 @@ function queryToDataFile(dataSource, queryStr) {
         query: \`${queryStr}\`,
       })
     }
-  }).data)
+  })).data
 `
 }
 
