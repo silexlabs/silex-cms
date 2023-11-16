@@ -38,11 +38,11 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.123",
+    "@silexlabs/silex": "^3.0.0-alpha.124",
     "grapesjs": "^0.21.7"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.21"
+    "@silexlabs/grapesjs-data-source": "^0.0.22"
   },
   "author": "lexoyo",
   "license": "MIT",
