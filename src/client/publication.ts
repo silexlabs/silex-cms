@@ -1,9 +1,9 @@
 import { Component, Page } from 'grapesjs'
 import { DataSourceEditor, StoredState, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
 import { echoBlock, ifBlock, loopBlock } from '../liquid'
-import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
+// This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
 
 /**
  * Make html attribute
@@ -26,7 +26,7 @@ function makeStyle(key, value) {
 /**
  * Comes from silex but didn't manage to import
  */
-export function transformPath(editor: DataSourceEditor, path: string, type: ClientSideFileType): string {
+export function transformPath(editor: DataSourceEditor, path: string, type): string {
   const config = editor.getModel().get('config')
   return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
@@ -38,7 +38,7 @@ export function transformPath(editor: DataSourceEditor, path: string, type: Clie
   }, path)
 }
 
-export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
+export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data): void {
   editor.Pages.getAll().forEach(page => {
     const query = editor.DataSourceManager.getPageQuery(page)
     // Remove empty data source queries
@@ -49,8 +49,8 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     })
     if(Object.keys(query).length > 0) {
       data.files?.push({
-        type: ClientSideFileType.OTHER,
-        path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, ClientSideFileType.OTHER),
+        type: 'other',
+        path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, 'other'),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
         content: getDataFile(editor, page, query),
       })

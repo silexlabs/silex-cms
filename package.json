@@ -18,15 +18,15 @@
     "build:server": "rollup -c rollup.server.config.mjs",
     "lint": "eslint src/**/*.[jt]s",
     "lint:fix": "$npm_execpath run lint -- --fix",
-    "test": "jest --rootDir src",
+    "test": "jest --rootDir src --config jest.config.js",
     "test:watch": "$npm_execpath run test -- --watch"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-eslint": "^9.0.5",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/jest": "^29.5.8",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.53.0",

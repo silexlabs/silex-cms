@@ -1,10 +1,12 @@
 /*
  * @jest-environment jsdom
  */
-import { Field, Filter, Property, State, getOrCreatePersistantId } from "@silexlabs/grapesjs-data-source"
+import { Filter, Property, State, getOrCreatePersistantId } from "@silexlabs/grapesjs-data-source"
 import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidStatementProperties, ifBlock, loopBlock } from "./liquid"
 import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from "./liquid.mock"
-import grapesjs, { Component } from "grapesjs"
+import grapesjs from "grapesjs"
+
+import {expect, test} from '@jest/globals'
 
 test('get liquid statements for properties', () => {
   const { expression } = simpleExpression
