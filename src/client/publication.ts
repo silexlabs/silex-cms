@@ -3,6 +3,7 @@ import { DataSourceEditor, StoredState, getState, getStateIds } from '@silexlabs
 import { echoBlock, ifBlock } from '../liquid'
 import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
 import { EleventyPluginOptions } from '../client'
+import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 
 /**
  * Make html attribute
@@ -10,8 +11,8 @@ import { EleventyPluginOptions } from '../client'
  */
 function makeAttribute(key, value) {
   switch (typeof value) {
-    case 'boolean': return value ? key : ''
-    default: return `${key}="${value}"`
+  case 'boolean': return value ? key : ''
+  default: return `${key}="${value}"`
   }
 }
 
@@ -27,7 +28,7 @@ function makeStyle(key, value) {
  */
 export function transformPath(editor: DataSourceEditor, path: string, type: ClientSideFileType): string {
   const config = editor.getModel().get('config')
-  return config.publicationTransformers.reduce((result: string, transformer: any) => {
+  return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
       return transformer.transformPath ? transformer.transformPath(result, type) ?? result : result
     } catch (e) {
@@ -61,10 +62,10 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
 }
 
 function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>): string {
-  const content = Object.entries(query).map(([dataSourceId, query]) => {
+  const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
     if (dataSource) {
-      return queryToDataFile(dataSource)
+      return queryToDataFile(dataSource, queryStr)
     } else {
       console.error('No data source for id', dataSourceId)
       throw new Error(`No data source for id ${dataSourceId}`)
@@ -80,7 +81,7 @@ module.exports = async function () {
   `
 }
 
-function queryToDataFile(dataSource) {
+function queryToDataFile(dataSource, queryStr) {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -99,7 +100,7 @@ function queryToDataFile(dataSource) {
       },
       method: '${method}',
       body: JSON.stringify({
-        query: \`${query}\`,
+        query: \`${queryStr}\`,
       })
     }
   }).data)
@@ -146,11 +147,11 @@ export function renderComponent(component: Component, toHtml: () => string): str
       const after = (ifEnd ?? '') + (forEnd ?? '')
       // TODO: src, href, alt
       return `${before
-        }<${tagName}
+      }<${tagName}
                 ${attributes}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}
               >${innerHtml
-        }</${tagName}>${after
-        }`
+}</${tagName}>${after
+}`
     } else {
       // Not a real component
       // FIXME: understand why
