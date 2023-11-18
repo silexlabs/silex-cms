@@ -1,24 +1,17 @@
 import { DataSourceEditor, DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { getDataSourceConfig } from './client/data-source-config'
+import { optionsToGrapesJsConfig, getZeroConfig } from './client/config'
 import { renderComponent, transformFiles } from './client/publication'
 
-export interface EleventyPluginOptions {
-  /**
-   * Options for the data source editor
-   */
-  dataSourceEditorOptions?: DataSourceEditorOptions
-  /**
-   * Use eleventy's fetch plugin to fetch data from data sources
-   */
-  useFetchPlugin: boolean
+export interface EleventyPluginOptions extends DataSourceEditorOptions {
+  // ... add options for the eleventy plugin here
 }
 export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {
-  // Defaults
-  const opts: EleventyPluginOptions = {
-    useFetchPlugin: false,
+  // Options with default
+  const opts = {
+    ...getZeroConfig(config) as DataSourceEditorOptions,
     ...options,
-  }
+  } as EleventyPluginOptions
 
   // Generate the liquid when the site is published
   config.addPublicationTransformers({
@@ -33,22 +26,22 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   })
 
   // Get the config for the data source plugin
-  const dataSourceConfig = getDataSourceConfig(config, opts.dataSourceEditorOptions)
+  const grapesJsConfig = optionsToGrapesJsConfig(opts)
 
-  // Merge the two configs
+  // Merge the initial config with GrapesJs config
+  // Returns the new config
   return {
     ...config,
-    ...dataSourceConfig,
     grapesJsConfig: {
       ...config.grapesJsConfig ?? {},
-      ...dataSourceConfig.grapesJsConfig ?? {},
+      ...grapesJsConfig,
       plugins: [
         ...config.grapesJsConfig?.plugins ?? [],
-        ...dataSourceConfig.grapesJsConfig?.plugins ?? [],
+        ...grapesJsConfig.plugins,
       ],
       pluginsOpts: {
         ...config.grapesJsConfig?.pluginsOpts ?? {},
-        ...dataSourceConfig.grapesJsConfig?.pluginsOpts ?? {},
+        ...grapesJsConfig.pluginsOpts,
       },
     },
   }
