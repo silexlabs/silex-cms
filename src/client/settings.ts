@@ -10,15 +10,15 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
       setTimeout(() => {
         // Update the settings form when the selection changed without recreating the form
         Array.from(document.querySelectorAll('#settings-eleventy input'))
-        .forEach((input: HTMLInputElement) => {
-          switch(input.type) {
+          .forEach((input: HTMLInputElement) => {
+            switch(input.type) {
             case 'checkbox':
               input.checked = !!settings[input.name]
               break
             default:
               input.value = settings[input.name] ?? ''
-          }
-        })
+            }
+          })
       })
       return html`
     <style>
@@ -39,17 +39,17 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
             <select name="eleventyPageData" id="pageDataSelect">
               <option value="" ?selected=${!collectionPageData?.id}>None</option>
               ${queryables
-                .filter(field => field.kind === 'list')
-                .reduce((groups, field) => {
-                  const group = groups.find(g => g.dataSourceId === field.dataSourceId)
-                  if (group) {
-                    group.fields.push(field)
-                  } else {
-                    groups.push({ dataSourceId: field.dataSourceId, fields: [field] })
-                  }
-                  return groups
-                }, [])
-                .map(group => html`
+    .filter(field => field.kind === 'list')
+    .reduce((groups, field) => {
+      const group = groups.find(g => g.dataSourceId === field.dataSourceId)
+      if (group) {
+        group.fields.push(field)
+      } else {
+        groups.push({ dataSourceId: field.dataSourceId, fields: [field] })
+      }
+      return groups
+    }, [])
+    .map(group => html`
                   <optgroup label=${group.dataSourceId}>
                     ${group.fields.map(field => html`
                       <option .value=${field.id} .data-field=${JSON.stringify(field)} ?selected=${collectionPageData?.id === field.id}>${field.id}</option>
