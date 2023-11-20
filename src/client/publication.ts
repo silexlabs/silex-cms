@@ -48,14 +48,13 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       }
     })
     if(Object.keys(query).length > 0) {
+      // There is a query in this page
       data.files?.push({
         type: 'other',
         path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, 'other'),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
         content: getDataFile(editor, page, query),
       })
-    } else {
-      // console.log('no query for page', page)
     }
   })
 }

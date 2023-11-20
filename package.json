@@ -40,8 +40,9 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.124",
-    "grapesjs": "^0.21.7"
+    "@silexlabs/silex": "^3.0.0-alpha.130",
+    "grapesjs": "^0.21.7",
+    "lit-html": "3.0.2"
   },
   "dependencies": {
     "@silexlabs/grapesjs-data-source": "^0.0.22"
