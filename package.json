@@ -40,12 +40,12 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.130",
+    "@silexlabs/silex": "^3.0.0-alpha.131",
     "grapesjs": "^0.21.7",
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.22",
+    "@silexlabs/grapesjs-data-source": "^0.0.23",
     "dedent": "^1.5.1"
   },
   "author": "lexoyo",

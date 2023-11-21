@@ -4,6 +4,8 @@ import { optionsToGrapesJsConfig, getZeroConfig } from './client/config'
 import { renderComponent, transformFiles } from './client/publication'
 import settings from './client/settings'
 import { Plugin } from '@silexlabs/silex-plugins'
+import states from './client/states'
+import DataSource from './client/DataSource'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // ... add options for the eleventy plugin here
@@ -22,7 +24,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
 
   config.on('silex:startup:end', () => {
     // Add plugins for collection pages
-    config.addPlugin([settings as Plugin], opts)
+    config.addPlugin([settings as Plugin, states as Plugin, DataSource as Plugin], opts)
 
     // Generate 11ty data files
     const editor = config.getEditor()

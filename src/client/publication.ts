@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, StoredState, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
-import { echoBlock, ifBlock, loopBlock } from '../liquid'
+import { DataSourceEditor, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
+import { echoBlock, getLiquidBlock, getStateName, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 // This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
@@ -61,7 +61,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     const pageData = data.files.find(file => file.path === path)
     const settings = page.get('settings') as Record<string, string>
     if(!settings) throw new Error(`No settings for page ${page.getName() || 'index'}`)
-    pageData.content = dedent`---
+    const frontMatter = dedent`---
       ${settings.eleventyPermalink ? `permalink: "${settings.eleventyPermalink}"` : ''}
       ${settings.eleventyPageData ? `pagination:
         data: ${settings.eleventyPageData}
@@ -76,7 +76,20 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         ${settings.eleventyNavigationUrl ? `url: ${settings.eleventyNavigationUrl}` : ''}
       ` : ''}
       ---\n
-    ` + pageData.content
+    `
+    // Render the body states
+    const body = page.getMainComponent()
+    const pagination = getState(body, 'pagination', true)
+    let bodyStatesLiquid = ''
+    if (pagination?.expression.length > 0) {
+      //const block = getLiquidBlock(body, pagination.expression)
+      bodyStatesLiquid = dedent`
+        {% assign ${getStateName(getPersistantId(body), 'pagination')} = pagination %}
+      `
+    }
+    
+    // Render the HTML
+    pageData.content = frontMatter + bodyStatesLiquid + pageData.content
 
     // Create the data file for this page
     const query = editor.DataSourceManager.getPageQuery(page)
@@ -86,9 +99,6 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         delete query[key]
       }
     })
-    if(settings.eleventyPageData) {
-      console.log('eleventyPageData', settings.eleventyPageData, query)
-    }
     if(Object.keys(query).length > 0) {
       // There is a query in this page
       data.files?.push({
@@ -98,7 +108,6 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         content: getDataFile(editor, page, query),
       })
     }
-    console.log('page', settings, path, '\n', pageData.content, '\n', data.files[data.files.length - 1].content)
   })
 }
 
@@ -193,7 +202,7 @@ export function renderComponent(component: Component, toHtml: () => string): str
         + (statesObj.title && statesObj.title?.expression.length ? ` title="${echoBlock(component, statesObj.title.expression)}"` : '')
       const style = Object.entries(component.getStyle()).map(([key, value]) => makeStyle(key, value)).join(' ')
         + (statesObj.style && statesObj.style?.expression.length ? ` ${echoBlock(component, statesObj.style.expression)}` : '')
-      const innerHtml = statesObj.innerHTML && statesObj.innerHTML?.expression.length ? echoBlock(component, statesObj.innerHTML.expression) : component.getInnerHTML()
+      const innerHtml = statesObj.innerHTML && statesObj.innerHTML?.expression.length ? echoBlock(component, statesObj.innerHTML.expression) : toHtml()
       const [ifStart, ifEnd] = statesObj.condition?.expression.length ? ifBlock(component, statesObj.condition.expression) : []
       const [forStart, forEnd] = statesObj.__data?.expression.length ? loopBlock('__data', component, statesObj.__data.expression) : []
       const before = (ifStart ?? '') + (forStart ?? '')
