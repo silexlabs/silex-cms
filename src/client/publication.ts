@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
 import { DataSourceEditor, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
-import { echoBlock, getLiquidBlock, getStateName, ifBlock, loopBlock } from '../liquid'
+import { echoBlock, getStateName, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 // This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
