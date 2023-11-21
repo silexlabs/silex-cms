@@ -45,7 +45,8 @@
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.22"
+    "@silexlabs/grapesjs-data-source": "^0.0.22",
+    "dedent": "^1.5.1"
   },
   "author": "lexoyo",
   "license": "MIT",

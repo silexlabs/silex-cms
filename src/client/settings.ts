@@ -6,7 +6,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
     label: 'Eleventy',
     render: (settings) => {
       const queryables = config.getEditor().DataSourceManager.getDataTree().getAllQueryables()
-      const collectionPageData = queryables.find(field => field.id === settings.eleventyPageData) ?? null
+      const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
       setTimeout(() => {
         // Update the settings form when the selection changed without recreating the form
         Array.from(document.querySelectorAll('#settings-eleventy input'))
@@ -26,16 +26,18 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
         width: 20px;
         height: 20px;
       }
+      .settings-dialog > div .silex-form__element > label {
+        border: none;
+      }
     </style>
     <div id="settings-eleventy" class="silex-hideable silex-hidden">
       <div class="gjs-sm-sector-title">11ty Plugin</div>
-      <div class="silex-help">The 11ty plugin enables you to integrate <a href="https://www.11ty.dev/docs/">11ty</a> static site generator with Silex.</div>
+      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-plugin-11ty">11ty plugin for Silex</a> <strong>is installed</strong>. It integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator with Silex.</div>
       <div class="silex-form__group col2">
         <label class="silex-form__element">
           <h3>Create pages from data</h3>
           <p class="silex-help">The <a href="https://www.11ty.dev/docs/pagination/">Pagination feature</a> is used for iterating over any data to create multiple output files.</p>
           <label class="silex-form__element">Page data
-            <p class="">Select the data source to use for creating pages. <a href="https://www.11ty.dev/docs/pagination/">Read more about Pagination</a>.</p>
             <select name="eleventyPageData" id="pageDataSelect">
               <option value="" ?selected=${!collectionPageData?.id}>None</option>
               ${queryables
@@ -52,39 +54,21 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
     .map(group => html`
                   <optgroup label=${group.dataSourceId}>
                     ${group.fields.map(field => html`
-                      <option .value=${field.id} .data-field=${JSON.stringify(field)} ?selected=${collectionPageData?.id === field.id}>${field.id}</option>
+                      <option .value=${`${field.dataSourceId}.${field.id}`} .data-field=${JSON.stringify(field)} ?selected=${collectionPageData?.id === field.id}>${field.id}</option>
                     `)}
                   </optgroup>
                 `)}
             </select>
           </label>
           <label class="silex-form__element">Size
-            <p class="">Set the number of items per page. To get </p>
             <input type="number" name="eleventyPageSize" .value=${settings.eleventyPageSize ?? 1}/>
           </label>
           <label class="silex-form__element">Reverse
-            <p class="">Reverse the order of the items in the collection.</p>
             <input type="checkbox" name="eleventyPageReverse" ?checked=${!!settings.eleventyPageReverse ?? false}/>
           </label>
           <label class="silex-form__element">Permalink
-            <p class="">Change the output target of the current template. Normally, you cannot use template syntax to reference other variables in your data, but <code>permalink</code> is an exception. <a href="https://www.11ty.dev/docs/permalinks/">Read more about Permalinks</a>.</p>
             <input type="text" name="eleventyPermalink" .value=${settings.eleventyPermalink ?? ''}/>
           </label>
-        </label>
-        <label class="silex-form__element">
-          <h3>Internationalization (I18n)</h3>
-          <p class="silex-help">This 11ty plugin enables you to use multiple languages in your 11ty site. <a href="https://www.11ty.dev/docs/languages/">Read more about the I18n plugin</a>.</p>
-          Enable
-          <input type="checkbox" name="eleventyI18n" ?checked=${!!settings.eleventyI18n ?? false}/>
-          <label class="silex-form__element">Default language
-            <input type="text" name="eleventyI18nDefaultLanguage" .value=${settings.eleventyI18nDefaultLanguage ?? ''}/>
-          </label>
-        </label>
-        <label class="silex-form__element">
-          <h3>Image</h3>
-          <p class="silex-help">This 11ty plugin enables you to use responsive images in your 11ty site. <a href="https://www.11ty.dev/docs/plugins/image/">Read more about the Image plugin</a>. Enable this option will only make an image filter available in Silex, it will not configure the 11ty plugin - this you need to do in the 11ty config file.</p>
-          Enable
-          <input type="checkbox" name="eleventyImage" ?checked=${!!settings.eleventyImage ?? false}/>
         </label>
         <label class="silex-form__element">
           <h3>Navigation Plugin</h3>

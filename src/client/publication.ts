@@ -1,3 +1,4 @@
+import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
 import { DataSourceEditor, StoredState, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
 import { echoBlock, ifBlock, loopBlock } from '../liquid'
@@ -25,6 +26,7 @@ function makeStyle(key, value) {
 
 /**
  * Comes from silex but didn't manage to import
+ * FIXME: expose this from silex
  */
 export function transformPath(editor: DataSourceEditor, path: string, type): string {
   const config = editor.getModel().get('config')
@@ -38,8 +40,45 @@ export function transformPath(editor: DataSourceEditor, path: string, type): str
   }, path)
 }
 
+function slugify(text) {
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^a-z0-9-]/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
+
+/**
+ * Transform the files to be published
+ * This hook is called just before the files are written to the file system
+ */
 export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data): void {
   editor.Pages.getAll().forEach(page => {
+    // Add front matter to the page
+    const name = slugify(page.getName() || 'index')
+    const path = transformPath(editor, `/${name}.html`, 'html')
+    const pageData = data.files.find(file => file.path === path)
+    const settings = page.get('settings') as Record<string, string>
+    if(!settings) throw new Error(`No settings for page ${page.getName() || 'index'}`)
+    pageData.content = dedent`---
+      ${settings.eleventyPermalink ? `permalink: "${settings.eleventyPermalink}"` : ''}
+      ${settings.eleventyPageData ? `pagination:
+        data: ${settings.eleventyPageData}
+        ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
+        ${settings.eleventyPageReverse ? 'reverse: true' : ''}
+      ` : ''}
+      ${settings.eleventyNavigationKey ? `eleventyNavigation:
+        key: ${settings.eleventyNavigationKey}
+        ${settings.eleventyNavigationTitle ? `title: ${settings.eleventyNavigationTitle}` : ''}
+        ${settings.eleventyNavigationOrder ? `order: ${settings.eleventyNavigationOrder}` : ''}
+        ${settings.eleventyNavigationParent ? `parent: ${settings.eleventyNavigationParent}` : ''}
+        ${settings.eleventyNavigationUrl ? `url: ${settings.eleventyNavigationUrl}` : ''}
+      ` : ''}
+      ---\n
+    ` + pageData.content
+
+    // Create the data file for this page
     const query = editor.DataSourceManager.getPageQuery(page)
     // Remove empty data source queries
     Object.entries(query).forEach(([key, value]) => {
@@ -47,6 +86,9 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         delete query[key]
       }
     })
+    if(settings.eleventyPageData) {
+      console.log('eleventyPageData', settings.eleventyPageData, query)
+    }
     if(Object.keys(query).length > 0) {
       // There is a query in this page
       data.files?.push({
@@ -56,9 +98,13 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         content: getDataFile(editor, page, query),
       })
     }
+    console.log('page', settings, path, '\n', pageData.content, '\n', data.files[data.files.length - 1].content)
   })
 }
 
+/**
+ * Generate the data file for a given page
+ */
 function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>): string {
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
@@ -79,6 +125,9 @@ module.exports = async function () {
   `
 }
 
+/**
+ * Generate the fetch call for a given page
+ */
 function queryToDataFile(dataSource, queryStr) {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
