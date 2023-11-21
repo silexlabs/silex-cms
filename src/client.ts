@@ -6,10 +6,17 @@ import settings from './client/settings'
 import { Plugin } from '@silexlabs/silex-plugins'
 import states from './client/states'
 import DataSource from './client/DataSource'
+import filters from './client/filters'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
-  // ... add options for the eleventy plugin here
+  // Image plugin enabled to add specific filters
+  // https://www.11ty.dev/docs/plugins/image/
+  imagePlugin: boolean,
+  // Internationalization plugin enabled to add specific filters
+  // https://www.11ty.dev/docs/plugins/i18n/
+  i18nPlugin: boolean,
 }
+
 export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {
   // Options with default
   const opts = {
@@ -24,7 +31,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
 
   config.on('silex:startup:end', () => {
     // Add plugins for collection pages
-    config.addPlugin([settings as Plugin, states as Plugin, DataSource as Plugin], opts)
+    config.addPlugin([settings as Plugin, states as Plugin, DataSource as Plugin, filters as Plugin], opts)
 
     // Generate 11ty data files
     const editor = config.getEditor()
