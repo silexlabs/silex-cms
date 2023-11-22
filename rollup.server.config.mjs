@@ -1,7 +1,8 @@
-import typescript from '@rollup/plugin-typescript';
-import eslint from '@rollup/plugin-eslint';
-import nodeResolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
+import typescript from '@rollup/plugin-typescript'
+import eslint from '@rollup/plugin-eslint'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import tslint from 'rollup-plugin-tslint'
 
 export default {
   input: 'src/server.ts',
@@ -12,10 +13,25 @@ export default {
   },
   external: ['@silexlabs/silex'],
   plugins: [
-    typescript(), // Supports typescript
+
+    // FIXME: Linting doesn't work
+    /*
+    tslint({
+      configuration: './tsconfig.server.json',
+    }),
+    */
+    // Tried this too
+    /*
+    eslint({
+      tsconfig: 'tsconfig.server.json',
+    }),
+    */
+
+    typescript({
+      tsconfig: 'tsconfig.server.json',
+    }),
     nodeResolve(), // Import modules from node_modules
-    eslint(), // Linting
     commonjs(), // Convert CommonJS modules to ES6 when importing node_modules
   ],
-};
+}
 

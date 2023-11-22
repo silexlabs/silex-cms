@@ -6,18 +6,18 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
     const page = config.getEditor().Pages.getSelected()
     const body = page.getMainComponent()
     const settings = page.get('settings') as Record<string, string>
-    if (settings.eleventyPageData) {
+    if (settings?.eleventyPageData) {
       const [dataSourceId, fieldId] = settings.eleventyPageData.split('.')
       const dataSource = config.getEditor().DataSourceManager.get(dataSourceId)
       const type = dataSource.getTypes().find(type => type.id === fieldId)
       // Update body states with the new settings
       setState(body, 'pagination', {
         expression: [{
-          label: 'Unused',
+          label: 'Unused pagination label',
           type: 'property',
           propType: 'field',
-          fieldId,
-          dataSourceId,
+          fieldId: 'pagination',
+          dataSourceId: 'eleventy',
           typeIds: ['pagination'],
           kind: 'object',
         }]
@@ -27,7 +27,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
       // items: [], // Array of current page’s chunk of data
       setState(body, 'items', {
         expression: [{
-          label: 'Unused',
+          label: 'Unused items label',
           type: 'property',
           propType: 'field',
           fieldId,
@@ -41,7 +41,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
       // pages: [], // Array of all chunks of paginated data (in order)
       setState(body, 'pages', {
         expression: [{
-          label: 'Unused',
+          label: 'Unused pages label',
           type: 'property',
           propType: 'field',
           fieldId,

@@ -11,7 +11,9 @@ export default {
   },
   external: ['@silexlabs/silex', 'grapesjs'],
   plugins: [
-    typescript(), // Supports typescript
+    typescript({
+      tsconfig: 'tsconfig.client.json',
+    }),
     commonjs(), // Convert CommonJS modules to ES6 when importing node_modules
     resolve({
       customResolveOptions: {
@@ -21,4 +23,4 @@ export default {
       },
     }),
   ],
-};
+}

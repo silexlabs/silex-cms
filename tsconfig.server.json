@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+  },
+  "exclude": [
+    //"node_modules", // Useless apparently
+    "dist",
+  ]
+}

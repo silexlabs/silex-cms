@@ -60,7 +60,10 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     const path = transformPath(editor, `/${name}.html`, 'html')
     const pageData = data.files.find(file => file.path === path)
     const settings = page.get('settings') as Record<string, string>
-    if(!settings) throw new Error(`No settings for page ${page.getName() || 'index'}`)
+    if(!settings) {
+      console.warn(`No settings for page ${page.getName() || 'index'}`)
+      return
+    }
     const frontMatter = dedent`---
       ${settings.eleventyPermalink ? `permalink: "${settings.eleventyPermalink}"` : ''}
       ${settings.eleventyPageData ? `pagination:
@@ -83,9 +86,16 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     let bodyStatesLiquid = ''
     if (pagination?.expression.length > 0) {
       //const block = getLiquidBlock(body, pagination.expression)
-      bodyStatesLiquid = dedent`
-        {% assign ${getStateName(getPersistantId(body), 'pagination')} = pagination %}
-      `
+      const bodyId = getPersistantId(body)
+      if (bodyId) {
+        bodyStatesLiquid = dedent`
+          {% assign ${getStateName(bodyId, 'pagination')} = pagination %}
+          {% assign ${getStateName(bodyId, 'items')} = pagination.items %}
+          {% assign ${getStateName(bodyId, 'pages')} = pagination.pages %}
+        `
+      } else {
+        console.error('body has no persistant ID => do not add liquid for 11ty data')
+      }
     }
     
     // Render the HTML
@@ -103,7 +113,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       // There is a query in this page
       data.files?.push({
         type: 'other',
-        path: transformPath(editor, `/${page.getName() || 'index'}.11tydata.js`, 'other'),
+        path: transformPath(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'other'),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
         content: getDataFile(editor, page, query),
       })
