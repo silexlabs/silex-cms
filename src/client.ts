@@ -1,44 +1,79 @@
-import { DataSourceEditor, DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { optionsToGrapesJsConfig, getZeroConfig } from './client/config'
-import { renderComponent, transformFiles } from './client/publication'
+import publication from './client/publication'
 import settings from './client/settings'
 import { Plugin } from '@silexlabs/silex-plugins'
 import states from './client/states'
 import DataSource from './client/DataSource'
 import filters from './client/filters'
+import merge from 'deepmerge'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // 11ty fetch plugin options
   // https://www.11ty.dev/docs/plugins/fetch/
+  // Default: { duration: '1d', type: 'json' }
   fetchPlugin?: object,
   // Image plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/image/
-  imagePlugin: boolean,
+  // Default: false
+  imagePlugin?: boolean,
   // Internationalization plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/i18n/
-  i18nPlugin: boolean,
+  // Default: false
+  i18nPlugin?: boolean,
+  // Publication paths based on 11ty file structure
+  dir?: {
+    // Directory for 11ty input files
+    // Silex will publish in /_silex/ in this directory
+    // E.g. content
+    // Default: ''
+    input?: string,
+    // Directory created in input directory for Silex files
+    // Default: _silex
+    silex?: string,
+    // Directory for the HTML pages relative to the input directory
+    // Silex will add HTML pages to this directory
+    // Default: ''
+    html?: string,
+    // Directory for the assets relative to the input directory
+    // Silex will add assets to this directory
+    // Default assets
+    assets?: string,
+    // Directory for the CSS files relative to the input directory
+    // Silex will add CSS files to this directory
+    // Default css
+    css?: string,
+  },
+  urls?: {
+    // URL where the CSS files will be accessible to the front end
+    // Default: css
+    css?: string,
+    // URL where the assets will be accessible to the front end
+    // Default: assets
+    assets?: string,
+  },
 }
 
-export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {
+export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}): ClientConfig {
   // Options with default
-  const opts = {
-    ...getZeroConfig(config) as DataSourceEditorOptions,
-    ...options,
-  } as EleventyPluginOptions
+  const opts = merge(
+    getZeroConfig(config) as EleventyPluginOptions,
+    options,
+  ) as EleventyPluginOptions
 
-  // Generate the liquid when the site is published
-  config.addPublicationTransformers({
-    renderComponent,
-  })
-
-  config.on('silex:startup:end', () => {
-    // Add plugins for collection pages
-    config.addPlugin([settings as Plugin, states as Plugin, DataSource as Plugin, filters as Plugin], opts)
-
-    // Generate 11ty data files
-    const editor = config.getEditor()
-    editor.on('silex:publish:data', data => transformFiles(editor as DataSourceEditor, opts, data))
+  // Add all the plugins
+  config.on('silex:grapesjs:end', () => {
+    // Wait for the editor to be ready
+    // Add the plugins can access editor.DataSourceManager
+    config.addPlugin([
+      DataSource as Plugin,
+      settings as Plugin,
+      states as Plugin,
+      filters as Plugin,
+      publication as Plugin,
+    ],
+    opts)
   })
 
   // Get the config for the data source plugin
@@ -46,19 +81,8 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
 
   // Merge the initial config with GrapesJs config
   // Returns the new config
-  return {
-    ...config,
-    grapesJsConfig: {
-      ...config.grapesJsConfig ?? {},
-      ...grapesJsConfig,
-      plugins: [
-        ...config.grapesJsConfig?.plugins ?? [],
-        ...grapesJsConfig.plugins,
-      ],
-      pluginsOpts: {
-        ...config.grapesJsConfig?.pluginsOpts ?? {},
-        ...grapesJsConfig.pluginsOpts,
-      },
-    },
-  }
+  return merge(
+    config,
+    { grapesJsConfig },
+  ) as ClientConfig
 }

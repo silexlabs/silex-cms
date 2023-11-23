@@ -3,10 +3,15 @@ import { EleventyPluginOptions } from '../client'
 import Backbone from 'backbone'
 
 export default function(config/*, opts: EleventyPluginOptions */): void {
-  const dm = config.getEditor().DataSourceManager
-  dm.add(new EleventyDataSource())
-  // FIXME: why do we have to call it twice?
-  dm.add(new EleventyDataSource())
+  config.on('silex:startup:end', () => {
+    const dm = config.getEditor().DataSourceManager
+    if(!dm) {
+      throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
+    }
+    dm.add(new EleventyDataSource())
+    // FIXME: why do we have to call it twice?
+    dm.add(new EleventyDataSource())
+  })
 }
 
 class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implements IDataSource {

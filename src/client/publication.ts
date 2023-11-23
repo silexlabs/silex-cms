@@ -1,10 +1,28 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, IDataSource, IDataSourceModel, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, IDataSourceModel, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
 import { echoBlock, getStateName, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
+import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { ClientSideFile } from '@silexlabs/silex/src/ts/types'
 // This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
+
+export default function(config: ClientConfig, options: EleventyPluginOptions) {
+  config.on('silex:startup:end', () => {
+    // Generate the liquid when the site is published
+    config.addPublicationTransformers({
+      renderComponent: (component, toHtml) => renderComponent(component, toHtml),
+      transformPermalink: (path, type) => transformPermalink(path, type, options),
+      transformPath: (path, type) => transformPath(path, type, options),
+      transformFile: (file) => transformFile(file),
+    })
+
+    // Generate 11ty data files
+    const editor = config.getEditor()
+    editor.on('silex:publish:data', data => transformFiles(editor as DataSourceEditor, options, data))
+  })
+}
 
 /**
  * Make html attribute
@@ -28,7 +46,7 @@ function makeStyle(key, value) {
  * Comes from silex but didn't manage to import
  * FIXME: expose this from silex
  */
-export function transformPath(editor: DataSourceEditor, path: string, type): string {
+function transformPaths(editor: DataSourceEditor, path: string, type): string {
   const config = editor.getModel().get('config')
   return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
@@ -40,6 +58,9 @@ export function transformPath(editor: DataSourceEditor, path: string, type): str
   }, path)
 }
 
+/**
+ * Transform the file name to be published
+ */
 function slugify(text) {
   return text.toString().toLowerCase()
     .replace(/\s+/g, '-') // Replace spaces with -
@@ -53,25 +74,23 @@ function slugify(text) {
  * Transform the files to be published
  * This hook is called just before the files are written to the file system
  */
-export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data): void {
+function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data): void {
   editor.Pages.getAll().forEach(page => {
-    // Add front matter to the page
+    // Add front matter to the HTML page
     const name = slugify(page.getName() || 'index')
-    const path = transformPath(editor, `/${name}.html`, 'html')
+    const path = transformPaths(editor, `/${name}.html`, 'html')
     const pageData = data.files.find(file => file.path === path)
     const settings = page.get('settings') as Record<string, string>
-    if(!settings) {
-      console.warn(`No settings for page ${page.getName() || 'index'}`)
-      return
-    }
+    // Permalink is either the one set in the page settings or the file name as a folder or index.html
+    const permalink = settings?.eleventyPermalink || (path.endsWith('index.html') ? '/index.html' : `/${ path.split('/').pop()?.replace(/\.html$/, '') }/`)
     const frontMatter = dedent`---
-      ${settings.eleventyPermalink ? `permalink: "${settings.eleventyPermalink}"` : ''}
-      ${settings.eleventyPageData ? `pagination:
+      permalink: ${ permalink }
+      ${settings?.eleventyPageData ? `pagination:
         data: ${settings.eleventyPageData}
         ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
         ${settings.eleventyPageReverse ? 'reverse: true' : ''}
       ` : ''}
-      ${settings.eleventyNavigationKey ? `eleventyNavigation:
+      ${settings?.eleventyNavigationKey ? `eleventyNavigation:
         key: ${settings.eleventyNavigationKey}
         ${settings.eleventyNavigationTitle ? `title: ${settings.eleventyNavigationTitle}` : ''}
         ${settings.eleventyNavigationOrder ? `order: ${settings.eleventyNavigationOrder}` : ''}
@@ -110,10 +129,10 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       }
     })
     if(Object.keys(query).length > 0) {
-      // There is a query in this page
+      // There is at least 1 query in this page
       data.files?.push({
         type: 'other',
-        path: transformPath(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'other'),
+        path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'html'),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
         content: getDataFile(editor, page, query, options),
       })
@@ -163,7 +182,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
     ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
     fetchOptions: {
       headers: {
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
         ${headersStr}
       },
       method: '${method}',
@@ -178,7 +197,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
 /**
  * Render the components when they are published
  */
-export function renderComponent(component: Component, toHtml: () => string): string | undefined {
+function renderComponent(component: Component, toHtml: () => string): string | undefined {
   const statesIds = getStateIds(component, false)
   const statesArr = statesIds
     .map(stateId => ({
@@ -227,5 +246,77 @@ export function renderComponent(component: Component, toHtml: () => string): str
     }
   } else {
     return toHtml()
+  }
+}
+
+function toPath(path: (string | undefined)[]) {
+  return '/' + path
+    .filter(p => !!p)
+    .map(p => p?.replace(/(^\/|\/$)/g, ''))
+    .join('/')
+}
+
+function transformPermalink(path: string, type: string, options: EleventyPluginOptions): string {
+  switch (type) {
+  case 'html':
+    return toPath([
+      path
+    ])
+  case 'asset':
+    return toPath([
+      options.urls?.assets,
+      path.replace(/^\/?assets\//, ''),
+    ])
+  case 'css': {
+    return toPath([
+      options.urls?.css,
+      path.replace(/^\/?css\//, ''),
+    ])
+  }
+  default:
+    console.warn('Unknown file type in transform permalink:', type)
+    return path
+  }
+}
+
+function transformPath(path: string, type: string, options: EleventyPluginOptions): string {
+  switch (type) {
+  case 'html':
+    return toPath([
+      options.dir?.input,
+      options.dir?.silex,
+      options.dir?.html,
+      path,
+    ])
+  case 'css':
+    return toPath([
+      options.dir?.input,
+      options.dir?.silex,
+      options.dir?.css,
+      path.replace(/^\/?css\//, ''),
+    ])
+  case 'asset':
+    return toPath([
+      options.dir?.input,
+      options.dir?.silex,
+      options.dir?.assets,
+      path.replace(/^\/?assets\//, ''),
+    ])
+  default:
+    console.warn('Unknown file type in transform path:', type)
+    return path
+  }
+}
+
+function transformFile(file: ClientSideFile/*, options: EleventyPluginOptions*/): ClientSideFile {
+  //const fileWithContent = file as ClientSideFileWithContent
+  switch (file.type) {
+  case 'html':
+  case 'css':
+  case 'asset':
+    return file
+  default:
+    console.warn('Unknown file type in transform file:', file.type)
+    return file
   }
 }

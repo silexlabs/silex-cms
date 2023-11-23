@@ -9,10 +9,10 @@ export function echoBlock(component: Component, expression: Expression): string 
   const statements = getLiquidBlock(component, expression)
   return `{% liquid
     ${
-      statements
-      .map(({variableName, liquid}) => liquid)
-      .join('\n\t')
-    }
+  statements
+    .map(({ liquid }) => liquid)
+    .join('\n\t')
+}
     echo ${ statements[statements.length - 1].variableName }
   %}`
 }
@@ -28,10 +28,10 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
   if(!persistantId) throw new Error('This component has no persistant ID')
   return `{% liquid
     ${
-      statements
-      .map(({variableName, liquid}) => liquid)
-      .join('\n\t')
-    }
+  statements
+    .map(({liquid}) => liquid)
+    .join('\n\t')
+}
     assign ${ getStateName(persistantId, stateId) } = ${ statements[statements.length - 1].variableName }
   %}`
 }
@@ -45,26 +45,31 @@ export function loopBlock(stateId: StateId, component: Component, expression: Ex
   const last = expression[expression.length - 1]
   // Check data to loop over
   switch(last.type) {
-    case 'property':
-      if(last.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${last.kind}`)
-      break
-    case 'state':
-      if(last.forceKind !== 'list') throw new Error(`Provided state needs to be a list in order to loop, not a ${last.forceKind}`)
-      break
-    case 'filter':
-      break
+  case 'property':
+    if (last.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${last.kind}`)
+    break
+  case 'state':
+    if (last.forceKind !== 'list') throw new Error(`Provided state needs to be a list in order to loop, not a ${last.forceKind}`)
+    break
+  case 'filter':
+    break
   }
   const statements = getLiquidBlock(component, expression)
   const loopDataVariableName = statements[statements.length - 1].variableName
+  const persistantId = getPersistantId(component)
+  if(!persistantId) {
+    console.error('Component', component, 'has no persistant ID. Persistant ID is required to get component states.')
+    throw new Error('This component has no persistant ID')
+  }
   return [`{% liquid
     ${
-      statements
-      .map(({variableName, liquid}) => liquid)
-      .join('\n\t')
-    }
+  statements
+    .map(({liquid}) => liquid)
+    .join('\n\t')
+}
     %}
-    {% for ${getStateName(getPersistantId(component), '__data')} in ${ loopDataVariableName } %}
-  `, `{% endfor %}`]
+    {% for ${getStateName(persistantId, '__data')} in ${ loopDataVariableName } %}
+  `, '{% endfor %}']
 }
 
 /**
@@ -78,13 +83,13 @@ export function ifBlock(component: Component, expression: Expression): [start: s
   const lastVariableName = statements[statements.length - 1].variableName
   return [`{% liquid
     ${
-      statements
-      .map(({variableName, liquid}) => liquid)
-      .join('\n\t')
-    }
+  statements
+    .map(({liquid}) => liquid)
+    .join('\n\t')
+}
     %}
     {% if ${ lastVariableName } %}
-  `, `{% endif %}`]
+  `, '{% endif %}']
 }
 
 let numNextVar = 0
@@ -94,10 +99,14 @@ let numNextVar = 0
 export function getLiquidBlock(component: Component, expression: Expression): { variableName: string, liquid: string }[] {
   if(expression.length === 0) return []
   const rest = [...expression]
-  const result = []
+  const result = [] as { variableName: string, liquid: string }[]
   const firstToken = expression[0]
+  let lastVariableName = ''
   if(firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
-  let lastVariableName = firstToken.type === 'property' ? firstToken.dataSourceId.toString() : ''
+  if(firstToken.type === 'property') {
+    if(!firstToken.dataSourceId) throw new Error(`Property ${firstToken.fieldId} has no data source ID`)
+    lastVariableName = firstToken.dataSourceId.toString()
+  }
   while(rest.length) {
     // Move all tokens until the first filter
     const firstFilterIndex = rest.findIndex(token => token.type === 'filter')
@@ -109,7 +118,10 @@ export function getLiquidBlock(component: Component, expression: Expression): { 
     //console.log({expression, variableExpression, filterExpression, firstFilterIndex, firstNonFilterIndex})
     const statement = getLiquidStatement(variableExpression.concat(filterExpression), variableName, lastVariableName)
     lastVariableName = variableName
-    result.push({variableName, liquid: statement})
+    result.push({
+      variableName,
+      liquid: statement,
+    })
   }
   return result
 }
@@ -157,19 +169,19 @@ export function getLiquidStatement(expression: Token[], variableName: string, la
 export function getLiquidStatementProperties(properties: (Property | State)[]): string {
   return properties.map((token, index) => {
     switch (token.type) {
-      case 'state': {
-        if (index !== 0) throw new Error('State can only be the first token in an expression')
-        return getStateName(token.componentId, token.storedStateId)
-      }
-      case 'property': {
-        return token.fieldId
-      }
-      default: {
-        throw new Error(`Only state or property can be used in an expression, got ${(token as Token).type}`)
-      }
+    case 'state': {
+      if (index !== 0) throw new Error('State can only be the first token in an expression')
+      return getStateName(token.componentId, token.storedStateId)
+    }
+    case 'property': {
+      return token.fieldId
+    }
+    default: {
+      throw new Error(`Only state or property can be used in an expression, got ${(token as Token).type}`)
+    }
     }
   })
-  .join('.')
+    .join('.')
 }
 
 export function getLiquidStatementFilters(filters: Filter[]): string {
@@ -178,5 +190,5 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
     const options = token.options ? Object.values(token.options) : []
     return `${token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
-  .join(' | ')
+    .join(' | ')
 }

@@ -30,7 +30,7 @@ Add as a dependency
 $ npm i --save @silexlabs/silex-plugin-11ty
 ```
 
-Add to Silex config (client or server)
+Add to Silex client config:
 
 ```js
 import plugin from '@silexlabs/silex-plugin-11ty'
@@ -48,16 +48,36 @@ export default function(config, options) {
         'Content-Type': 'application/json',
       },
     }],
-    // ... Other options from @silexlabs/grapesjs-data-source plugin
+    // ... Other options for @silexlabs/grapesjs-data-source plugin - see https://github.com/silexlabs/grapesjs-data-source
+    dir {
+      input: 'pages/',
+      css: 'css',
+    },
+    // ... Other options for @silexlabs/silex-plugin-11ty plugin - see below
   })
 }
 ```
 
 ## Options
 
+You can pass an object containing all options of [the GrapesJs DataSource plugin](https://github.com/silexlabs/grapesjs-data-source)
+
+Here are additional options specific to this plugin:
+
 |Option|Description|Default|
 |-|-|-
-|`dataSources`|List of GraphQL APIs|`[]`|
+|`fetchPlugin`|Options to pass to [11ty fetch plugin](https://www.11ty.dev/docs/plugins/fetch/)|`{ duration: '1d', type: 'json' }`|
+|`imagePlugin`|Enable filters which assume that your eleventy site has the [11ty image plugin installed](https://www.11ty.dev/docs/plugins/image/)|`false`|
+|`i18nPlugin`|Enable filters which assume that your eleventy site has the [11ty i18n plugin installed](https://www.11ty.dev/docs/plugins/i18n/)|`false`|
+|`dir`|An object with options to define 11ty directory structure|`{}`|
+|`dir.input`|Directory for 11ty input files, Silex will publish your site in this folder|`` (empty string)|
+|`dir.silex`|Directory for Silex files, Silex will publish your site in this folder. This is relative to the `input` directory|`silex`|
+|`dir.html`|Directory for HTML files, Silex will generate HTML files (your site pages) in this folder. This is relative to the `silex` directory|`` (empty string)|
+|`dir.assets`|Directory for assets files, Silex will copy your assets (images, css, js, ...) to this folder when you publish your site. This is relative to the `silex` directory|`assets`|
+|`dir.css`|Directory for CSS files, Silex will generate CSS files to this folder when you publish your site. This is relative to the `assets` directory|`css`|
+|`urls`|An object with options to define your site urls|`{}`|
+|`urls.css`|Url of the folder containing the CSS files, Silex will use this to generate links to the CSS files.|`css`|
+|`urls.assets`|Url of the folder containing the assets files, Silex will use this to generate links to the assets files.|`assets`|
 
 ## Development
 

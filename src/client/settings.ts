@@ -1,26 +1,27 @@
 import { html } from 'lit-html'
 
 export default function(config/*, opts: EleventyPluginOptions */): void {
-  config.addSettings({
-    id: 'eleventy',
-    label: 'Eleventy',
-    render: (settings) => {
-      const queryables = config.getEditor().DataSourceManager.getDataTree().getAllQueryables()
-      const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
-      setTimeout(() => {
-        // Update the settings form when the selection changed without recreating the form
-        Array.from(document.querySelectorAll('#settings-eleventy input'))
-          .forEach((input: HTMLInputElement) => {
-            switch(input.type) {
-            case 'checkbox':
-              input.checked = !!settings[input.name]
-              break
-            default:
-              input.value = settings[input.name] ?? ''
-            }
-          })
-      })
-      return html`
+  config.on('silex:startup:end', () => {
+    config.addSettings({
+      id: 'eleventy',
+      label: 'Eleventy',
+      render: (settings) => {
+        const queryables = config.getEditor().DataSourceManager.getDataTree().getAllQueryables()
+        const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
+        setTimeout(() => {
+          // Update the settings form when the selection changed without recreating the form
+          (document.querySelectorAll('#settings-eleventy input') as NodeListOf<HTMLInputElement>)
+            .forEach((input: HTMLInputElement) => {
+              switch (input.type) {
+              case 'checkbox':
+                input.checked = !!settings[input.name]
+                break
+              default:
+                input.value = settings[input.name] ?? ''
+              }
+            })
+        })
+        return html`
     <style>
       form.silex-form input[type="checkbox"] {
         width: 20px;
@@ -92,6 +93,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
       </div>
     </div>
     `
-    }
-  }, 'page')
+      }
+    }, 'page')
+  })
 }

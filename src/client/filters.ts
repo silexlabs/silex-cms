@@ -2,14 +2,19 @@ import { Field, Filter, Options } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 
 export default function(config, opts: EleventyPluginOptions): void {
-  const dm = config.getEditor().DataSourceManager
-  const initialFilters = dm.filters
-  if(opts.imagePlugin) {
-    dm.filters = [...initialFilters, ...imageFilters]
-  }
-  if(opts.i18nPlugin) {
-    dm.filters = [...initialFilters, ...i18nFilters]
-  }
+  config.on('silex:startup:end', () => {
+    const dm = config.getEditor().DataSourceManager
+    if(!dm) {
+      throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
+    }
+    const initialFilters = dm.filters
+    if (opts.imagePlugin) {
+      dm.filters = [...initialFilters, ...imageFilters]
+    }
+    if (opts.i18nPlugin) {
+      dm.filters = [...initialFilters, ...i18nFilters]
+    }
+  })
 }
 
 const imageFilters: Filter[] = [{

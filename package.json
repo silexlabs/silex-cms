@@ -47,7 +47,8 @@
   },
   "dependencies": {
     "@silexlabs/grapesjs-data-source": "^0.0.24",
-    "dedent": "^1.5.1"
+    "dedent": "^1.5.1",
+    "deepmerge": "^4.3.1"
   },
   "author": "lexoyo",
   "license": "MIT",
