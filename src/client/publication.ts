@@ -152,9 +152,11 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
     console.info('not graphql', dataSource)
     return ''
   }
-  const url = dataSource.get('url')
-  const method = dataSource.get('method')
-  const headers = dataSource.has('headers') ? Object.entries(dataSource.get('headers')).map(([key, value]) => `'${key}': '${value}'`).join('\n') : ''
+  const s2s = dataSource.get('serverToServer')
+  const url = s2s ? s2s.url : dataSource.get('url')
+  const method = s2s ? s2s.method : dataSource.get('method')
+  const headers = s2s ? s2s.headers : dataSource.get('headers')
+  const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': '${value}'`).join('\n') : ''
   return `
   result['${dataSource.id}'] = (await EleventyFetch('${url}', {
     type: 'json',
@@ -162,7 +164,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
     fetchOptions: {
       headers: {
         'content-type': 'application/json',
-        ${headers}
+        ${headersStr}
       },
       method: '${method}',
       body: JSON.stringify({
