@@ -9,6 +9,9 @@ import DataSource from './client/DataSource'
 import filters from './client/filters'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
+  // 11ty fetch plugin options
+  // https://www.11ty.dev/docs/plugins/fetch/
+  fetchPlugin?: object,
   // Image plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/image/
   imagePlugin: boolean,

@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, IDataSource, IDataSourceModel, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
 import { echoBlock, getStateName, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -115,7 +115,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         type: 'other',
         path: transformPath(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'other'),
         //path: `/${page.getName() || 'index'}.11tydata.js`,
-        content: getDataFile(editor, page, query),
+        content: getDataFile(editor, page, query, options),
       })
     }
   })
@@ -124,11 +124,11 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
 /**
  * Generate the data file for a given page
  */
-function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>): string {
+function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>, options: EleventyPluginOptions): string {
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
     if (dataSource) {
-      return queryToDataFile(dataSource, queryStr)
+      return queryToDataFile(dataSource, queryStr, options)
     } else {
       console.error('No data source for id', dataSourceId)
       throw new Error(`No data source for id ${dataSourceId}`)
@@ -147,7 +147,7 @@ module.exports = async function () {
 /**
  * Generate the fetch call for a given page
  */
-function queryToDataFile(dataSource, queryStr) {
+function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -157,8 +157,8 @@ function queryToDataFile(dataSource, queryStr) {
   const headers = dataSource.has('headers') ? Object.entries(dataSource.get('headers')).map(([key, value]) => `'${key}': '${value}'`).join('\n') : ''
   return `
   result['${dataSource.id}'] = (await EleventyFetch('${url}', {
-    duration: '2s',
     type: 'json',
+    ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
     fetchOptions: {
       headers: {
         'content-type': 'application/json',
