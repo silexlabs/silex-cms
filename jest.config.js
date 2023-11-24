@@ -5,7 +5,8 @@
 
 module.exports = {
   transform: {
-    '.*\\.ts': 'ts-jest'
+    '.*\\.ts': ['ts-jest', { tsconfig: 'tsconfig.client.json' }]
   },
   testMatch: ['**/*.test.ts'],
+  testEnvironment: 'jsdom',
 }
