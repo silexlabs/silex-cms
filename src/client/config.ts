@@ -54,7 +54,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     // Default publication paths
     dir: {
       input: '',
-      silex: '_silex',
+      silex: '',
       assets: 'assets',
       css: 'css',
     },
