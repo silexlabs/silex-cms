@@ -58,6 +58,8 @@ export default function(config, options) {
 }
 ```
 
+Let's assume you called you config file `silex-config.js` then start Silex with `npx @silexlabs/silex --client-config=silex-config.js`
+
 ## Options
 
 You can pass an object containing all options of [the GrapesJs DataSource plugin](https://github.com/silexlabs/grapesjs-data-source)
