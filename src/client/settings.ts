@@ -1,5 +1,9 @@
 import { html } from 'lit-html'
+//import { createRef } from 'lit/directives/ref.js'
+//import { StepsSelector } from '@silexlabs/steps-selector'
+//import { renderExpression } from '@silexlabs/grapesjs-data-source'
 
+//const pageDataInputRef = createRef<StepsSelector>()
 export default function(config/*, opts: EleventyPluginOptions */): void {
   config.on('silex:startup:end', () => {
     config.addSettings({
@@ -21,6 +25,10 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
               }
             })
         })
+        // Create the selector for the page data
+        // const page = config.getEditor().Pages.getSelected()
+        // const body = page.getMainComponent()
+        // const pageDataInput = renderExpression(body, config.getEditor().DataSourceManager.dataTree, 'xxxx', 'Page data', true, pageDataInputRef)
         return html`
     <style>
       form.silex-form input[type="checkbox"] {
