@@ -37,7 +37,7 @@ Add to Silex client config:
 import Eleventy from './js/silex-plugin-11ty/client.js'
 
 export default function(config, options) {
-  config.addPlugin(plugin, {
+  config.addPlugin(Eleventy, {
     dataSources: [{
       id: 'countries',
       type: 'graphql',
@@ -79,7 +79,7 @@ module.exports = function(config, options) {
 Then start Silex with
 
 ```sh
-npx @silexlabs/silex --client-config=silex-client.js --server-config=`pwd`silex-server.js
+npx @silexlabs/silex --client-config=silex-client.js --server-config=`pwd`/silex-server.js
 ```
 
 ## Options
