@@ -33,9 +33,9 @@ $ npm i --save @silexlabs/silex-plugin-11ty
 Add to Silex client config:
 
 ```js
-import plugin from '@silexlabs/silex-plugin-11ty'
-// Or import YourPlugin from '../path/to/silex-plugin-11ty'
-// Or import YourPlugin from 'http://unpkg.com/silex-plugin-11ty'
+// silex-client.js
+import Eleventy from './js/silex-plugin-11ty/client.js'
+
 export default function(config, options) {
   config.addPlugin(plugin, {
     dataSources: [{
@@ -57,8 +57,30 @@ export default function(config, options) {
   })
 }
 ```
+And expose the plugin to the front end:
 
-Let's assume you called you config file `silex-config.js` then start Silex with `npx @silexlabs/silex --client-config=silex-config.js`
+```js
+// silex-server.js
+const StaticPlugin = require('@silexlabs/silex/dist/plugins/server/plugins/server/StaticPlugin').default
+const node_modules = require('node_modules-path')
+console.log('node_modules', node_modules('@silexlabs/silex-plugin-11ty'))
+module.exports = function(config, options) {
+  config.addPlugin(StaticPlugin, {
+    routes: [
+      {
+        route: '/js/silex-plugin-11ty/',
+        path: node_modules('@silexlabs/silex-plugin-11ty') + '/@silexlabs/silex-plugin-11ty/dist/',
+      },
+    ],
+  })
+}
+```
+
+Then start Silex with
+
+```sh
+npx @silexlabs/silex --client-config=silex-client.js --server-config=`pwd`silex-server.js
+```
 
 ## Options
 
