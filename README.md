@@ -49,7 +49,7 @@ export default function(config, options) {
       },
     }],
     // ... Other options for @silexlabs/grapesjs-data-source plugin - see https://github.com/silexlabs/grapesjs-data-source
-    dir {
+    dir: {
       input: 'pages/',
       css: 'css',
     },

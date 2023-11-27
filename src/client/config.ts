@@ -49,8 +49,8 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
       duration: '0s',
       type: 'json',
     },
-    imagePlugin: false,
-    i18nPlugin: false,
+    imagePlugin: true,
+    i18nPlugin: true,
     // Default publication paths
     dir: {
       input: '',

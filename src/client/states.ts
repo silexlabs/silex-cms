@@ -3,7 +3,6 @@ import { removeState, setState } from '@silexlabs/grapesjs-data-source'
 export default function(config/*, opts: EleventyPluginOptions */): void {
   config.on('silex:startup:end', () => {
     config.getEditor().on('page:select page:update', () => {
-      console.log('page:select page:update')
       const page = config.getEditor().Pages.getSelected()
       const body = page.getMainComponent()
       const settings = page.get('settings') as Record<string, string>

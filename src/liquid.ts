@@ -1,4 +1,4 @@
-import { Expression, Filter, Property, State, StateId, Token, getPersistantId } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 
 /**
@@ -32,7 +32,7 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
     .map(({liquid}) => liquid)
     .join('\n\t')
 }
-    assign ${ getStateName(persistantId, stateId) } = ${ statements[statements.length - 1].variableName }
+    assign ${ getStateVariableName(persistantId, stateId) } = ${ statements[statements.length - 1].variableName }
   %}`
 }
 
@@ -68,7 +68,7 @@ export function loopBlock(stateId: StateId, component: Component, expression: Ex
     .join('\n\t')
 }
     %}
-    {% for ${getStateName(persistantId, '__data')} in ${ loopDataVariableName } %}
+    {% for ${getStateVariableName(persistantId, '__data')} in ${ loopDataVariableName } %}
   `, '{% endfor %}']
 }
 
@@ -98,15 +98,14 @@ let numNextVar = 0
  */
 export function getLiquidBlock(component: Component, expression: Expression): { variableName: string, liquid: string }[] {
   if(expression.length === 0) return []
-  const rest = [...expression]
   const result = [] as { variableName: string, liquid: string }[]
   const firstToken = expression[0]
   let lastVariableName = ''
   if(firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
   if(firstToken.type === 'property') {
-    if(!firstToken.dataSourceId) throw new Error(`Property ${firstToken.fieldId} has no data source ID`)
-    lastVariableName = firstToken.dataSourceId.toString()
+    lastVariableName = firstToken.dataSourceId as string || ''
   }
+  const rest = [...expression]
   while(rest.length) {
     // Move all tokens until the first filter
     const firstFilterIndex = rest.findIndex(token => token.type === 'filter')
@@ -115,7 +114,6 @@ export function getLiquidBlock(component: Component, expression: Expression): { 
     const firstNonFilterIndex = rest.findIndex(token => token.type !== 'filter')
     const filterExpression = firstNonFilterIndex === -1 ? rest.splice(0) : rest.splice(0, firstNonFilterIndex)
     const variableName = getNextVariableName(component, numNextVar++)
-    //console.log({expression, variableExpression, filterExpression, firstFilterIndex, firstNonFilterIndex})
     const statement = getLiquidStatement(variableExpression.concat(filterExpression), variableName, lastVariableName)
     lastVariableName = variableName
     result.push({
@@ -130,10 +128,6 @@ export function getNextVariableName(component: Component, numNextVar: number): s
   return `var_${component.ccid}_${numNextVar}`
 }
 
-export function getStateName(componentId: string, stateId: StateId): string {
-  return `state_${ componentId }_${ stateId }`
-}
-
 /**
  * Get the liquid assign statement for the expression
  * The expression must
@@ -143,7 +137,7 @@ export function getStateName(componentId: string, stateId: StateId): string {
  * 
  * Example of return value: `countries.continent.countries | first.name`
  */
-export function getLiquidStatement(expression: Token[], variableName: string, lastVariableName: string = ''): string {
+export function getLiquidStatement(expression: Expression, variableName: string, lastVariableName: string = ''): string {
   if(expression.length === 0) throw new Error('Expression cannot be empty')
   // Split expression in 2: properties and filters
   const firstFilterIndex = expression.findIndex(token => token.type === 'filter')
@@ -171,9 +165,12 @@ export function getLiquidStatementProperties(properties: (Property | State)[]): 
     switch (token.type) {
     case 'state': {
       if (index !== 0) throw new Error('State can only be the first token in an expression')
-      return getStateName(token.componentId, token.storedStateId)
+      return getStateVariableName(token.componentId, token.storedStateId)
     }
     case 'property': {
+      if(token.fieldId === FIXED_TOKEN_ID) {
+        return `"${token.options?.value ?? ''}"`
+      }
       return token.fieldId
     }
     default: {

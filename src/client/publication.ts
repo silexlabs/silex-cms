@@ -1,18 +1,27 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, IDataSourceModel, StoredState, getPersistantId, getState, getStateIds } from '@silexlabs/grapesjs-data-source'
-import { echoBlock, getStateName, ifBlock, loopBlock } from '../liquid'
+import { DataSourceEditor, IDataSourceModel, StateId, Token, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { echoBlock, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { ClientSideFile } from '@silexlabs/silex/src/ts/types'
 // This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
 
+/**
+ * A state with the real tokens instead of the stored tokens
+ */
+interface RealState {
+  stateId: StateId,
+  label?: string,
+  tokens: Token[]
+}
+
 export default function(config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
-      renderComponent: (component, toHtml) => renderComponent(component, toHtml),
+      renderComponent: (component, toHtml) => renderComponent(config, component, toHtml),
       transformPermalink: (path, type) => transformPermalink(path, type, options),
       transformPath: (path, type) => transformPath(path, type, options),
       transformFile: (file) => transformFile(file),
@@ -108,9 +117,9 @@ function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions
       const bodyId = getPersistantId(body)
       if (bodyId) {
         bodyStatesLiquid = dedent`
-          {% assign ${getStateName(bodyId, 'pagination')} = pagination %}
-          {% assign ${getStateName(bodyId, 'items')} = pagination.items %}
-          {% assign ${getStateName(bodyId, 'pages')} = pagination.pages %}
+          {% assign ${getStateVariableName(bodyId, 'pagination')} = pagination %}
+          {% assign ${getStateVariableName(bodyId, 'items')} = pagination.items %}
+          {% assign ${getStateVariableName(bodyId, 'pages')} = pagination.pages %}
         `
       } else {
         console.error('body has no persistant ID => do not add liquid for 11ty data')
@@ -197,7 +206,8 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
 /**
  * Render the components when they are published
  */
-function renderComponent(component: Component, toHtml: () => string): string | undefined {
+function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
+  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
   const statesIds = getStateIds(component, false)
   const statesArr = statesIds
     .map(stateId => ({
@@ -209,33 +219,65 @@ function renderComponent(component: Component, toHtml: () => string): string | u
       state: getState(component, stateId, true),
     })))
     .filter(({ state }) => state.expression.length > 0)
+    // From expression of stored tokens to tokens (with methods not only data)
+    .map(({ stateId, state }) => ({
+      stateId,
+      label: state.label,
+      tokens: state.expression.map(token => dataTree.fromStored(token)),
+    }))
   // Convenience key value object
   const statesObj = statesArr
-    .reduce((final, { stateId, state }) => ({
+    .reduce((final, { stateId, label, tokens }) => ({
       ...final,
-      [stateId]: state,
-    }), {} as Record<string, StoredState>)
+      [stateId]: {
+        stateId,
+        label,
+        tokens,
+      },
+    }), {} as Record<StateId, RealState>)
 
   if (statesArr.length) {
     const tagName = component.get('tagName')
     if (tagName) {
-      const className = component.getClasses().join(' ')
-        + (statesObj.className && statesObj.className?.expression.length ? ` ${echoBlock(component, statesObj.className.expression)}` : '')
+      const hasSrc = !!statesObj.src?.tokens.length
+      const hasHref = !!statesObj.href?.tokens.length
+      const hasTitle = !!statesObj.title?.tokens.length
+      const hasAlt = !!statesObj.alt?.tokens.length
+      const hasStyle = !!statesObj.style?.tokens.length
+      const hasClassName = !!statesObj.className?.tokens.length
+      const hasInnerHtml = !!statesObj.innerHTML?.tokens.length
+      const hasCondition = !!statesObj.condition?.tokens.length
+      const hasData = !!statesObj.__data?.tokens.length
+
       // Initial attributes
-      const attributes = Object.entries(component.get('attributes') as object).map(([key, value]) => makeAttribute(key, value)).join(' ')
-        // Attributes from attributes state
-        + (statesObj.attributes && statesObj.attributes?.expression.length ? ` ${echoBlock(component, statesObj.attributes.expression)}` : '')
+      const originalAttributes = component.get('attributes') as Record<string, string>
+      hasSrc && delete originalAttributes.src
+      hasHref && delete originalAttributes.href
+      hasTitle && delete originalAttributes.title
+      hasAlt && delete originalAttributes.alt
+
+      // New attributes
+      const attributes = Object.entries(originalAttributes)
+        .map(([key, value]) => makeAttribute(key, value)).join(' ')
         // SRC state
-        + (statesObj.src && statesObj.src?.expression.length ? ` src="${echoBlock(component, statesObj.src.expression)}"` : '')
+        + (hasSrc ? ` src="${echoBlock(component, statesObj.src.tokens)}"` : '')
         // HREF state
-        + (statesObj.href && statesObj.href?.expression.length ? ` href="${echoBlock(component, statesObj.href.expression)}"` : '')
+        + (hasHref ? ` href="${echoBlock(component, statesObj.href.tokens)}"` : '')
         // Title state
-        + (statesObj.title && statesObj.title?.expression.length ? ` title="${echoBlock(component, statesObj.title.expression)}"` : '')
+        + (hasTitle ? ` title="${echoBlock(component, statesObj.title.tokens)}"` : '')
+        // Alt state
+        + (hasAlt ? ` alt="${echoBlock(component, statesObj.alt.tokens)}"` : '')
+
+      // Class names
+      const className = component.getClasses().join(' ')
+        + (hasClassName ? ` ${echoBlock(component, statesObj.className.tokens)}` : '')
+
+      // Style attribute
       const style = Object.entries(component.getStyle()).map(([key, value]) => makeStyle(key, value)).join(' ')
-        + (statesObj.style && statesObj.style?.expression.length ? ` ${echoBlock(component, statesObj.style.expression)}` : '')
-      const innerHtml = statesObj.innerHTML && statesObj.innerHTML?.expression.length ? echoBlock(component, statesObj.innerHTML.expression) : toHtml()
-      const [ifStart, ifEnd] = statesObj.condition?.expression.length ? ifBlock(component, statesObj.condition.expression) : []
-      const [forStart, forEnd] = statesObj.__data?.expression.length ? loopBlock('__data', component, statesObj.__data.expression) : []
+        + (hasStyle ? ` ${echoBlock(component, statesObj.style.tokens)}` : '')
+      const innerHtml = hasInnerHtml ? echoBlock(component, statesObj.innerHTML.tokens) : component.getInnerHTML()
+      const [ifStart, ifEnd] = hasCondition ? ifBlock(component, statesObj.condition.tokens) : []
+      const [forStart, forEnd] = hasData ? loopBlock('__data', component, statesObj.__data.tokens) : []
       const before = (ifStart ?? '') + (forStart ?? '')
       const after = (ifEnd ?? '') + (forEnd ?? '')
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`

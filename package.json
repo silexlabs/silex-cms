@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "silex --client-config ./dist/client.js --server-config `pwd`/dist/server.js",
-    "dev": "SILEX_CLIENT_CONFIG=./dist/client.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3000 SILEX_DEBUG=true nodemon `node_modules @silexlabs/silex`/@silexlabs/silex",
+    "dev": "SILEX_CLIENT_CONFIG=./dist/client.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3000 SILEX_DEBUG=true SILEX_FS_ROOT=/tmp/test SILEX_FS_HOSTING_ROOT=/tmp/test nodemon `node_modules @silexlabs/silex`/@silexlabs/silex",
     "build": "$npm_execpath run build:client && $npm_execpath run build:server",
     "build:watch": "nodemon -e ts,js --watch src -x \"$npm_execpath run build\"",
     "build:client": "rollup -c rollup.client.config.mjs",
@@ -47,7 +47,7 @@
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.26",
+    "@silexlabs/grapesjs-data-source": "^0.0.27",
     "dedent": "^1.5.1",
     "deepmerge": "^4.3.1"
   },
