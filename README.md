@@ -1,22 +1,24 @@
-# Eleventy Visual Designer
+# Silex CMS
 
-Eleventy Visual Designer is a Silex plugin that simplifies the creation of Eleventy layouts. It provides a visual interface to design pages while seamlessly integrating GraphQL data, allowing for a streamlined, code-free development process
+This is a Silex plugin to make Eleventy layouts visually with integration of any GraphQL API, allowing for a streamlined, code-free development process
 
 Links
 
 * [Eleventy / 11ty](https://11ty.dev)
 * [Silex free/libre website builder](https://www.silex.me)
+* [Discussion about this plugin](https://community.silex.me/d/26-work-in-progress-dynamic-websites/24)
+* [Issue with ideas and links to compatible CMSs](https://github.com/silexlabs/Silex/issues/1478)
 
 Features
 
-1. Visual design interface for Eleventy layouts
-1. Integration with GraphQL APIs for visula design on real data
-1. Expression builders for content, visibility conditions and loops
-1. Live preview of data-driven designs
-1. Automatic generation of Eleventy-specific data files and front matter
-1. Support for localization and internationalization
-1. Customizable SEO settings for collection pages
-1. Mock data capabilities for offline design testing
+* [x] Visual design interface for Eleventy layouts
+* [x] Integration with GraphQL APIs for visula design on real data
+* [x] Expression builders for content, visibility conditions and loops
+* [x] Automatic generation of Eleventy-specific data files and front matter
+* [x] Support for localization and internationalization
+* [ ] Live preview of data-driven designs
+* [ ] Customizable SEO settings for collection pages
+* [ ] Mock data capabilities for offline design testing
 
 > **Add a gif or a live demo of your plugin here**
 

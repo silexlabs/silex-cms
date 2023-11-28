@@ -30,6 +30,10 @@ export default function(config, opts: EleventyPluginOptions): void {
     optionsForm: (input: Field | null, options: Options) => {
       return `
         <form>
+          <details>
+            <summary>Help</summary>
+            Check <a href="https://www.11ty.dev/docs/plugins/image/" target="_blank">11ty's docs about image plugin</a> for more information.
+          </details>
           <label>Alt (select a custom state)
             <select name="alt">
               ${
