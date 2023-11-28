@@ -4,6 +4,8 @@ This is a Silex plugin to make Eleventy layouts visually with integration of any
 
 Links
 
+* [User docs](https://docs.silex.me/en/user/cms)
+* [Developer docs](https://docs.silex.me/en/dev/cms)
 * [Eleventy / 11ty](https://11ty.dev)
 * [Silex free/libre website builder](https://www.silex.me)
 * [Discussion about this plugin](https://community.silex.me/d/26-work-in-progress-dynamic-websites/24)
@@ -82,6 +84,52 @@ Then start Silex with
 
 ```sh
 npx @silexlabs/silex --client-config=silex-client.js --server-config=`pwd`/silex-server.js
+```
+
+### 11ty configuration
+
+Install required 11ty packages:
+
+```sh
+$ npm install  @11ty/eleventy @11ty/eleventy-fetch @11ty/eleventy-img
+```
+
+You need to add a `.eleventy.js` file to your project, with the following content:
+
+```js
+const { EleventyI18nPlugin } = require("@11ty/eleventy");
+const Image = require("@11ty/eleventy-img");
+  
+module.exports = function(eleventyConfig) {
+  // Serve CSS along with the site
+  eleventyConfig.addPassthroughCopy({"silex/hosting/css/*.css": "css"});
+
+  // For the fetch plugin
+  eleventyConfig.watchIgnores.add('**/.cache/**')
+
+  // i18n plugin
+  eleventyConfig.addPlugin(EleventyI18nPlugin, {
+    // any valid BCP 47-compatible language tag is supported
+    defaultLanguage: "en", 
+  });
+
+  // Image plugin
+  eleventyConfig.addShortcode("image", async function(src, alt, sizes) {
+    let metadata = await Image(src, {
+      widths: [300, 600],
+      formats: ["avif", "jpeg"]
+    });
+    let imageAttributes = {
+      alt,
+      sizes,
+      loading: "lazy",
+      decoding: "async",
+    };
+
+    // You bet we throw an error on a missing alt (alt="" works okay)
+    return Image.generateHTML(metadata, imageAttributes);
+  });
+};
 ```
 
 ## Options
