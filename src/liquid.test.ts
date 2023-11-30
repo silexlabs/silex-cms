@@ -1,7 +1,7 @@
 /*
  * @jest-environment jsdom
  */
-import { Filter, Property, State, getOrCreatePersistantId, DataTree } from "@silexlabs/grapesjs-data-source"
+import { Filter, Property, State, getOrCreatePersistantId, DataTree, Field } from "@silexlabs/grapesjs-data-source"
 import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidStatementProperties, ifBlock, loopBlock } from "./liquid"
 import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from "./liquid.mock"
 import grapesjs from "grapesjs"
@@ -173,7 +173,15 @@ test('assign block', () => {
 
 test('loop block', () => {
   const editor = grapesjs.init({headless: true})
-  const dataTree = {} as DataTree
+  const dataTree = {
+    getExpressionResultType: jest.fn(() => ({
+      id: 'test field id',
+      label: 'test field label',
+      typeIds: ['test type id'],
+      dataSourceId: 'test data source id',
+      kind: 'list',
+    } as Field)),
+  } as any as DataTree
   const component = editor.addComponents('test')[0]
   getOrCreatePersistantId(component)
   const { expression } = expressionList
