@@ -8,6 +8,7 @@ import states from './client/states'
 import DataSource from './client/DataSource'
 import filters from './client/filters'
 import merge from 'deepmerge'
+import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // 11ty fetch plugin options
@@ -53,6 +54,20 @@ export interface EleventyPluginOptions extends DataSourceEditorOptions {
     // Default: assets
     assets?: string,
   },
+}
+
+export interface Silex11tyPluginWebsiteSettings extends WebsiteSettings {
+  eleventyPageData?: string,
+  eleventyPermalink?: string,
+  eleventyPageSize?: number,
+  eleventyPageReverse?: boolean,
+  silexLanguagesList?: string,
+  silexLanguagesDefault?: string,
+  eleventyNavigationKey?: string,
+  eleventyNavigationTitle?: string,
+  eleventyNavigationOrder?: number,
+  eleventyNavigationParent?: string,
+  eleventyNavigationUrl?: string,
 }
 
 export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}): ClientConfig {

@@ -1,4 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, Field } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 
 /**
@@ -40,20 +40,12 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
  * Generate liquid instructions which start and end a loop over the provided expression
  * This is used for components states
  */
-export function loopBlock(stateId: StateId, component: Component, expression: Expression): [start: string, end: string] {
+export function loopBlock(dataTree: DataTree, component: Component, expression: Expression): [start: string, end: string] {
   if(expression.length === 0) throw new Error('Expression is empty')
-  const last = expression[expression.length - 1]
   // Check data to loop over
-  switch(last.type) {
-  case 'property':
-    if (last.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${last.kind}`)
-    break
-  case 'state':
-    if (last.forceKind !== 'list') throw new Error(`Provided state needs to be a list in order to loop, not a ${last.forceKind}`)
-    break
-  case 'filter':
-    break
-  }
+  const field = dataTree.getExpressionResultType(expression, component)
+  if (!field) throw new Error(`Expression ${expression.map(token => token.label).join(' -> ')} is invalid`)
+  if (field.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${field.kind}`)
   const statements = getLiquidBlock(component, expression)
   const loopDataVariableName = statements[statements.length - 1].variableName
   const persistantId = getPersistantId(component)

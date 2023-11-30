@@ -2,11 +2,28 @@ import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
 import { DataSourceEditor, IDataSourceModel, StateId, Token, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { echoBlock, ifBlock, loopBlock } from '../liquid'
-import { EleventyPluginOptions } from '../client'
+import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { ClientSideFile } from '@silexlabs/silex/src/ts/types'
-// This breaks the unit tests in the github action only: import { ClientSideFileType, PublicationData } from '@silexlabs/silex/src/ts/types'
+//import { ClientSideFile, ClientSideFileType, ClientSideFileWithContent, PublicationData } from '@silexlabs/silex/src/ts/types'
+
+// FIXME: should be imported from silex
+type ClientSideFile = {
+  path: string,
+  type: string,
+}
+type ClientSideFileWithContent = ClientSideFile & {
+  content: string,
+}
+type PublicationData = {
+  files?: ClientSideFile[],
+}
+enum ClientSideFileType {
+  HTML = 'html',
+  CSS = 'css',
+  ASSET = 'asset',
+  OTHER = 'other',
+}
 
 /**
  * A state with the real tokens instead of the stored tokens
@@ -24,7 +41,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
       renderComponent: (component, toHtml) => renderComponent(config, component, toHtml),
       transformPermalink: (path, type) => transformPermalink(path, type, options),
       transformPath: (path, type) => transformPath(path, type, options),
-      transformFile: (file) => transformFile(file),
+      //transformFile: (file) => transformFile(file),
     })
 
     // Generate 11ty data files
@@ -79,55 +96,87 @@ function slugify(text) {
     .replace(/-+$/, '') // Trim - from end of text
 }
 
+export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: string): string | null {
+  const isCollectionPage = !!settings.eleventyPageData
+  const permalink = settings.eleventyPermalink
+  const isHome = slug === 'index'
+  // User provided a permalink explicitely
+  if (permalink) {
+    return permalink
+  } else if(isCollectionPage) {
+    // Let 11ty handle the permalink
+    return null
+  } else if (isHome) {
+    // Normal home page
+    return '/index.html'
+  } else {
+    // Use the page name
+    return `/${slug}/index.html`
+  }
+}
+
+/**
+ * Get the front matter for a given page
+ */
+export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, lang: string = ''): string {
+  const permalink = getPermalink(settings, slug)
+  return dedent`---
+    ${settings?.eleventyPageData ? `pagination:
+      data: ${settings.eleventyPageData}
+      ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
+      ${settings.eleventyPageReverse ? 'reverse: true' : ''}
+    ` : ''}
+    ${permalink ? `permalink: ${permalink}` : ''}
+    ${lang ? `lang: ${lang}` : ''}
+    ${settings?.eleventyNavigationKey ? `eleventyNavigation:
+      key: ${settings.eleventyNavigationKey}
+      ${settings.eleventyNavigationTitle ? `title: ${settings.eleventyNavigationTitle}` : ''}
+      ${settings.eleventyNavigationOrder ? `order: ${settings.eleventyNavigationOrder}` : ''}
+      ${settings.eleventyNavigationParent ? `parent: ${settings.eleventyNavigationParent}` : ''}
+      ${settings.eleventyNavigationUrl ? `url: ${settings.eleventyNavigationUrl}` : ''}
+    ` : ''}
+  `
+    // Prettify
+    .split('\n')
+    .filter(line => line.trim().length > 0)
+    .concat(['', '---', ''])
+    .join('\n')
+}
+
+/**
+ * Get the body states for a given page
+ */
+export function getBodyStates(page: Page): string {
+  // Render the body states
+  const body = page.getMainComponent()
+  const pagination = getState(body, 'pagination', true)
+  if (pagination?.expression.length > 0) {
+    //const block = getLiquidBlock(body, pagination.expression)
+    const bodyId = getPersistantId(body)
+    if (bodyId) {
+      return dedent`
+        {% assign ${getStateVariableName(bodyId, 'pagination')} = pagination %}
+        {% assign ${getStateVariableName(bodyId, 'items')} = pagination.items %}
+        {% assign ${getStateVariableName(bodyId, 'pages')} = pagination.pages %}
+      `
+    } else {
+      console.error('body has no persistant ID => do not add liquid for 11ty data')
+    }
+  }
+  return ''
+}
+
 /**
  * Transform the files to be published
  * This hook is called just before the files are written to the file system
+ * Exported for unit tests
  */
-function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data): void {
+export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
   editor.Pages.getAll().forEach(page => {
-    // Add front matter to the HTML page
-    const name = slugify(page.getName() || 'index')
-    const path = transformPaths(editor, `/${name}.html`, 'html')
-    const pageData = data.files.find(file => file.path === path)
-    const settings = page.get('settings') as Record<string, string>
-    // Permalink is either the one set in the page settings or the file name as a folder or index.html
-    const permalink = settings?.eleventyPermalink || (path.endsWith('index.html') ? '/index.html' : `/${ path.split('/').pop()?.replace(/\.html$/, '') }/`)
-    const frontMatter = dedent`---
-      permalink: ${ permalink }
-      ${settings?.eleventyPageData ? `pagination:
-        data: ${settings.eleventyPageData}
-        ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
-        ${settings.eleventyPageReverse ? 'reverse: true' : ''}
-      ` : ''}
-      ${settings?.eleventyNavigationKey ? `eleventyNavigation:
-        key: ${settings.eleventyNavigationKey}
-        ${settings.eleventyNavigationTitle ? `title: ${settings.eleventyNavigationTitle}` : ''}
-        ${settings.eleventyNavigationOrder ? `order: ${settings.eleventyNavigationOrder}` : ''}
-        ${settings.eleventyNavigationParent ? `parent: ${settings.eleventyNavigationParent}` : ''}
-        ${settings.eleventyNavigationUrl ? `url: ${settings.eleventyNavigationUrl}` : ''}
-      ` : ''}
-      ---\n
-    `
-    // Render the body states
-    const body = page.getMainComponent()
-    const pagination = getState(body, 'pagination', true)
-    let bodyStatesLiquid = ''
-    if (pagination?.expression.length > 0) {
-      //const block = getLiquidBlock(body, pagination.expression)
-      const bodyId = getPersistantId(body)
-      if (bodyId) {
-        bodyStatesLiquid = dedent`
-          {% assign ${getStateVariableName(bodyId, 'pagination')} = pagination %}
-          {% assign ${getStateVariableName(bodyId, 'items')} = pagination.items %}
-          {% assign ${getStateVariableName(bodyId, 'pages')} = pagination.pages %}
-        `
-      } else {
-        console.error('body has no persistant ID => do not add liquid for 11ty data')
-      }
-    }
-    
-    // Render the HTML
-    pageData.content = frontMatter + bodyStatesLiquid + pageData.content
+    // Get the page properties
+    const slug = slugify(page.getName() || 'index')
+    const settings = page.get('settings') as Silex11tyPluginWebsiteSettings ?? {}
+    const languages = settings.silexLanguagesList?.split(',').map(lang => lang.trim()).filter(lang => !!lang)
 
     // Create the data file for this page
     const query = editor.DataSourceManager.getPageQuery(page)
@@ -137,14 +186,62 @@ function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions
         delete query[key]
       }
     })
-    if(Object.keys(query).length > 0) {
-      // There is at least 1 query in this page
-      data.files?.push({
-        type: 'other',
-        path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'html'),
-        //path: `/${page.getName() || 'index'}.11tydata.js`,
-        content: getDataFile(editor, page, query, options),
+
+    // Find the page in the published data
+    if(!data.files) throw new Error('No files in publication data')
+    const path = transformPaths(editor, `/${slug}.html`, 'html')
+    const pageData = data.files.find(file => file.path === path) as ClientSideFileWithContent | undefined
+    if(!pageData) throw new Error(`No file for path ${path}`)
+    if(pageData.type !== ClientSideFileType.HTML) throw new Error(`File for path ${path} is not HTML`)
+    const dataFile = Object.keys(query).length > 0 ? {
+      type: ClientSideFileType.OTHER,
+      path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'html'),
+      //path: `/${page.getName() || 'index'}.11tydata.js`,
+      content: getDataFile(editor, page, query, options),
+    } : null
+
+    if(languages && languages.length > 0) {
+      const pages: ClientSideFileWithContent[] = languages.flatMap(lang => {
+        // Change the HTML
+        const frontMatter = getFrontMatter(settings, slug, lang)
+        const bodyStates = getBodyStates(page)
+        const pageFile = {
+          type: ClientSideFileType.HTML,
+          path: path.replace(/\.html$/, `-${lang}.html`),
+          content: frontMatter + bodyStates + pageData.content,
+        }
+
+        // Create the data file for this page
+        if (dataFile) {
+          return [pageFile, {
+            ...dataFile,
+            path: dataFile.path.replace(/\.11tydata\.js$/, `-${lang}.11tydata.js`),
+          }] // It is important to keep pageFile first, see bellow
+        }
+        return pageFile
       })
+
+      // Update the existing page
+      const [existingPage, ...newPages] = pages
+      pageData.content = existingPage.content
+      pageData.path = existingPage.path
+
+      // Add the other pages
+      data.files.push(...newPages)
+    } else {
+      // Change the HTML
+      const frontMatter = getFrontMatter(settings, slug)
+      const bodyStates = getBodyStates(page)
+
+      // Update the page before it is published
+      const content = frontMatter + bodyStates + pageData.content
+      pageData.content = content
+
+      // Add the data file
+      if (dataFile) {
+        // There is at least 1 query in this page
+        data.files.push(dataFile)
+      }
     }
   })
 }
@@ -277,7 +374,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         + (hasStyle ? ` ${echoBlock(component, statesObj.style.tokens)}` : '')
       const innerHtml = hasInnerHtml ? echoBlock(component, statesObj.innerHTML.tokens) : component.getInnerHTML()
       const [ifStart, ifEnd] = hasCondition ? ifBlock(component, statesObj.condition.tokens) : []
-      const [forStart, forEnd] = hasData ? loopBlock('__data', component, statesObj.__data.tokens) : []
+      const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
       const before = (ifStart ?? '') + (forStart ?? '')
       const after = (ifEnd ?? '') + (forEnd ?? '')
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`
@@ -350,15 +447,15 @@ function transformPath(path: string, type: string, options: EleventyPluginOption
   }
 }
 
-function transformFile(file: ClientSideFile/*, options: EleventyPluginOptions*/): ClientSideFile {
-  //const fileWithContent = file as ClientSideFileWithContent
-  switch (file.type) {
-  case 'html':
-  case 'css':
-  case 'asset':
-    return file
-  default:
-    console.warn('Unknown file type in transform file:', file.type)
-    return file
-  }
-}
+//function transformFile(file: ClientSideFile/*, options: EleventyPluginOptions*/): ClientSideFile {
+//  //const fileWithContent = file as ClientSideFileWithContent
+//  switch (file.type) {
+//  case 'html':
+//  case 'css':
+//  case 'asset':
+//    return file
+//  default:
+//    console.warn('Unknown file type in transform file:', file.type)
+//    return file
+//  }
+//}

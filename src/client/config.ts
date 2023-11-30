@@ -39,7 +39,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     dataSources: [{
       id: 'countries',
       type: 'graphql',
-      label: 'Countries',
+      label: 'Countries API',
       url: 'https://countries.trevorblades.com/graphql',
       method: 'POST',
       headers: {},

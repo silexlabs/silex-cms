@@ -1,16 +1,19 @@
+import { DataSourceEditor } from '@silexlabs/grapesjs-data-source'
+import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { html } from 'lit-html'
+import { Silex11tyPluginWebsiteSettings } from '../client'
 //import { createRef } from 'lit/directives/ref.js'
 //import { StepsSelector } from '@silexlabs/steps-selector'
 //import { renderExpression } from '@silexlabs/grapesjs-data-source'
 
 //const pageDataInputRef = createRef<StepsSelector>()
-export default function(config/*, opts: EleventyPluginOptions */): void {
+export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
   config.on('silex:startup:end', () => {
     config.addSettings({
       id: 'eleventy',
       label: 'Eleventy',
-      render: (settings) => {
-        const queryables = config.getEditor().DataSourceManager.getDataTree().getAllQueryables()
+      render: (settings: Silex11tyPluginWebsiteSettings) => {
+        const queryables = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree().getAllQueryables()
         const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
         setTimeout(() => {
           // Update the settings form when the selection changed without recreating the form
@@ -77,6 +80,15 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
           </label>
           <label class="silex-form__element">Permalink
             <input type="text" name="eleventyPermalink" .value=${settings.eleventyPermalink ?? ''}/>
+          </label>
+          <label class="silex-form__element">Available languages
+            <p class="silex-help">Silex can duplicate this page for each language and generate a different URL for each language.</p>
+            <p class="silex-help">Provide a comma separated list of languages. For example: <code>en,fr</code>. An empty value will deactivate this feature.</p>
+            <input type="text" name="silexLanguagesList" .value=${settings.silexLanguagesList ?? ''}/>
+          </label>
+          <label class="silex-form__element">Default language
+            <p class="silex-help">If set, this language will be omitted from the URL. For example: <code>en</code> means that the english version of the page will be available at <code>/page.html</code> and the french version at <code>/fr/page.html</code></p>
+            <input type="text" name="silexLanguagesDefault" .value=${settings.silexLanguagesDefault ?? ''}/>
           </label>
         </label>
         <label class="silex-form__element">

@@ -9,7 +9,7 @@ export default {
     format: 'es',
     sourcemap: true,
   },
-  external: ['@silexlabs/silex', 'grapesjs'],
+  //external: ['@silexlabs/silex', 'grapesjs'],
   plugins: [
     typescript({
       tsconfig: 'tsconfig.client.json',

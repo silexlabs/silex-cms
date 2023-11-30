@@ -89,16 +89,16 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
         kind: 'object',
         dataSourceId: 'eleventy',
       }, {
-        id: 'pages',
-        label: 'Pages',
-        typeIds: ['page'],
-        kind: 'list',
-        dataSourceId: 'eleventy',
-      }, {
         id: 'pageNumber',
         label: 'Page number',
         typeIds: ['number'],
         kind: 'scalar',
+        dataSourceId: 'eleventy',
+      }, {
+        id: 'pages',
+        label: 'Pages',
+        typeIds: ['page'],
+        kind: 'list',
         dataSourceId: 'eleventy',
       }],
     }, {
@@ -214,18 +214,18 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
       typeIds: ['page'],
       kind: 'object',
       dataSourceId: 'eleventy',
-    }, {
-      id: 'eleventy',
-      label: 'Eleventy',
-      typeIds: ['eleventy'],
-      kind: 'object',
-      dataSourceId: 'eleventy',
-    }, {
-      id: 'env',
-      label: 'Env',
-      typeIds: ['env'],
-      kind: 'object',
-      dataSourceId: 'eleventy',
+    //}, {
+    //  id: 'eleventy',
+    //  label: 'Eleventy',
+    //  typeIds: ['eleventy'],
+    //  kind: 'object',
+    //  dataSourceId: 'eleventy',
+    //}, {
+    //  id: 'env',
+    //  label: 'Env',
+    //  typeIds: ['env'],
+    //  kind: 'object',
+    //  dataSourceId: 'eleventy',
     }]
   }
 }
