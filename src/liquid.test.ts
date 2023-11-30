@@ -6,7 +6,7 @@ import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidSt
 import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from "./liquid.mock"
 import grapesjs from "grapesjs"
 
-import {expect, test} from '@jest/globals'
+import {expect, jest, test} from '@jest/globals'
 
 test('get liquid statements for properties', () => {
   const { expression } = simpleExpression
