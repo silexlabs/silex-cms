@@ -41,7 +41,7 @@
     "typescript": "^5.3.2"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.131",
+    "@silexlabs/silex": "^3.0.0-alpha.134",
     "@silexlabs/steps-selector": "^0.0.5",
     "grapesjs": "^0.21.7",
     "lit-html": "3.0.2"
