@@ -153,27 +153,31 @@ Here are additional options specific to this plugin:
 |`urls.css`|Url of the folder containing the CSS files, Silex will use this to generate links to the CSS files.|`css`|
 |`urls.assets`|Url of the folder containing the assets files, Silex will use this to generate links to the assets files.|`assets`|
 
-## Development
-
-Notes about states
-
-Read only states
-
-* Not visible in the properties panel
-* Visible in completion of expressions
+## Dev notes
 
 Hidden states
 
 * States with hidden property set to true
 * Not rendered in the HTML page as liquid
-* Read only
+* Not visible in the properties panel
+* Visible in completion of expressions
 
-public and private states
 
-* Public = states which you get with getState(id, true)
-* Private = states which you get with getState(id, false)
-* Private states are read only
-* Private states are not rendered in the HTML page as liquid
+Public states
+
+* In the UI they are represented by a list in the properties panel "states" section
+* In the HTML page they are rendered as "assign" liquid blocks before the element
+* You get these states with getState(id, true)
+* They are typically properties custom states the user need to create expressions, e.g. to use in the append filter
+
+Private states
+
+* In the UI they are represented in the properties panel as element's properties
+* In the HTML page they are rendered as liquid blocks in place of the element, for loops, echo, if, etc.
+* You get these states with getState(id, false)
+* They are typically properties of the element, like "innerHTML", "src", "href", etc.
+
+## Development
 
 Clone the repository
 
