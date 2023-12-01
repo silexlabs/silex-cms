@@ -155,6 +155,26 @@ Here are additional options specific to this plugin:
 
 ## Development
 
+Notes about states
+
+Read only states
+
+* Not visible in the properties panel
+* Visible in completion of expressions
+
+Hidden states
+
+* States with hidden property set to true
+* Not rendered in the HTML page as liquid
+* Read only
+
+public and private states
+
+* Public = states which you get with getState(id, true)
+* Private = states which you get with getState(id, false)
+* Private states are read only
+* Private states are not rendered in the HTML page as liquid
+
 Clone the repository
 
 ```sh

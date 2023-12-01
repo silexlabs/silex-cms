@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, IDataSourceModel, StateId, Token, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
-import { echoBlock, ifBlock, loopBlock } from '../liquid'
+import { DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { assignBlock, echoBlock, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
@@ -301,20 +301,12 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
 }
 
 /**
- * Render the components when they are published
+ * Make stored states into real states
+ * Filter out hidden states and empty expressions
  */
-function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
-  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
-  const statesIds = getStateIds(component, false)
-  const statesArr = statesIds
-    .map(stateId => ({
-      stateId,
-      state: getState(component, stateId, false),
-    }))
-    .concat(getStateIds(component, true).map(stateId => ({
-      stateId,
-      state: getState(component, stateId, true),
-    })))
+function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: StoredState}[]): {stateId: StateId, label: string | undefined, tokens: State[]}[] {
+  return states
+    .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
     // From expression of stored tokens to tokens (with methods not only data)
     .map(({ stateId, state }) => ({
@@ -322,6 +314,28 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       label: state.label,
       tokens: state.expression.map(token => dataTree.fromStored(token)),
     }))
+}
+
+/**
+ * Render the components when they are published
+ */
+function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
+  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
+
+  const statesPrivate = getRealStates(dataTree, getStateIds(component, false)
+    .map(stateId => ({
+      stateId,
+      state: getState(component, stateId, false),
+    })))
+
+  const statesPublic = getRealStates(dataTree, getStateIds(component, true)
+    .map(stateId => ({
+      stateId,
+      state: getState(component, stateId, true),
+    })))
+
+  const statesArr = statesPrivate.concat(statesPublic)
+
   // Convenience key value object
   const statesObj = statesArr
     .reduce((final, { stateId, label, tokens }) => ({
@@ -375,7 +389,8 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const innerHtml = hasInnerHtml ? echoBlock(component, statesObj.innerHTML.tokens) : component.getInnerHTML()
       const [ifStart, ifEnd] = hasCondition ? ifBlock(component, statesObj.condition.tokens) : []
       const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
-      const before = (ifStart ?? '') + (forStart ?? '')
+      const states = statesPublic.map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
+      const before = (states ?? '') + (ifStart ?? '') + (forStart ?? '')
       const after = (ifEnd ?? '') + (forEnd ?? '')
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
