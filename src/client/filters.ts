@@ -1,5 +1,6 @@
 import { Field, Filter, Options, State, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
+import { html } from 'lit-html'
 
 export default function(config, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
@@ -28,7 +29,7 @@ export default function(config, opts: EleventyPluginOptions): void {
       widths: '',
     },
     optionsForm: (input: Field | null, options: Options) => {
-      return `
+      return html`
         <form>
           <details>
             <summary>Help</summary>

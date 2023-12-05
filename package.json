@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "silex --client-config ./dist/client.js --server-config `pwd`/dist/server.js",
-    "dev": "SILEX_CLIENT_CONFIG=./dist/client.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3000 SILEX_DEBUG=true SILEX_FS_ROOT=/tmp/silex/storage SILEX_FS_HOSTING_ROOT=/tmp/silex/hosting nodemon `node_modules @silexlabs/silex`/@silexlabs/silex",
+    "dev": "SILEX_CLIENT_CONFIG=./client-test.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3000 SILEX_DEBUG=true SILEX_FS_ROOT=/tmp/silex/storage SILEX_FS_HOSTING_ROOT=/tmp/silex/hosting nodemon `node_modules @silexlabs/silex`/@silexlabs/silex",
     "build": "$npm_execpath run build:client && $npm_execpath run build:server",
     "build:watch": "nodemon -e ts,js --watch src -x \"$npm_execpath run build\"",
     "build:client": "rollup -c rollup.client.config.mjs",
@@ -27,13 +27,13 @@
     "@rollup/plugin-eslint": "^9.0.5",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "eslint": "^8.55.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "node_modules-path": "^2.0.7",
-    "nodemon": "^3.0.1",
+    "nodemon": "^3.0.2",
     "rollup": "^4.6.1",
     "rollup-plugin-tslint": "^0.2.2",
     "ts-jest": "^29.1.1",
@@ -47,7 +47,7 @@
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.29",
+    "@silexlabs/grapesjs-data-source": "^0.0.30",
     "dedent": "^1.5.1",
     "deepmerge": "^4.3.1"
   },

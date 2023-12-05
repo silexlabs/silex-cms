@@ -70,34 +70,38 @@ export interface Silex11tyPluginWebsiteSettings extends WebsiteSettings {
   eleventyNavigationUrl?: string,
 }
 
-export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}): ClientConfig {
+export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {
   // Options with default
   const opts = merge(
     getZeroConfig(config) as EleventyPluginOptions,
     options,
+    { arrayMerge: (_, sourceArray) => sourceArray }, // Do not merge arrays by concatenation, just replace if present
   ) as EleventyPluginOptions
 
-  // Add all the plugins
-  config.on('silex:grapesjs:end', () => {
-    // Wait for the editor to be ready
-    // Add the plugins can access editor.DataSourceManager
-    config.addPlugin([
-      DataSource as Plugin,
-      settings as Plugin,
-      states as Plugin,
-      filters as Plugin,
-      publication as Plugin,
-    ],
-    opts)
-  })
+  // Wait for the editor to be ready
+  // Add the plugins can access editor.DataSourceManager
+  config.addPlugin([
+    DataSource as Plugin,
+    settings as Plugin,
+    states as Plugin,
+    filters as Plugin,
+    publication as Plugin,
+  ], opts)
 
   // Get the config for the data source plugin
   const grapesJsConfig = optionsToGrapesJsConfig(opts)
 
   // Merge the initial config with GrapesJs config
   // Returns the new config
-  return merge(
-    config,
-    { grapesJsConfig },
-  ) as ClientConfig
+  config.grapesJsConfig = grapesJsConfig
+  //config.grapesJsConfig = {
+  //  ...config.grapesJsConfig,
+  //  ...grapesJsConfig,
+  //  plugins: [
+  //    ...config.grapesJsConfig.plugins ?? [],
+  //    ...grapesJsConfig.plugins,
+  //  ],
+  //} as EditorConfig
+
+  return config
 }

@@ -7,6 +7,9 @@ module.exports = (config) => {
       {
         route: '/client.js.map',
         path: __dirname + '/../dist/client.js.map',
+      }, {
+        route: '/client.js',
+        path: __dirname + '/../dist/client.js',
       },
     ],
   })
