@@ -42,12 +42,12 @@
   },
   "peerDependencies": {
     "@silexlabs/silex": "^3.0.0-alpha.134",
-    "@silexlabs/steps-selector": "^0.0.5",
+    "@silexlabs/steps-selector": "^0.0.7",
     "grapesjs": "^0.21.7",
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.30",
+    "@silexlabs/grapesjs-data-source": "^0.0.31",
     "dedent": "^1.5.1",
     "deepmerge": "^4.3.1"
   },
