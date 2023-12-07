@@ -286,7 +286,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
     console.warn('11ty plugin for Silex: no content-type in headers of the graphql query. I will set it to application/json for you. To avoid this warning, add a header with key "content-type" and value "application/json" in silex config.')
     headers['content-type'] = 'application/json'
   }
-  const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': '${value}',`).join('\n') : ''
+  const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
   return `
   result['${dataSource.id}'] = (await EleventyFetch(\`${url}\`, {
     type: 'json',
