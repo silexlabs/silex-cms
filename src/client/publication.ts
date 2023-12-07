@@ -126,7 +126,7 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
       ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
       ${settings.eleventyPageReverse ? 'reverse: true' : ''}
     ` : ''}
-    ${permalink ? `permalink: ${permalink}` : ''}
+    ${permalink ? `permalink: "${permalink}"` : ''}
     ${lang ? `lang: ${lang}` : ''}
     ${settings?.eleventyNavigationKey ? `eleventyNavigation:
       key: ${settings.eleventyNavigationKey}
