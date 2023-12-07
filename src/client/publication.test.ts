@@ -19,7 +19,7 @@ test('Front matter of a simple page', () => {
   expect(() => getFrontMatter({}, 'page-1')).not.toThrow()
   expect(getFrontMatter({}, 'page-1')).toEqual(dedent`
   ---
-  permalink: /page-1/index.html
+  permalink: "/page-1/index.html"
   \n---\n`)
 })
 
@@ -47,7 +47,7 @@ test('Permalink', () => {
   ---
   pagination:
     data: ${eleventyPageData}
-  permalink: ${eleventyPermalink}
+  permalink: "${eleventyPermalink}"
   \n---\n`)
 })
 
