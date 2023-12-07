@@ -16,8 +16,8 @@ import { getFrontMatter } from './publication'
 //})
 
 test('Front matter of a simple page', () => {
-  expect(() => getFrontMatter({}, 'page-1')).not.toThrow()
-  expect(getFrontMatter({}, 'page-1')).toEqual(dedent`
+  expect(() => getFrontMatter({}, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter({}, 'page-1', '')).toEqual(dedent`
   ---
   permalink: "/page-1/index.html"
   \n---\n`)
@@ -27,11 +27,12 @@ test('Front matter of a collection page', () => {
   const settings = {
     eleventyPageData: 'directus.posts',
   }
-  expect(() => getFrontMatter(settings, 'page-1')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1')).toEqual(dedent`
+  expect(() => getFrontMatter(settings, 'page-1', 'collectionTest')).not.toThrow()
+  expect(getFrontMatter(settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
     data: directus.posts
+  collection: "collectionTest"
   \n---\n`)
 })
 
@@ -42,8 +43,8 @@ test('Permalink', () => {
     eleventyPageData,
     eleventyPermalink,
   }
-  expect(() => getFrontMatter(settings, 'page-1')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1')).toEqual(dedent`
+  expect(() => getFrontMatter(settings, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter(settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
     data: ${eleventyPageData}
@@ -57,11 +58,11 @@ test('With languages', () => {
     silexLanguagesList: 'fr,en',
     silexLanguagesDefault: 'en',
   }
-  expect(() => getFrontMatter(settings, 'page-1', 'fr')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', 'fr')).toEqual(dedent`
+  expect(() => getFrontMatter(settings, 'page-1', '', 'fr')).not.toThrow()
+  expect(getFrontMatter(settings, 'page-1', '', 'fr')).toEqual(dedent`
   ---
   pagination:
     data: directus.posts
-  lang: fr
+  lang: "fr"
   \n---\n`)
 })

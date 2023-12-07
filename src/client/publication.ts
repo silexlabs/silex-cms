@@ -118,7 +118,7 @@ export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: str
 /**
  * Get the front matter for a given page
  */
-export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, lang: string = ''): string {
+export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, collection, lang = ''): string {
   const permalink = getPermalink(settings, slug)
   return dedent`---
     ${settings?.eleventyPageData ? `pagination:
@@ -127,7 +127,8 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
       ${settings.eleventyPageReverse ? 'reverse: true' : ''}
     ` : ''}
     ${permalink ? `permalink: "${permalink}"` : ''}
-    ${lang ? `lang: ${lang}` : ''}
+    ${lang ? `lang: "${lang}"` : ''}
+    ${collection ? `collection: "${collection}"` : ''}
     ${settings?.eleventyNavigationKey ? `eleventyNavigation:
       key: ${settings.eleventyNavigationKey}
       ${settings.eleventyNavigationTitle ? `title: ${settings.eleventyNavigationTitle}` : ''}
@@ -203,7 +204,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     if(languages && languages.length > 0) {
       const pages: ClientSideFileWithContent[] = languages.flatMap(lang => {
         // Change the HTML
-        const frontMatter = getFrontMatter(settings, slug, lang)
+        const frontMatter = getFrontMatter(settings, slug, page.getName(), lang)
         const bodyStates = getBodyStates(page)
         const pageFile = {
           type: ClientSideFileType.HTML,
@@ -230,7 +231,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       data.files.push(...newPages)
     } else {
       // Change the HTML
-      const frontMatter = getFrontMatter(settings, slug)
+      const frontMatter = getFrontMatter(settings, slug, page.getName())
       const bodyStates = getBodyStates(page)
 
       // Update the page before it is published
