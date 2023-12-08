@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, UnariOperator, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -362,7 +362,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const hasStyle = !!statesObj.style?.tokens.length
       const hasClassName = !!statesObj.className?.tokens.length
       const hasInnerHtml = !!statesObj.innerHTML?.tokens.length
-      const hasCondition = !!statesObj.condition?.tokens.length
+      const hasCondition = !!statesObj.condition1?.tokens.length
       const hasData = !!statesObj.__data?.tokens.length
 
       // Initial attributes
@@ -392,7 +392,16 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const style = Object.entries(component.getStyle()).map(([key, value]) => makeStyle(key, value)).join(' ')
         + (hasStyle ? ` ${echoBlock(component, statesObj.style.tokens)}` : '')
       const innerHtml = hasInnerHtml ? echoBlock(component, statesObj.innerHTML.tokens) : component.getInnerHTML()
-      const [ifStart, ifEnd] = hasCondition ? ifBlock(component, statesObj.condition.tokens) : []
+      const operator = component.get('conditionOperator') ?? UnariOperator.TRUTHY
+      const binary = operator && Object.values(BinariOperator).includes(operator)
+      const [ifStart, ifEnd] = hasCondition ? ifBlock(component, binary ? {
+        expression: statesObj.condition1.tokens,
+        expression2: statesObj.condition2.tokens,
+        operator,
+      } : {
+        expression: statesObj.condition1.tokens,
+        operator,
+      }) : []
       const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
       const states = statesPublic.map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
       const before = (states ?? '') + (ifStart ?? '') + (forStart ?? '')

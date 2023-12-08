@@ -1,5 +1,19 @@
 import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree } from '@silexlabs/grapesjs-data-source'
+import { BinariOperator, UnariOperator } from '@silexlabs/grapesjs-data-source/src/types'
 import { Component } from 'grapesjs'
+
+export interface BinaryCondition {
+  operator: BinariOperator,
+  expression: Expression,
+  expression2: Expression,
+}
+
+export interface UnaryCondition {
+  operator: UnariOperator,
+  expression: Expression,
+}
+
+export type Condition = BinaryCondition | UnaryCondition
 
 /**
  * Generate liquid instructions which echo the value of an expression
@@ -68,11 +82,30 @@ export function loopBlock(dataTree: DataTree, component: Component, expression: 
  * Generate liquid instructions which define a variable for later use
  * This is used for components states
  */
-export function ifBlock(component: Component, expression: Expression): [start: string, end: string] {
-  if(expression.length === 0) throw new Error('Expression is empty')
-  // Check data to loop over
-  const statements = getLiquidBlock(component, expression)
+export function ifBlock(component: Component, condition: Condition): [start: string, end: string] {
+  // Check the first expression
+  if(condition.expression.length === 0) throw new Error('If block expression is empty')
+
+  // Check the operator
+  const unary = Object.values(UnariOperator).includes(condition.operator as UnariOperator) ? condition as UnaryCondition : null
+  const binary = Object.values(BinariOperator).includes(condition.operator as BinariOperator) ? condition as BinaryCondition : null
+  if(!unary && !binary) throw new Error(`If block operator is invalid: ${condition.operator}`)
+
+  // Check the second expression
+  if(binary && binary.expression2.length === 0) throw new Error('If block second expression is empty')
+
+  // Get liquid for the first expression
+  const statements = getLiquidBlock(component, condition.expression)
   const lastVariableName = statements[statements.length - 1].variableName
+
+  // Get liquid for the second 
+  let lastVariableName2 = ''
+  if(binary) {
+    statements.push(...getLiquidBlock(component, binary.expression2))
+    lastVariableName2 = statements[statements.length - 1].variableName
+  }
+
+  // Get liquid for the whole if block
   return [`{% liquid
     ${
   statements
@@ -80,8 +113,28 @@ export function ifBlock(component: Component, expression: Expression): [start: s
     .join('\n\t')
 }
     %}
-    {% if ${ lastVariableName } %}
+    {% if ${ unary ? getUnaryOp(lastVariableName, unary.operator) : getBinaryOp(lastVariableName, lastVariableName2, binary!.operator) } %}
   `, '{% endif %}']
+}
+
+function getUnaryOp(variableName: string, operator: UnariOperator): string {
+  switch(operator) {
+  case UnariOperator.TRUTHY: return `${variableName} and ${variableName} != blank and ${variableName} != empty`
+  case UnariOperator.FALSY: return `not ${variableName}`
+  case UnariOperator.EMPTY_ARR: return `${variableName}.size == 0`
+  case UnariOperator.NOT_EMPTY_ARR: return `${variableName}.size > 0`
+  }
+}
+
+function getBinaryOp(variableName: string, variableName2: string, operator: BinariOperator): string {
+  switch(operator) {
+  case BinariOperator.EQUAL: return `${variableName} == ${variableName2}`
+  case BinariOperator.NOT_EQUAL: return `${variableName} != ${variableName2}`
+  case BinariOperator.GREATER_THAN: return `${variableName} > ${variableName2}`
+  case BinariOperator.LESS_THAN: return `${variableName} < ${variableName2}`
+  case BinariOperator.GREATER_THAN_OR_EQUAL: return `${variableName} >= ${variableName2}`
+  case BinariOperator.LESS_THAN_OR_EQUAL: return `${variableName} <= ${variableName2}`
+  }
 }
 
 let numNextVar = 0
