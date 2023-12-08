@@ -283,7 +283,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
   // Check that the content-type is set
-  if(headers && !headers['content-type']) {
+  if(headers && !Object.keys(headers).find(key => key.toLowerCase() === 'content-type')) {
     console.warn('11ty plugin for Silex: no content-type in headers of the graphql query. I will set it to application/json for you. To avoid this warning, add a header with key "content-type" and value "application/json" in silex config.')
     headers['content-type'] = 'application/json'
   }
