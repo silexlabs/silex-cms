@@ -1,13 +1,12 @@
 /*
  * @jest-environment jsdom
  */
-import { Filter, Property, State, getOrCreatePersistantId, DataTree, Field, UnariOperator } from '@silexlabs/grapesjs-data-source'
+import { Filter, Property, State, getOrCreatePersistantId, DataTree, Field, UnariOperator, BinariOperator } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidStatementProperties, ifBlock, loopBlock } from './liquid'
 import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from './liquid.mock'
 import grapesjs from 'grapesjs'
 
 import { expect, jest, test } from '@jest/globals'
-import { BinariOperator } from '@silexlabs/grapesjs-data-source/src/types'
 
 test('get liquid statements for properties', () => {
   const { expression } = simpleExpression
