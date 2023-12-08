@@ -289,19 +289,24 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   }
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
   return `
-  result['${dataSource.id}'] = (await EleventyFetch(\`${url}\`, {
-    type: 'json',
-    ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
-    fetchOptions: {
-      headers: {
-        ${headersStr}
-      },
-      method: '${method}',
-      body: JSON.stringify({
-        query: \`${queryStr}\`,
-      })
-    }
-  })).data
+  try {
+    result['${dataSource.id}'] = (await EleventyFetch(\`${url}\`, {
+      type: 'json',
+      ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
+      fetchOptions: {
+        headers: {
+          ${headersStr}
+        },
+        method: '${method}',
+        body: JSON.stringify({
+          query: \`${queryStr}\`,
+        })
+      }
+    })).data
+  } catch (e) {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${url}', '${method}', '${queryStr}')
+    throw e
+  }
 `
 }
 
