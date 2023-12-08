@@ -1,5 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree } from '@silexlabs/grapesjs-data-source'
-import { BinariOperator, UnariOperator } from '@silexlabs/grapesjs-data-source/src/types'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 
 export interface BinaryCondition {
