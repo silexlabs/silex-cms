@@ -6,7 +6,7 @@ export default function (config, options = {}) {
     ...options,
     dataSources: [
       {
-        id: 'countries api ID',
+        id: 'countries_api',
         type: 'graphql',
         label: 'Countries API',
         url: 'https://countries.trevorblades.com/graphql',
