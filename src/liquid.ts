@@ -146,8 +146,8 @@ export function getLiquidBlock(component: Component, expression: Expression): { 
   const firstToken = expression[0]
   let lastVariableName = ''
   if(firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
-  if(firstToken.type === 'property') {
-    lastVariableName = firstToken.dataSourceId as string || ''
+  if(firstToken.type === 'property' && firstToken.dataSourceId && firstToken.dataSourceId !== 'eleventy') {
+    lastVariableName = firstToken.dataSourceId as string
   }
   const rest = [...expression]
   while(rest.length) {
