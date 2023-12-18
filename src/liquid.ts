@@ -228,8 +228,68 @@ export function getLiquidStatementProperties(properties: (Property | State)[]): 
 export function getLiquidStatementFilters(filters: Filter[]): string {
   if(!filters.length) return ''
   return ' | ' + filters.map(token => {
-    const options = token.options ? Object.values(token.options) : []
+    const options = token.options ? Object.values(token.options).map(option => handleFilterOption(option as string)) : []
     return `${token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
     .join(' | ')
+}
+
+function isExpression(json: unknown): boolean {
+  if(!Array.isArray(json)) return false
+  return json.every(token => {
+    if(typeof token !== 'object') return false
+    if(!token.type) return false
+    switch(token.type) {
+    case 'property': {
+      if(!token.fieldId) return false
+      if(token.fieldId === FIXED_TOKEN_ID) {
+        if(!token.options?.value) return false
+      }
+      break
+    }
+    case 'state': {
+      if(!token.componentId) return false
+      if(!token.storedStateId) return false
+      break
+    }
+    case 'filter': {
+      if(!token.id) return false
+      break
+    }
+    }
+    return true
+  })
+
+}
+
+function handleFilterOption(option: string): string {
+  let json = null
+  try {
+    json = JSON.parse(option)
+  } catch(e) {
+    // Ignore
+  }
+  if(json) {
+    if(isExpression(json)) {
+      const expression = json as Expression
+      return expression.map(token => {
+        switch(token.type) {
+        case 'property': {
+          if(token.fieldId === FIXED_TOKEN_ID) {
+            return `"${token.options?.value ?? ''}"`
+          }
+          return token.fieldId
+        }
+        case 'state': {
+          return getStateVariableName(token.componentId, token.storedStateId)
+        }
+        case 'filter': {
+          throw new Error('Filter cannot be used in a filter option')
+        }
+        }
+      })
+        .join('.')
+    }
+  }
+  return option
 }
