@@ -23,6 +23,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.includes('String'),
     apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
+    quotedOptions: ['alt'],
     options: {
       alt: '',
       sizes: '',
@@ -81,6 +82,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
+    quotedOptions: [],
     options: {},
   }, {
     type: 'filter',
@@ -89,6 +91,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => ([{ url: input, lang: 'en', label: 'English' }, { url: input, lang: 'fr', label: 'Français' }]),
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['locale_link'], kind: 'list' }),
+    quotedOptions: [],
     options: {},
   }]
 }

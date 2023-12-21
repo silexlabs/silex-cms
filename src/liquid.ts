@@ -228,10 +228,21 @@ export function getLiquidStatementProperties(properties: (Property | State)[]): 
 export function getLiquidStatementFilters(filters: Filter[]): string {
   if(!filters.length) return ''
   return ' | ' + filters.map(token => {
-    const options = token.options ? Object.values(token.options).map(option => handleFilterOption(option as string)) : []
+    const options = token.options ? Object.entries(token.options)
+      .map(([key, value]) => handleFilterOption(token, key, value as string)) : []
     return `${token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
     .join(' | ')
+}
+
+/**
+ * Quote a string for liquid
+ * Check that the string is not already quoted
+ * Escape existing quotes
+ */
+function quote(value: string): string {
+  if(value.startsWith('"') && value.endsWith('"')) return value
+  return `"${value.replace(/"/g, '\\"')}"`
 }
 
 function isExpression(json: unknown): boolean {
@@ -262,17 +273,12 @@ function isExpression(json: unknown): boolean {
 
 }
 
-function handleFilterOption(option: string): string {
-  let json = null
+function handleFilterOption(filter: Filter, key: string, value: string): string {
   try {
-    json = JSON.parse(option)
-  } catch(e) {
-    // Ignore
-  }
-  if(json) {
+    const json = JSON.parse(value)
     if(isExpression(json)) {
       const expression = json as Expression
-      return expression.map(token => {
+      const result = expression.map(token => {
         switch(token.type) {
         case 'property': {
           if(token.fieldId === FIXED_TOKEN_ID) {
@@ -289,7 +295,10 @@ function handleFilterOption(option: string): string {
         }
       })
         .join('.')
+      return filter.quotedOptions.includes(key) ? quote(result) : result
     }
+  } catch(e) {
+    // Ignore
   }
-  return option
+  return filter.quotedOptions.includes(key) ? quote(value) : value
 }
