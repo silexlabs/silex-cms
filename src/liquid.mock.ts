@@ -92,6 +92,7 @@ export const expressionWithFirst = {
       'type': 'filter',
       'id': 'first',
       'label': 'first',
+      'quotedOptions': [],
       'options': {}
     },
     {
@@ -172,6 +173,7 @@ export const expressionListWithWhere = {
       'type': 'filter',
       'id': 'where',
       'label': 'where',
+      'quotedOptions': [],
       'options': {
         'key': 'lang',
         'value': 'FR'

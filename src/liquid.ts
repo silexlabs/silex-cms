@@ -1,4 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 
 export interface BinaryCondition {
@@ -243,34 +243,6 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
 function quote(value: string): string {
   if(value.startsWith('"') && value.endsWith('"')) return value
   return `"${value.replace(/"/g, '\\"')}"`
-}
-
-function isExpression(json: unknown): boolean {
-  if(!Array.isArray(json)) return false
-  return json.every(token => {
-    if(typeof token !== 'object') return false
-    if(!token.type) return false
-    switch(token.type) {
-    case 'property': {
-      if(!token.fieldId) return false
-      if(token.fieldId === FIXED_TOKEN_ID) {
-        if(!token.options?.value) return false
-      }
-      break
-    }
-    case 'state': {
-      if(!token.componentId) return false
-      if(!token.storedStateId) return false
-      break
-    }
-    case 'filter': {
-      if(!token.id) return false
-      break
-    }
-    }
-    return true
-  })
-
 }
 
 function handleFilterOption(filter: Filter, key: string, value: string): string {
