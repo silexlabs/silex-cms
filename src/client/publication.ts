@@ -46,7 +46,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
 
     // Generate 11ty data files
     const editor = config.getEditor()
-    editor.on('silex:publish:data', data => transformFiles(editor as DataSourceEditor, options, data))
+    editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
   })
 }
 
@@ -330,7 +330,7 @@ function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: Sto
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
-  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
+  const dataTree = (config.getEditor() as unknown as DataSourceEditor).DataSourceManager.getDataTree()
 
   const statesPrivate = getRealStates(dataTree, getStateIds(component, false)
     .map(stateId => ({

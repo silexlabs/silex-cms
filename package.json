@@ -42,7 +42,7 @@
   },
   "peerDependencies": {
     "@silexlabs/silex": "^3.0.0-alpha.134",
-    "grapesjs": "^0.21.7",
+    "grapesjs": "0.21.7",
     "lit-html": "3.0.2"
   },
   "dependencies": {
