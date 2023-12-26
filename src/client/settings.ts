@@ -44,7 +44,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
     </style>
     <div id="settings-eleventy" class="silex-hideable silex-hidden">
       <div class="gjs-sm-sector-title">11ty Plugin</div>
-      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-plugin-11ty">11ty plugin for Silex</a> <strong>is installed</strong>. It integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator with Silex.</div>
+      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-cms">11ty plugin for Silex</a> <strong>is installed</strong>. It integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator with Silex.</div>
       <div class="silex-form__group col2">
         <label class="silex-form__element">
           <h3>Create pages from data</h3>

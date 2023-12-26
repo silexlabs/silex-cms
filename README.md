@@ -31,14 +31,14 @@ This is how to use the plugin in your Silex instance or JS project
 Add as a dependency
 
 ```bash
-$ npm i --save @silexlabs/silex-plugin-11ty
+$ npm i --save @silexlabs/silex-cms
 ```
 
 Add to Silex client config:
 
 ```js
 // silex-client.js
-import Eleventy from './js/silex-plugin-11ty/client.js'
+import Eleventy from './js/silex-cms/client.js'
 
 export default function(config, options) {
   config.addPlugin(Eleventy, {
@@ -57,7 +57,7 @@ export default function(config, options) {
       input: 'pages/',
       css: 'css',
     },
-    // ... Other options for @silexlabs/silex-plugin-11ty plugin - see below
+    // ... Other options for @silexlabs/silex-cms plugin - see below
   })
 }
 ```
@@ -67,13 +67,13 @@ And expose the plugin to the front end:
 // silex-server.js
 const StaticPlugin = require('@silexlabs/silex/dist/plugins/server/plugins/server/StaticPlugin').default
 const node_modules = require('node_modules-path')
-console.log('node_modules', node_modules('@silexlabs/silex-plugin-11ty'))
+console.log('node_modules', node_modules('@silexlabs/silex-cms'))
 module.exports = function(config, options) {
   config.addPlugin(StaticPlugin, {
     routes: [
       {
-        route: '/js/silex-plugin-11ty/',
-        path: node_modules('@silexlabs/silex-plugin-11ty') + '/@silexlabs/silex-plugin-11ty/dist/',
+        route: '/js/silex-cms/',
+        path: node_modules('@silexlabs/silex-cms') + '/@silexlabs/silex-cms/dist/',
       },
     ],
   })
@@ -182,8 +182,8 @@ Private states
 Clone the repository
 
 ```sh
-$ git clone https://github.com/silexlabs/silex-plugin-11ty.git
-$ cd silex-plugin-11ty
+$ git clone https://github.com/silexlabs/silex-cms.git
+$ cd silex-cms
 ```
 
 Install dependencies
