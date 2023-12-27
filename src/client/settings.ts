@@ -91,10 +91,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
             <p class="silex-help">Provide a comma separated list of languages. For example: <code>en,fr</code>. An empty value will deactivate this feature.</p>
             <input type="text" name="silexLanguagesList" .value=${settings.silexLanguagesList ?? ''}/>
           </label>
-          <label class="silex-form__element">Default language
-            <p class="silex-help">If set, this language will be omitted from the URL. For example: <code>en</code> means that the english version of the page will be available at <code>/page.html</code> and the french version at <code>/fr/page.html</code></p>
-            <input type="text" name="silexLanguagesDefault" .value=${settings.silexLanguagesDefault ?? ''}/>
-          </label>
         </label>
         <label class="silex-form__element">
           <h3>Navigation Plugin</h3>
