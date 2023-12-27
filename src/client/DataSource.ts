@@ -8,8 +8,9 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
+    // FIXME: why do we have to call it twice before the setTimeout?
     dm.add(new EleventyDataSource())
-    // FIXME: why do we have to call it twice?
+    dm.add(new EleventyDataSource())
     dm.add(new EleventyDataSource())
   })
 }

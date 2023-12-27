@@ -102,6 +102,12 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   //    ...grapesJsConfig.plugins,
   //  ],
   //} as EditorConfig
-
+  document.head.insertAdjacentHTML('beforeend', `<style>
+    :root {
+      --ds-lowlight: #292929 !important;
+      --tertiary-color: #a291ff !important;
+      --ds-highlight: #a291ff !important;
+    }
+  </style>`)
   return config
 }

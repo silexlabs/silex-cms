@@ -1,10 +1,15 @@
-import { DataSourceEditor } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, DataSourceId, Field } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { html } from 'lit-html'
 import { Silex11tyPluginWebsiteSettings } from '../client'
 //import { createRef } from 'lit/directives/ref.js'
 //import { StepsSelector } from '@silexlabs/steps-selector'
 //import { renderExpression } from '@silexlabs/grapesjs-data-source'
+
+interface FieldsByDataSource {
+  dataSourceId: DataSourceId
+  fields: Field[]
+}
 
 //const pageDataInputRef = createRef<StepsSelector>()
 export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
@@ -59,10 +64,10 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
       if (group) {
         group.fields.push(field)
       } else {
-        groups.push({ dataSourceId: field.dataSourceId, fields: [field] })
+        groups.push({ dataSourceId: field.dataSourceId || 'Unknown', fields: [field] })
       }
       return groups
-    }, [])
+    }, [] as FieldsByDataSource[])
     .map(group => html`
                   <optgroup label=${group.dataSourceId}>
                     ${group.fields.map(field => html`
