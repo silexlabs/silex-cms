@@ -1,0 +1,39 @@
+---
+permalink: "/index.html"
+
+---
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/css/index.css" />
+
+
+<title></title>
+<link rel="icon" href="" />
+<meta name="description" property="description" content=""/>
+<meta name="og:title" property="og:title" content=""/>
+<meta name="og:description" property="og:description" content=""/>
+<meta name="og:image" property="og:image" content=""/>
+</head>
+<body id="i56k"><H1 id="i8dp">All blog posts:<br/></H1>{% liquid
+    assign var_ibd4_164 = directus.blog
+    %}
+    {% for state_ibd4___data in var_ibd4_164 %}
+  <div id="ibd4" style="min-height: 100px;"><div id="ipek" class="field">Label: <span id="iaaq">{% liquid
+    assign var_iaaq_157 = state_ibd4___data.label
+    echo var_iaaq_157
+  %}</span><br/></div><div id="ibwz6" class="field">Title: <span id="ico1j">{% liquid
+    assign var_ico1j_158 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_ico1j_159 = var_ico1j_158.title
+    echo var_ico1j_159
+  %}</span><br/></div><div id="i7x85" class="field">Text: <span id="iqu22">{% liquid
+    assign var_iqu22_160 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_iqu22_161 = var_iqu22_160.richtext_content
+    echo var_iqu22_161
+  %}</span><br/></div><div id="ieud7" class="field">Image: <span id="iqx2l">{% liquid
+    assign var_iqx2l_162 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_iqx2l_163 = var_iqx2l_162.image.filename_download
+    echo var_iqx2l_163
+  %}</span><br/></div></div>{% endfor %}</body>
+</html>

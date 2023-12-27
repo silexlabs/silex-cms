@@ -1,0 +1,50 @@
+---
+pagination:
+  data: directus.blog
+  size: 3
+lang: "fr"
+collection: "Posts"
+
+---
+{% assign state_iossg_pagination = pagination %}
+{% assign state_iossg_items = pagination.items %}
+{% assign state_iossg_pages = pagination.pages %}<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/css/posts.css" />
+
+
+<title></title>
+<link rel="icon" href="" />
+<meta name="description" property="description" content=""/>
+<meta name="og:title" property="og:title" content=""/>
+<meta name="og:description" property="og:description" content=""/>
+<meta name="og:image" property="og:image" content=""/>
+</head>
+<body id="iossg"><H1 id="iqeos">Paginated blog posts:<br/></H1>{% liquid
+    assign var_iat7h_183 = state_iossg_items
+    %}
+    {% for state_ibd4___data in var_iat7h_183 %}
+  <div id="iat7h" style="min-height: 100px;"><div id="iqif7" class="field">Label: <span id="ithxw">{% liquid
+    assign var_ithxw_178 = state_ibd4___data.label
+    echo var_ithxw_178
+  %}</span><br/></div><div id="i22mm" class="field">Title: <span id="i3yrx">{% liquid
+    assign var_i3yrx_179 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_i3yrx_180 = var_i3yrx_179.title
+    echo var_i3yrx_180
+  %}</span><br/></div><div id="iqoyh" class="field">Text: <span id="idam9">{% liquid
+    assign var_idam9_181 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_idam9_182 = var_idam9_181.richtext_content
+    echo var_idam9_182
+  %}</span><br/></div></div>{% endfor %}<div id="i06yk"><div id="i7v3g"><A id="iv80l" href="{% liquid
+    assign var_iv80l_184 = state_iossg_pagination.href.next
+    echo var_iv80l_184
+  %}">Next</A> (<span id="imf3q">{% liquid
+    assign var_imf3q_185 = state_iossg_pagination.pageNumber | plus: 1
+    echo var_imf3q_185
+  %}</span><span id="iaemo"> /</span><span id="iuexr">{% liquid
+    assign var_iuexr_186 = state_iossg_pages | size
+    echo var_iuexr_186
+  %}</span>)<br/></div></div></body>
+</html>
