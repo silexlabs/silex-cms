@@ -17,23 +17,23 @@ permalink: "/index.html"
 <meta name="og:image" property="og:image" content=""/>
 </head>
 <body id="i56k"><H1 id="i8dp">All blog posts:<br/></H1>{% liquid
-    assign var_ibd4_164 = directus.blog
+    assign var_ibd4_249 = directus.blog
     %}
-    {% for state_ibd4___data in var_ibd4_164 %}
+    {% for state_ibd4___data in var_ibd4_249 %}
   <div id="ibd4" style="min-height: 100px;"><div id="ipek" class="field">Label: <span id="iaaq">{% liquid
-    assign var_iaaq_157 = state_ibd4___data.label
-    echo var_iaaq_157
+    assign var_iaaq_242 = state_ibd4___data.label
+    echo var_iaaq_242
   %}</span><br/></div><div id="ibwz6" class="field">Title: <span id="ico1j">{% liquid
-    assign var_ico1j_158 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_ico1j_159 = var_ico1j_158.title
-    echo var_ico1j_159
+    assign var_ico1j_243 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_ico1j_244 = var_ico1j_243.title
+    echo var_ico1j_244
   %}</span><br/></div><div id="i7x85" class="field">Text: <span id="iqu22">{% liquid
-    assign var_iqu22_160 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_iqu22_161 = var_iqu22_160.richtext_content
-    echo var_iqu22_161
+    assign var_iqu22_245 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_iqu22_246 = var_iqu22_245.richtext_content
+    echo var_iqu22_246
   %}</span><br/></div><div id="ieud7" class="field">Image: <span id="iqx2l">{% liquid
-    assign var_iqx2l_162 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_iqx2l_163 = var_iqx2l_162.image.filename_download
-    echo var_iqx2l_163
+    assign var_iqx2l_247 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_iqx2l_248 = var_iqx2l_247.image.filename_download
+    echo var_iqx2l_248
   %}</span><br/></div></div>{% endfor %}</body>
 </html>
