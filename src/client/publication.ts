@@ -281,7 +281,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const s2s = dataSource.get('serverToServer')
   const url = s2s ? s2s.url : dataSource.get('url')
   // Add a cache buster to avoid caching between pages, this will still cache between 11ty builds
-  const urlWithCacheBuster = url + (url.includes('?') ? '&' : '?') + 'cacheBuster=' + Date.now()
+  const urlWithCacheBuster = url + (url.includes('?') ? '&' : '?') + 'cache_buster=' + Math.round(Math.random() * 1000000)
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
   // Check that the content-type is set
