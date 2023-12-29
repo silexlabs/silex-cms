@@ -49,7 +49,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     ],
     // 11ty plugins
     fetchPlugin: {
-      duration: '0s',
+      duration: '1s',
       type: 'json',
     },
     imagePlugin: true,

@@ -280,6 +280,8 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   }
   const s2s = dataSource.get('serverToServer')
   const url = s2s ? s2s.url : dataSource.get('url')
+  // Add a cache buster to avoid caching between pages, this will still cache between 11ty builds
+  const urlWithCacheBuster = url + (url.includes('?') ? '&' : '?') + 'cacheBuster=' + Date.now()
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
   // Check that the content-type is set
@@ -290,8 +292,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
   return `
   try {
-    result['${dataSource.id}'] = (await EleventyFetch(\`${url}\`, {
-      type: 'json',
+    result['${dataSource.id}'] = (await EleventyFetch(\`${urlWithCacheBuster}\`, {
       ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
       fetchOptions: {
         headers: {
@@ -304,7 +305,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${url}', '${method}', \`${queryStr}\`)
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', '${method}', \`${queryStr}\`)
     throw e
   }
 `
