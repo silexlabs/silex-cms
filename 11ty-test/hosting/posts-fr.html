@@ -23,28 +23,28 @@ collection: "Posts"
 <meta name="og:image" property="og:image" content=""/>
 </head>
 <body id="iossg"><H1 id="iqeos">Paginated blog posts:<br/></H1>{% liquid
-    assign var_iat7h_268 = state_iossg_items
+    assign var_iat7h_41 = state_iossg_items
     %}
-    {% for state_ibd4___data in var_iat7h_268 %}
+    {% for state_ibd4___data in var_iat7h_41 %}
   <div id="iat7h" style="min-height: 100px;"><div id="iqif7" class="field">Label: <span id="ithxw">{% liquid
-    assign var_ithxw_263 = state_ibd4___data.label
-    echo var_ithxw_263
+    assign var_ithxw_36 = state_ibd4___data.label
+    echo var_ithxw_36
   %}</span><br/></div><div id="i22mm" class="field">Title: <span id="i3yrx">{% liquid
-    assign var_i3yrx_264 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_i3yrx_265 = var_i3yrx_264.title
-    echo var_i3yrx_265
+    assign var_i3yrx_37 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_i3yrx_38 = var_i3yrx_37.title
+    echo var_i3yrx_38
   %}</span><br/></div><div id="iqoyh" class="field">Text: <span id="idam9">{% liquid
-    assign var_idam9_266 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_idam9_267 = var_idam9_266.richtext_content
-    echo var_idam9_267
+    assign var_idam9_39 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
+	assign var_idam9_40 = var_idam9_39.richtext_content
+    echo var_idam9_40
   %}</span><br/></div></div>{% endfor %}<div id="i06yk"><div id="i7v3g"><A id="iv80l" href="{% liquid
-    assign var_iv80l_269 = state_iossg_pagination.href.next
-    echo var_iv80l_269
+    assign var_iv80l_42 = state_iossg_pagination.href.next
+    echo var_iv80l_42
   %}">Next</A> (<span id="imf3q">{% liquid
-    assign var_imf3q_270 = state_iossg_pagination.pageNumber | plus: 1
-    echo var_imf3q_270
+    assign var_imf3q_43 = state_iossg_pagination.pageNumber | plus: 1
+    echo var_imf3q_43
   %}</span><span id="iaemo"> /</span><span id="iuexr">{% liquid
-    assign var_iuexr_271 = state_iossg_pages | size
-    echo var_iuexr_271
+    assign var_iuexr_44 = state_iossg_pages | size
+    echo var_iuexr_44
   %}</span>)<br/></div></div></body>
 </html>

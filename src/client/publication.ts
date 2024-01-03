@@ -5,6 +5,7 @@ import { assignBlock, echoBlock, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { Properties } from '@silexlabs/grapesjs-data-source/src/view/properties-editor'
 //import { ClientSideFile, ClientSideFileType, ClientSideFileWithContent, PublicationData } from '@silexlabs/silex/src/ts/types'
 
 // FIXME: should be imported from silex
@@ -356,7 +357,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         label,
         tokens,
       },
-    }), {} as Record<StateId, RealState>)
+    }), {} as Record<Properties, RealState>)
 
   if (statesArr.length) {
     const tagName = component.get('tagName')
@@ -368,7 +369,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const hasStyle = !!statesObj.style?.tokens.length
       const hasClassName = !!statesObj.className?.tokens.length
       const hasInnerHtml = !!statesObj.innerHTML?.tokens.length
-      const hasCondition = !!statesObj.condition1?.tokens.length
+      const hasCondition = !!statesObj.condition?.tokens.length
       const hasData = !!statesObj.__data?.tokens.length
 
       // Initial attributes
@@ -401,11 +402,11 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const operator = component.get('conditionOperator') ?? UnariOperator.TRUTHY
       const binary = operator && Object.values(BinariOperator).includes(operator)
       const [ifStart, ifEnd] = hasCondition ? ifBlock(component, binary ? {
-        expression: statesObj.condition1.tokens,
+        expression: statesObj.condition.tokens,
         expression2: statesObj.condition2.tokens,
         operator,
       } : {
-        expression: statesObj.condition1.tokens,
+        expression: statesObj.condition.tokens,
         operator,
       }) : []
       const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
