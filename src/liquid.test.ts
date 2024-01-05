@@ -179,7 +179,7 @@ test('assign block', () => {
   expect(result[2])
     .toMatch(/assign \w+ = \w+\.name/)
   expect(result[3])
-    .toMatch(/assign state_\w+_testStateId = \w+/)
+    .toMatch(/assign state_\w+-\w+_testStateId = \w+/)
   expect(result[4]).toBe('  %}')
 })
 
@@ -201,7 +201,7 @@ test('loop block', () => {
   expect(start.split('\n')[1])
     .toMatch(/assign \w+ = countries\.continent/)
   expect(start.split('\n')[3])
-    .toMatch(/{% for state_\w+___data in var_\w+ %}/)
+    .toMatch(/{% for state_\w+-\w+___data in var_\w+ %}/)
 
   const [start1, end1] = loopBlock(dataTree, component, expressionListWithWhere.expression)
   expect(start1.split('\n')).toHaveLength(5)
