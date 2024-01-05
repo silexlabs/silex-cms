@@ -1,4 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression, getExpressionResultType } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 
 export interface BinaryCondition {
@@ -56,7 +56,7 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
 export function loopBlock(dataTree: DataTree, component: Component, expression: Expression): [start: string, end: string] {
   if(expression.length === 0) throw new Error('Expression is empty')
   // Check data to loop over
-  const field = dataTree.getExpressionResultType(expression, component)
+  const field = getExpressionResultType(expression, component, dataTree)
   if (!field) throw new Error(`Expression ${expression.map(token => token.label).join(' -> ')} is invalid`)
   if (field.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${field.kind}`)
   const statements = getLiquidBlock(component, expression)

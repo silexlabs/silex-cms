@@ -14,6 +14,42 @@ export default function(config, opts: EleventyPluginOptions): void {
     if (opts.i18nPlugin) {
       dm.filters.push(...i18nFilters)
     }
+    // Eleventy provided filters: https://www.11ty.dev/docs/filters/#eleventy-provided-filters
+    dm.filters.push({
+      type: 'filter',
+      id: 'log',
+      label: 'log',
+      validate: (field: Field | null) => !!field,
+      output: type => type,
+      apply: (str) => {
+        console.log(str)
+        return str
+      },
+      options: {},
+      quotedOptions: [],
+    }, {
+      type: 'filter',
+      id: 'slugify',
+      label: 'slugify',
+      validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
+      output: type => type,
+      apply: (str) => {
+        return str.toString().toLowerCase().replace(/\s+/g, '-')
+      },
+      options: {},
+      quotedOptions: [],
+    }, {
+      type: 'filter',
+      id: 'url',
+      label: 'url',
+      validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
+      output: type => type,
+      apply: (str) => {
+        return str.toString().toLowerCase().replace(/\s+/g, '-')
+      },
+      options: {},
+      quotedOptions: [],
+    })
   })
 
   const imageFilters: Filter[] = [{

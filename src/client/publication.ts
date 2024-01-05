@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, UnariOperator, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, ifBlock, loopBlock } from '../liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -324,7 +324,7 @@ function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: Sto
     .map(({ stateId, state }) => ({
       stateId,
       label: state.label,
-      tokens: state.expression.map(token => dataTree.fromStored(token)),
+      tokens: state.expression.map(token => fromStored(token, dataTree)),
     }))
 }
 

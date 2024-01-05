@@ -8,6 +8,18 @@ import grapesjs from 'grapesjs'
 
 import { expect, jest, test } from '@jest/globals'
 
+jest.mock('@silexlabs/grapesjs-data-source', () => ({
+  ...jest.requireActual('@silexlabs/grapesjs-data-source') as typeof import('@silexlabs/grapesjs-data-source'),
+  getExpressionResultType: jest.fn(() => ({
+    id: 'test field id',
+    label: 'test field label',
+    typeIds: ['test type id'],
+    dataSourceId: 'test data source id',
+    kind: 'list',
+  } as Field)),
+  fromStored: jest.fn(),
+}))
+
 test('get liquid statements for properties', () => {
   const { expression } = simpleExpression
   expect(getLiquidStatementProperties(expression as Property[]))
@@ -174,14 +186,12 @@ test('assign block', () => {
 test('loop block', () => {
   const editor = grapesjs.init({ headless: true })
   const dataTree = {
-    getExpressionResultType: jest.fn(() => ({
-      id: 'test field id',
-      label: 'test field label',
-      typeIds: ['test type id'],
-      dataSourceId: 'test data source id',
-      kind: 'list',
-    } as Field)),
-  } as any as DataTree
+    filters: [],
+    dataSources: [],
+    getType(typeId, dataSourceId?) {
+      return null
+    },
+  } as unknown as DataTree
   const component = editor.addComponents('test')[0]
   getOrCreatePersistantId(component)
   const { expression } = expressionList

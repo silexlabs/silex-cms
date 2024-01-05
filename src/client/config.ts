@@ -31,7 +31,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
   return {
     // UI config
     view: {
-      appendTo: () => config.getEditor().Panels.getPanel('views-container')?.view.el,
+      el: () => config.getEditor().Panels.getPanel('views-container')?.view.el,
       button: () => config.getEditor().Panels.getPanel('views')!.get('buttons')!.get('open-tm'),
     },
     // Liquid filters
