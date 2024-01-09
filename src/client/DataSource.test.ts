@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals'
 import { EleventyDataSourceTest } from './DataSource'
 
 test('Init the data source', () => {
