@@ -121,6 +121,10 @@ export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: str
  */
 export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, collection, lang = ''): string {
   const permalink = getPermalink(settings, slug)
+    // Escape quotes in permalink
+    // because it is in double quotes in the front matter
+    ?.replace(/"/g, '\\"')
+
   return dedent`---
     ${settings?.eleventyPageData ? `pagination:
       data: ${settings.eleventyPageData}
