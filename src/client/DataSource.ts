@@ -1,26 +1,68 @@
-import { Field, IDataSource, Type } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, Field, IDataSource, Type } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 import Backbone from 'backbone'
+import { ClientConfig } from '@silexlabs/silex'
 
-export default function(config/*, opts: EleventyPluginOptions */): void {
+function expect(condition: boolean, message: string) {
+  if(!condition) {
+    throw new Error(message)
+  }
+}
+
+export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
   config.on('silex:startup:end', () => {
-    const dm = config.getEditor().DataSourceManager
+    const dm = (config.getEditor() as DataSourceEditor).DataSourceManager
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
-    // FIXME: why do we have to call it twice before the setTimeout?
-    dm.add(new EleventyDataSource())
-    dm.add(new EleventyDataSource())
-    dm.add(new EleventyDataSource())
+    expect(!dm.get('eleventy'), 'The eleventy data source has already been registered')
+    dm.add(new EleventyDataSource(), {merge: false})
+    expect(!!dm.get('eleventy'), 'The eleventy data source should be registered')
   })
 }
 
 class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implements IDataSource {
+  /**
+   * FIXME: this is required because _.uniqueId in backbone gives the same id as the one in the main app (c1), so we probably use a different underscore instance?
+   */
+  cid = 'eleventy'
+
+  /**
+   * Unique identifier of the data source
+   * This is used to retrieve the data source from the editor
+   */
   id = 'eleventy'
+
+  /**
+   * Implement IDatasource
+   */
   async connect(): Promise<void> {}
+
+  /**
+   * Implement IDatasource
+   */
   getQuery(/*expressions: Expression[]*/): string { return '' }
+
+  /**
+   * Implement IDatasource
+   */
   getTypes(): Type[] {
     return [{
+      id: 'string',
+      label: 'String',
+      dataSourceId: 'eleventy',
+      fields: [],
+    }, {
+      id: 'number',
+      label: 'Number',
+      dataSourceId: 'eleventy',
+      fields: [],
+    }, {
+      id: 'date',
+      label: 'Date',
+      dataSourceId: 'eleventy',
+      fields: [],
+    }, {
       id: 'page',
       label: 'Page',
       dataSourceId: 'eleventy',
@@ -208,6 +250,10 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
       }],
     }]
   }
+
+  /**
+   * Implement IDatasource
+   */
   getQueryables(): Field[] {
     return [{
       id: 'page',
@@ -229,4 +275,7 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
     //  dataSourceId: 'eleventy',
     }]
   }
+}
+
+export class EleventyDataSourceTest extends EleventyDataSource {
 }
