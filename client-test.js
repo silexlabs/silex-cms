@@ -1,6 +1,6 @@
 import EleventyPlugin from '../client.js'
 
-// A test client
+// A test client config
 export default function (config, options = {}) {
   const opts = {
     dataSources: [
