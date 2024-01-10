@@ -416,7 +416,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
       const states = statesPublic.map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
       const before = (states ?? '') + (ifStart ?? '') + (forStart ?? '')
-      const after = (ifEnd ?? '') + (forEnd ?? '')
+      const after = (forEnd ?? '') + (ifEnd ?? '')
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
