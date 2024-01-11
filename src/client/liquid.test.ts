@@ -188,7 +188,7 @@ test('loop block', () => {
   const dataTree = {
     filters: [],
     dataSources: [],
-    getType(typeId, dataSourceId?) {
+    getType() {
       return null
     },
   } as unknown as DataTree

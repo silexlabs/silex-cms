@@ -3,6 +3,47 @@ import { ClientConfig } from '@silexlabs/silex'
 export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
   config.on('silex:grapesjs:end', () => {
     const editor = config.getEditor()
+    // **
+    // Shortcode
+    editor.BlockManager.add('eleventy-shortcode', {
+      label: 'Shortcode',
+      category: 'Eleventy',
+      content: { type: 'eleventy-shortcode' },
+      media: '<span style="font-size: 50px;">{%</span>',
+    })
+    editor.DomComponents.addType('eleventy-shortcode', {
+      model: {
+        defaults: {
+          traits: [{
+            type: 'shortcode-name',
+            label: 'Shortcode name',
+            name: 'shortcode_name',
+            placeholder: 'shortcode_name',
+          }, {
+            type: 'shortcode-attributes',
+            label: 'Shortcode attributes',
+            name: 'shortcode_attributes',
+            placeholder: 'param1, "example param 2"',
+          }],
+        },
+      },
+    })
+    function updateShortcode(component) {
+      const { shortcode_attributes, shortcode_name } = component.get('attributes')
+      component.components(`{% ${shortcode_name} ${shortcode_attributes} %}`)
+    }
+    editor.TraitManager.addType('shortcode-name', {
+      onEvent({ component }) {
+        updateShortcode(component)
+      },
+    })
+    editor.TraitManager.addType('shortcode-attributes', {
+      onEvent({ component }) {
+        updateShortcode(component)
+      },
+    })
+    // **
+    // Select element
     editor.BlockManager.add('eleventy-select', {
       label: 'select',
       category: 'Eleventy',
@@ -16,7 +57,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
           droppable: true,
           // Prevent the drop down from opening on click
           script: function() {
-            console.log('script', this)
             this.addEventListener('mousedown', event => {
               event.preventDefault()
             })
@@ -24,27 +64,8 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
         },
       },
     })
-    editor.BlockManager.add('eleventy-option', {
-      label: 'option',
-      category: 'Eleventy',
-      media: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
-      content: { type: 'eleventy-option' },
-    })
-    editor.DomComponents.addType('eleventy-select', {
-      model: {
-        defaults: {
-          tagName: 'select',
-          droppable: true,
-          // Prevent the drop down from opening on click
-          script: function() {
-            console.log('script', this)
-            this.addEventListener('mousedown', event => {
-              event.preventDefault()
-            })
-          },
-        },
-      },
-    })
+    // **
+    // Option element
     editor.BlockManager.add('eleventy-option', {
       label: 'option',
       category: 'Eleventy',
@@ -74,6 +95,8 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
         },
       },
     })
+    // **
+    // Image web component
     editor.BlockManager.add('eleventy-img', {
       label: 'eleventy-img',
       category: 'Eleventy',
