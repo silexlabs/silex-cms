@@ -30,7 +30,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
     })
     function updateShortcode(component) {
       const { shortcode_attributes, shortcode_name } = component.get('attributes')
-      component.components(`{% ${shortcode_name} ${shortcode_attributes} %}`)
+      component.components(`{% ${shortcode_name} ${shortcode_attributes ?? ''} %}`)
     }
     editor.TraitManager.addType('shortcode-name', {
       onEvent({ component }) {
