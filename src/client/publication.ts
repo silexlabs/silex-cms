@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
 import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
-import { assignBlock, echoBlock, ifBlock, loopBlock } from '../liquid'
+import { assignBlock, echoBlock, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'

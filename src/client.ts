@@ -94,14 +94,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   // Merge the initial config with GrapesJs config
   // Returns the new config
   config.grapesJsConfig = grapesJsConfig
-  //config.grapesJsConfig = {
-  //  ...config.grapesJsConfig,
-  //  ...grapesJsConfig,
-  //  plugins: [
-  //    ...config.grapesJsConfig.plugins ?? [],
-  //    ...grapesJsConfig.plugins,
-  //  ],
-  //} as EditorConfig
+  // Add styles on the editor to override the default colors
   document.head.insertAdjacentHTML('beforeend', `<style>
     :root {
       --ds-lowlight: #292929 !important;
