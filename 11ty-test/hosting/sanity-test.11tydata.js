@@ -4,7 +4,7 @@ module.exports = async function () {
   const result = {}
   
   try {
-    result['sanity'] = (await EleventyFetch(`https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=350404`, {
+    result['sanity'] = (await EleventyFetch(`https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=286802`, {
       ...{"duration":"1s","type":"json"},
       fetchOptions: {
         headers: {
@@ -40,7 +40,7 @@ module.exports = async function () {
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, 'sanity', 'https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=350404', 'POST', `query {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, 'sanity', 'https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=286802', 'POST', `query {
   __typename
   allBlog {
     __typename

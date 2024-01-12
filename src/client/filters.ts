@@ -22,7 +22,7 @@ export default function(config, opts: EleventyPluginOptions): void {
       validate: (field: Field | null) => !!field,
       output: type => type,
       apply: (str) => {
-        console.log(str)
+        console.info(str)
         return str
       },
       options: {},

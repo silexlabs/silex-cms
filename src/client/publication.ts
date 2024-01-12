@@ -407,7 +407,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const binary = operator && Object.values(BinariOperator).includes(operator)
       const [ifStart, ifEnd] = hasCondition ? ifBlock(component, binary ? {
         expression: statesObj.condition.tokens,
-        expression2: statesObj.condition2.tokens,
+        expression2: statesObj.condition2?.tokens ?? [],
         operator,
       } : {
         expression: statesObj.condition.tokens,

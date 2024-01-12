@@ -91,7 +91,7 @@ export function ifBlock(component: Component, condition: Condition): [start: str
   if(!unary && !binary) throw new Error(`If block operator is invalid: ${condition.operator}`)
 
   // Check the second expression
-  if(binary && binary.expression2.length === 0) throw new Error('If block second expression is empty')
+  if(binary && binary.expression2.length === 0) return ['', '']
 
   // Get liquid for the first expression
   const statements = getLiquidBlock(component, condition.expression)
