@@ -420,9 +420,11 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         operator,
       }) : []
       const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
-      const states = statesPublic.map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
-      const before = (states ?? '') + (ifStart ?? '') + (forStart ?? '')
-      const after = (forEnd ?? '') + (ifEnd ?? '')
+      const states = statesPublic
+        .map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
+        .join('\n')
+      const before = (states ?? '') + (forStart ?? '') + (ifStart ?? '')
+      const after =  (ifEnd ?? '') + (forEnd ?? '')
 
       // Attributes
       const originalAttributes = component.get('attributes') as Record<string, string>
