@@ -2,6 +2,8 @@
 
 This is a Silex plugin to make Eleventy layouts visually with integration of any GraphQL API, allowing for a streamlined, code-free development process
 
+> This plugin requires you to use 11ty v3.0.0 or higher in your project
+
 Links
 
 * [User docs](https://docs.silex.me/en/user/cms)
