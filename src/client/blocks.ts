@@ -1,4 +1,4 @@
-import { ClientConfig } from '@silexlabs/silex'
+import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 
 export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
   config.on('silex:grapesjs:end', () => {

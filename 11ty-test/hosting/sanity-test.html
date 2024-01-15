@@ -17,25 +17,8 @@ collection: "Sanity test"
 <meta name="og:description" property="og:description" content=""/>
 <meta name="og:image" property="og:image" content=""/>
 </head>
-<body id="ioenk"><H1 id="iedlg">Sanity Posts<br/></H1>{% liquid
-    assign var_iyg6c_52 = sanity.allBlog
-    %}
-    {% for state_iyg6c___data in var_iyg6c_52 %}
-  <div id="iyg6c" style="min-height: 100px; border-bottom: 1px solid #9c9999;"><H2 id="iwena" style="padding: 10px;">{% liquid
-    assign var_iwena_49 = state_iyg6c___data.title
-    echo var_iwena_49
-  %}</H2><div id="iyk9s">Author: <span id="i5dtk">{% liquid
-    assign var_i5dtk_50 = state_iyg6c___data.author.name
-    echo var_i5dtk_50
-  %}</span><br/></div><img id="i286u" src="{% liquid
-    assign var_i286u_51 = state_iyg6c___data.author.avatar.asset.url
-    echo var_i286u_51
-  %}" style="color: black; object-fit: cover; object-position: center center; max-width: 200px;"></img></div>{% endfor %}<div id="ipsco">Number of posts: <span id="iy9wf" title="{% liquid
-    assign var_iy9wf_53 = sanity.allBlog | first
-	assign var_iy9wf_54 = var_iy9wf_53.title
-    echo var_iy9wf_54
-  %}">{% liquid
-    assign var_iy9wf_55 = sanity.allBlog | size
-    echo var_iy9wf_55
-  %}</span><br/></div></body>
+<body id="ioenk"><H1 id="iedlg">Sanity Posts<br/></H1><div id="iyg6c"><H2 id="iwena">Title</H2><div id="iyk9s">Author: <span id="i5dtk">Dynamic</span><br/></div><img id="i286u" src="/assets/data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3R5bGU9ImZpbGw6IHJnYmEoMCwwLDAsMC4xNSk7IHRyYW5zZm9ybTogc2NhbGUoMC43NSkiPgogICAgICAgIDxwYXRoIGQ9Ik04LjUgMTMuNWwyLjUgMyAzLjUtNC41IDQuNSA2SDVtMTYgMVY1YTIgMiAwIDAgMC0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnoiPjwvcGF0aD4KICAgICAgPC9zdmc+"></img></div><div id="ipsco">Number of posts: <span undefined="{% liquid
+    assign var_iy9wf_3 = sanity.allBlog | size
+    echo var_iy9wf_3
+  %}" id="iy9wf">Dynamic</span><br/></div></body>
 </html>

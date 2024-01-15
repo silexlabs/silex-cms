@@ -4,7 +4,7 @@ module.exports = async function () {
   const result = {}
   
   try {
-    result['directus'] = (await EleventyFetch(`https://eco-starter.2.internet2000.net/cms/graphql?cache_buster=190207`, {
+    result['directus'] = (await EleventyFetch(`https://eco-starter.2.internet2000.net/cms/graphql?cache_buster=330407`, {
       ...{"duration":"1s","type":"json"},
       fetchOptions: {
         headers: {
@@ -41,7 +41,7 @@ module.exports = async function () {
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, 'directus', 'https://eco-starter.2.internet2000.net/cms/graphql?cache_buster=190207', 'POST', `query {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, 'directus', 'https://eco-starter.2.internet2000.net/cms/graphql?cache_buster=330407', 'POST', `query {
   __typename
   blog {
     __typename
@@ -71,7 +71,7 @@ module.exports = async function () {
 
 
   try {
-    result['sanity'] = (await EleventyFetch(`https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=355613`, {
+    result['sanity'] = (await EleventyFetch(`https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=261035`, {
       ...{"duration":"1s","type":"json"},
       fetchOptions: {
         headers: {
@@ -93,7 +93,7 @@ module.exports = async function () {
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, 'sanity', 'https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=355613', 'POST', `query {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, 'sanity', 'https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default?cache_buster=261035', 'POST', `query {
   __typename
   Blog {
     __typename

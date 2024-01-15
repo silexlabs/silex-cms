@@ -22,29 +22,5 @@ collection: "Posts"
 <meta name="og:description" property="og:description" content=""/>
 <meta name="og:image" property="og:image" content=""/>
 </head>
-<body id="iossg"><H1 id="iqeos">Paginated blog posts:<br/></H1>{% liquid
-    assign var_iat7h_42 = state_iossg_items
-    %}
-    {% for state_ibd4___data in var_iat7h_42 %}
-  <div id="iat7h" style="min-height: 100px;"><div id="iqif7" class="field">Label: <span id="ithxw">{% liquid
-    assign var_ithxw_37 = state_ibd4___data.label
-    echo var_ithxw_37
-  %}</span><br/></div><div id="i22mm" class="field">Title: <span id="i3yrx">{% liquid
-    assign var_i3yrx_38 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_i3yrx_39 = var_i3yrx_38.title
-    echo var_i3yrx_39
-  %}</span><br/></div><div id="iqoyh" class="field">Text: <span id="idam9">{% liquid
-    assign var_idam9_40 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_idam9_41 = var_idam9_40.richtext_content
-    echo var_idam9_41
-  %}</span><br/></div></div>{% endfor %}<div id="i06yk"><div id="i7v3g"><A id="iv80l" href="{% liquid
-    assign var_iv80l_43 = state_iossg_pagination.href.next
-    echo var_iv80l_43
-  %}">Next</A> (<span id="imf3q">{% liquid
-    assign var_imf3q_44 = state_iossg_pagination.pageNumber | plus: 1
-    echo var_imf3q_44
-  %}</span><span id="iaemo"> /</span><span id="iuexr">{% liquid
-    assign var_iuexr_45 = state_iossg_pages | size
-    echo var_iuexr_45
-  %}</span>)<br/></div></div></body>
+<body id="iossg"><H1 id="iqeos">Paginated blog posts:<br/></H1><div id="iat7h"><div id="iqif7" class="field">Label: <span id="ithxw">Dynamic</span><br/></div><div id="i22mm" class="field">Title: <span id="i3yrx">Dynamic</span><br/></div><div id="iqoyh" class="field">Text: <span id="idam9">Dynamic</span><br/></div></div><div id="i06yk"><div id="i7v3g"><A id="iv80l">Next</A> (<span id="imf3q">num</span><span id="iaemo"> /</span><span id="iuexr"> num</span>)<br/></div></div></body>
 </html>

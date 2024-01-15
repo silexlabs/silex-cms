@@ -4,7 +4,7 @@
 
 import dedent from 'dedent'
 import {expect, test} from '@jest/globals'
-import { getFrontMatter } from './publication'
+import { buildAttributes, getFrontMatter, isAttribute } from './publication'
 //import grapesjs, { Page } from 'grapesjs'
 //import { DataSourceEditor, DataSourceEditorOptions, getState } from '@silexlabs/grapesjs-data-source'
 //
@@ -65,4 +65,27 @@ test('With languages', () => {
     data: directus.posts
   lang: "fr"
   \n---\n`)
+})
+
+test('isAttribute', () => {
+  expect(isAttribute('data-attribute')).toBe(true)
+  expect(isAttribute('href')).toBe(true)
+  expect(isAttribute('innerHTML')).toBe(false)
+  expect(isAttribute('')).toBe(false)
+})
+
+test('buildAttributes', () => {
+  const attributes = buildAttributes({
+    'data-original': 'original-value',
+    'data-both': 'original-value',
+  }, [{
+    stateId: 'data-new-stateid',
+    label: 'data-new',
+    value: 'new-value',
+  },{
+    stateId: 'data-both-stateid',
+    label: 'data-both',
+    value: 'new-value',
+  }])
+  expect(attributes).toEqual('data-new="new-value" data-both="new-value original-value" data-original="original-value"')
 })

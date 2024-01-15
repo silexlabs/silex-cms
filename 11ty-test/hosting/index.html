@@ -16,34 +16,10 @@ permalink: "/index.html"
 <meta name="og:description" property="og:description" content=""/>
 <meta name="og:image" property="og:image" content=""/>
 </head>
-<body id="i56k"><H1 id="i8dp">All blog posts:<br/></H1>{% liquid
-    assign var_ibd4_22 = directus.blog
-    %}
-    {% for state_ibd4___data in var_ibd4_22 %}
-  <div id="ibd4" style="min-height: 100px;"><div id="ipek" class="field">Label: <span id="iaaq">{% liquid
-    assign var_iaaq_11 = state_ibd4___data.label
-    echo var_iaaq_11
-  %}</span><br/></div>{% liquid
-    assign var_ibwz6_16 = state_ibd4___data.translations | where: "languages_id.code", "fr" | first
-	assign var_ibwz6_17 = var_ibwz6_16.title
-    %}
-    {% if var_ibwz6_17 and var_ibwz6_17 != blank and var_ibwz6_17 != empty %}
-  <div id="ibwz6" class="field" style="padding: 10px;">Title: <span id="ico1j">{% liquid
-    assign var_ico1j_14 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_ico1j_15 = var_ico1j_14.title
-    echo var_ico1j_15
-  %}</span><br/></div>{% endif %}<div id="i7x85" class="field">Text: <span id="iqu22">{% liquid
-    assign var_iqu22_18 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_iqu22_19 = var_iqu22_18.richtext_content
-    echo var_iqu22_19
-  %}</span><br/></div><div id="ieud7" class="field">Image: <span id="iqx2l">{% liquid
-    assign var_iqx2l_20 = state_ibd4___data.translations | where: "languages_id.code", page.lang | first
-	assign var_iqx2l_21 = var_iqx2l_20.image.filename_download
-    echo var_iqx2l_21
-  %}</span><br/></div></div>{% endfor %}<select id="iws4f"><option id="irqpb" label="test"></option></select><div></div><div id="itn2f" shortcode-name="image" shortcode-attributes="test1, test2" shortcode_name="aaa xxx" shortcode_attributes="bbb yyy" title="{% liquid
-    assign var_itn2f_23 = sanity.Blog
-    echo var_itn2f_23
-  %}">{% aaa xxx bbb yyy %}</div><div id="iqd8if"><div id="ixcx1r">Insert your text here</div></div><img webc:is="eleventy-image" src="/assets/test.webp" id="i9q7pu"/></body><script>var items = document.querySelectorAll('#iws4f');
+<body id="i56k"><H1 id="i8dp">All blog posts:<br/></H1><div id="ibd4"><div id="ipek" class="field">Label: <span id="iaaq">Dynamic</span><br/></div><div id="ibwz6" class="field">Title: <span id="ico1j">Dynamic</span><br/></div><div id="i7x85" class="field">Text: <span id="iqu22">Dynamic</span><br/></div><div id="ieud7" class="field">Image: <span id="iqx2l">Dynamic</span><br/></div></div><select id="iws4f"><option id="irqpb" label="test"></option></select><div></div><div undefined="{% liquid
+    assign var_itn2f_2 = page.lang
+    echo var_itn2f_2
+  %}" id="itn2f" shortcode-name="image" shortcode-attributes="test1, test2" shortcode_name="aaa xxx" shortcode_attributes="bbb yyy">{% aaa xxx bbb yyy %}</div><div id="iqd8if"><div id="ixcx1r">Insert your text here a<br/></div></div><img webc:is="eleventy-image" src="/assets/test.webp" id="i9q7pu"/></body><script>var items = document.querySelectorAll('#iws4f');
           for (var i = 0, len = items.length; i < len; i++) {
             (function(){
 this.addEventListener('mousedown', function (event) {

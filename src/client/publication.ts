@@ -1,11 +1,10 @@
 import dedent from 'dedent'
 import { Component, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, Properties, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { Properties } from '@silexlabs/grapesjs-data-source/src/view/properties-editor'
 //import { ClientSideFile, ClientSideFileType, ClientSideFileWithContent, PublicationData } from '@silexlabs/silex/src/ts/types'
 
 // FIXME: should be imported from silex
@@ -55,18 +54,11 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
  * Make html attribute
  * Quote strings, no values for boolean
  */
-function makeAttribute(key, value) {
+function makeAttribute(key, value): string {
   switch (typeof value) {
   case 'boolean': return value ? key : ''
   default: return `${key}="${value}"`
   }
-}
-
-/**
- * Make inline style
- */
-function makeStyle(key, value) {
-  return `${key}: ${value};`
 }
 
 /**
@@ -333,6 +325,49 @@ function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: Sto
 }
 
 /**
+ * Check if a state is an attribute
+ * Exported for unit tests
+ */
+export function isAttribute(label: string): boolean {
+  if(!label) return false
+  return !Object.values(Properties).includes(label as Properties)
+}
+
+/**
+ * Build the attributes string for a given component
+ * Handle attributes which appear multiple times (class, style)
+ * Append to the original attributes
+ * Exported for unit tests
+ */
+export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: {stateId: StateId, label: string | undefined, value: string}[] ): string {
+  const attributesArr = attributeStates
+    .concat(Object.entries(originalAttributes).map(([label, value]) => ({
+      stateId: label,
+      label,
+      value,
+    })))
+    // Handle attributes which appear multiple times
+    .reduce((final, { stateId, label, value }) => {
+      const existing = final.find(({ label: existingLabel }) => existingLabel === label)
+      if (existing) {
+        existing.value += ' ' + value
+      } else {
+        final.push({
+          stateId,
+          label,
+          value,
+        })
+      }
+      return final
+    }, [] as ({stateId: StateId, value: string | boolean, label: string | undefined})[])
+  return attributesArr
+    // Convert to key="value" string
+    .map(({ label, value }) => makeAttribute(label, value))
+    // Back to string
+    .join(' ')
+}
+
+/**
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
@@ -350,58 +385,29 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       state: getState(component, stateId, true),
     })))
 
-  const statesArr = statesPrivate.concat(statesPublic)
-
-  // Convenience key value object
-  const statesObj = statesArr
-    .reduce((final, { stateId, label, tokens }) => ({
-      ...final,
-      [stateId]: {
-        stateId,
-        label,
-        tokens,
-      },
-    }), {} as Record<Properties, RealState>)
-
-  if (statesArr.length) {
+  if (statesPrivate.length > 0 || statesPublic.length > 0) {
     const tagName = component.get('tagName')
     if (tagName) {
-      const hasSrc = !!statesObj.src?.tokens.length
-      const hasHref = !!statesObj.href?.tokens.length
-      const hasTitle = !!statesObj.title?.tokens.length
-      const hasAlt = !!statesObj.alt?.tokens.length
-      const hasStyle = !!statesObj.style?.tokens.length
-      const hasClassName = !!statesObj.className?.tokens.length
+      // Convenience key value object
+      const statesObj = statesPrivate
+        // Filter out attributes, keep only properties
+        .filter(({ label }) => !isAttribute(label ?? ''))
+        // Add states
+        .concat(statesPublic)
+        .reduce((final, { stateId, label, tokens }) => ({
+          ...final,
+          [stateId]: {
+            stateId,
+            label,
+            tokens,
+          },
+        }), {} as Record<Properties, RealState>)
+
       const hasInnerHtml = !!statesObj.innerHTML?.tokens.length
       const hasCondition = !!statesObj.condition?.tokens.length
       const hasData = !!statesObj.__data?.tokens.length
 
-      // Initial attributes
-      const originalAttributes = component.get('attributes') as Record<string, string>
-      hasSrc && delete originalAttributes.src
-      hasHref && delete originalAttributes.href
-      hasTitle && delete originalAttributes.title
-      hasAlt && delete originalAttributes.alt
-
-      // New attributes
-      const attributes = Object.entries(originalAttributes)
-        .map(([key, value]) => makeAttribute(key, value)).join(' ')
-        // SRC state
-        + (hasSrc ? ` src="${echoBlock(component, statesObj.src.tokens)}"` : '')
-        // HREF state
-        + (hasHref ? ` href="${echoBlock(component, statesObj.href.tokens)}"` : '')
-        // Title state
-        + (hasTitle ? ` title="${echoBlock(component, statesObj.title.tokens)}"` : '')
-        // Alt state
-        + (hasAlt ? ` alt="${echoBlock(component, statesObj.alt.tokens)}"` : '')
-
-      // Class names
-      const className = component.getClasses().join(' ')
-        + (hasClassName ? ` ${echoBlock(component, statesObj.className.tokens)}` : '')
-
       // Style attribute
-      const style = Object.entries(component.getStyle()).map(([key, value]) => makeStyle(key, value)).join(' ')
-        + (hasStyle ? ` ${echoBlock(component, statesObj.style.tokens)}` : '')
       const innerHtml = hasInnerHtml ? echoBlock(component, statesObj.innerHTML.tokens) : component.getInnerHTML()
       const operator = component.get('conditionOperator') ?? UnariOperator.TRUTHY
       const binary = operator && Object.values(BinariOperator).includes(operator)
@@ -417,7 +423,21 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const states = statesPublic.map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
       const before = (states ?? '') + (ifStart ?? '') + (forStart ?? '')
       const after = (forEnd ?? '') + (ifEnd ?? '')
-      return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}${className ? ` class="${className}"` : ''}${style ? ` style="${style}"` : ''}>${innerHtml}</${tagName}>${after}`
+
+      // Attributes
+      const originalAttributes = component.get('attributes') as Record<string, string>
+      const attributes = buildAttributes(originalAttributes, statesPrivate
+        // Filter out properties, keep only attributes
+        .filter(({ stateId }) => isAttribute(stateId))
+        // Make tokens a string
+        .map(({ stateId, tokens, label }) => ({
+          stateId,
+          label,
+          value: echoBlock(component, tokens),
+        }))
+      )
+
+      return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
       // FIXME: understand why
