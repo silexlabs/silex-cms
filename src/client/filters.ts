@@ -18,7 +18,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     dm.filters.push({
       type: 'filter',
       id: 'log',
-      label: 'log',
+      label: 'log (11ty)',
       validate: (field: Field | null) => !!field,
       output: type => type,
       apply: (str) => {
@@ -30,7 +30,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     }, {
       type: 'filter',
       id: 'slugify',
-      label: 'slugify',
+      label: 'slugify (11ty)',
       validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
       output: type => type,
       apply: (str) => {
@@ -41,7 +41,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     }, {
       type: 'filter',
       id: 'url',
-      label: 'url',
+      label: 'url (11ty)',
       validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
       output: type => type,
       apply: (str) => {
@@ -55,7 +55,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   const imageFilters: Filter[] = [{
     type: 'filter',
     id: 'image',
-    label: 'Image',
+    label: 'Image (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.includes('String'),
     apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
@@ -114,7 +114,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   const i18nFilters: Filter[] = [{
     type: 'filter',
     id: 'locale_url',
-    label: 'Locale URL',
+    label: 'Locale URL (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
