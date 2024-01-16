@@ -76,16 +76,16 @@ test('isAttribute', () => {
 
 test('buildAttributes', () => {
   const attributes = buildAttributes({
-    'data-original': 'original-value',
-    'data-both': 'original-value',
+    'href': 'original-value',
+    'class': 'original-value',
   }, [{
-    stateId: 'data-new-stateid',
-    label: 'data-new',
+    stateId: 'href-id',
+    label: 'href',
     value: 'new-value',
   },{
-    stateId: 'data-both-stateid',
-    label: 'data-both',
+    stateId: 'class-id',
+    label: 'class',
     value: 'new-value',
   }])
-  expect(attributes).toEqual('data-new="new-value" data-both="new-value original-value" data-original="original-value"')
+  expect(attributes).toEqual('href="new-value" class="original-value new-value"')
 })

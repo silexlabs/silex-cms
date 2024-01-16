@@ -24,6 +24,7 @@ enum ClientSideFileType {
   ASSET = 'asset',
   OTHER = 'other',
 }
+const ATTRIBUTE_MULTIPLE_VALUES = ['class', 'style']
 
 /**
  * A state with the real tokens instead of the stored tokens
@@ -340,26 +341,38 @@ export function isAttribute(label: string): boolean {
  * Exported for unit tests
  */
 export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: {stateId: StateId, label: string, value: string}[] ): string {
-  const attributesArr = attributeStates
-    .concat(Object.entries(originalAttributes).map(([label, value]) => ({
+  const attributesArr = Object.entries(originalAttributes)
+    // Start with the original attributes
+    .map(([label, value]) => ({
       stateId: label,
       label,
       value,
-    })))
+    }))
+    // Override or add state attributes
+    .concat(attributeStates)
     // Handle attributes which appear multiple times
     .reduce((final, { stateId, label, value }) => {
       const existing = final.find(({ label: existingLabel }) => existingLabel === label)
       if (existing) {
-        existing.value += ' ' + value
+        if(ATTRIBUTE_MULTIPLE_VALUES.includes(label)) {
+          // Add to the original value
+          existing.value += ' ' + value
+        } else {
+          // Override the original value
+          existing.value = value
+        }
       } else {
+        // First time we see this attribute
         final.push({
           stateId,
           label,
           value,
         })
       }
+      // Return the original array
       return final
     }, [] as ({stateId: StateId, value: string | boolean, label: string})[])
+  // Build final result
   return attributesArr
     // Convert to key="value" string
     .map(({ label, value }) => makeAttribute(label, value))
@@ -428,6 +441,9 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
 
       // Attributes
       const originalAttributes = component.get('attributes') as Record<string, string>
+      // Add css classes
+      originalAttributes.class = component.getClasses().join(' ')
+      // Make the list of attributes
       const attributes = buildAttributes(originalAttributes, statesPrivate
         // Filter out properties, keep only attributes
         .filter(({ label }) => isAttribute(label))
@@ -438,6 +454,9 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
           value: echoBlock(component, tokens),
         }))
       )
+      if(tagName === 'ADDRESS') {
+        console.log('attributes', {attributes, originalAttributes, component, tagName})
+      }
 
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
