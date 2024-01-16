@@ -312,14 +312,14 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
  * Make stored states into real states
  * Filter out hidden states and empty expressions
  */
-function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: StoredState}[]): {stateId: StateId, label: string | undefined, tokens: State[]}[] {
+function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: StoredState}[]): {stateId: StateId, label: string, tokens: State[]}[] {
   return states
     .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
     // From expression of stored tokens to tokens (with methods not only data)
     .map(({ stateId, state }) => ({
       stateId,
-      label: state.label,
+      label: state.label || stateId,
       tokens: state.expression.map(token => fromStored(token, dataTree)),
     }))
 }
@@ -339,7 +339,7 @@ export function isAttribute(label: string): boolean {
  * Append to the original attributes
  * Exported for unit tests
  */
-export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: {stateId: StateId, label: string | undefined, value: string}[] ): string {
+export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: {stateId: StateId, label: string, value: string}[] ): string {
   const attributesArr = attributeStates
     .concat(Object.entries(originalAttributes).map(([label, value]) => ({
       stateId: label,
@@ -359,7 +359,7 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
         })
       }
       return final
-    }, [] as ({stateId: StateId, value: string | boolean, label: string | undefined})[])
+    }, [] as ({stateId: StateId, value: string | boolean, label: string})[])
   return attributesArr
     // Convert to key="value" string
     .map(({ label, value }) => makeAttribute(label, value))
@@ -391,7 +391,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       // Convenience key value object
       const statesObj = statesPrivate
         // Filter out attributes, keep only properties
-        .filter(({ label }) => !isAttribute(label ?? ''))
+        .filter(({ label }) => !isAttribute(label))
         // Add states
         .concat(statesPublic)
         .reduce((final, { stateId, label, tokens }) => ({
@@ -430,7 +430,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const originalAttributes = component.get('attributes') as Record<string, string>
       const attributes = buildAttributes(originalAttributes, statesPrivate
         // Filter out properties, keep only attributes
-        .filter(({ stateId }) => isAttribute(stateId))
+        .filter(({ label }) => isAttribute(label))
         // Make tokens a string
         .map(({ stateId, tokens, label }) => ({
           stateId,
