@@ -123,7 +123,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   }, {
     type: 'filter',
     id: 'locale_links',
-    label: 'Locale links',
+    label: 'Locale links (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => ([{ url: input, lang: 'en', label: 'English' }, { url: input, lang: 'fr', label: 'Français' }]),
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['locale_link'], kind: 'list' }),

@@ -164,7 +164,6 @@ Hidden states
 * Not visible in the properties panel
 * Visible in completion of expressions
 
-
 Public states
 
 * In the UI they are represented by a list in the properties panel "states" section
@@ -178,6 +177,18 @@ Private states
 * In the HTML page they are rendered as liquid blocks in place of the element, for loops, echo, if, etc.
 * You get these states with getState(id, false)
 * They are typically properties of the element, like "innerHTML", "src", "href", etc.
+
+Attributes vs Properties vs States
+
+* Attributes are the HTML attributes, e.g. "src", "href", "class", etc.
+* Properties are the properties of the element, e.g. "innerHTML", repeat/loop data, visibility conditions, etc.
+* States are reusable expressions which are not visible in the HTML page, e.g. "myVar", "myVar2", etc.
+
+Attributes with multiple values
+
+* If you define an attribute multiple times, the last value will replace the previous ones
+* Exception: "class" or "style", the values are merged, including the initial values defined elsewhere in Silex
+
 
 ## Development
 
