@@ -31,18 +31,7 @@ export default function(config, opts: EleventyPluginOptions): void {
       type: 'filter',
       id: 'slugify',
       label: 'slugify (11ty)',
-      validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
-      output: type => type,
-      apply: (str) => {
-        return str.toString().toLowerCase().replace(/\s+/g, '-')
-      },
-      options: {},
-      quotedOptions: [],
-    }, {
-      type: 'filter',
-      id: 'url',
-      label: 'url (11ty)',
-      validate: (field: Field | null) => !!field && field.typeIds.includes('String') && field.kind === 'scalar',
+      validate: (field: Field | null) => !!field && field.typeIds.map(t => t.toLowerCase()).includes('string') && field.kind === 'scalar',
       output: type => type,
       apply: (str) => {
         return str.toString().toLowerCase().replace(/\s+/g, '-')
@@ -56,7 +45,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     type: 'filter',
     id: 'image',
     label: 'Image (11ty)',
-    validate: (input: Field | null) => !!input?.typeIds.includes('String'),
+    validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string'),
     apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
     quotedOptions: ['alt'],
@@ -115,7 +104,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     type: 'filter',
     id: 'locale_url',
     label: 'Locale URL (11ty)',
-    validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
+    validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
     quotedOptions: [],
@@ -124,7 +113,7 @@ export default function(config, opts: EleventyPluginOptions): void {
     type: 'filter',
     id: 'locale_links',
     label: 'Locale links (11ty)',
-    validate: (input: Field | null) => !!input?.typeIds.includes('String') && input?.kind === 'scalar',
+    validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => ([{ url: input, lang: 'en', label: 'English' }, { url: input, lang: 'fr', label: 'Français' }]),
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['locale_link'], kind: 'list' }),
     quotedOptions: [],
