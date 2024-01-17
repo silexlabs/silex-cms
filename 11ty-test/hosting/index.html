@@ -1,8 +1,11 @@
 ---
-permalink: "/index.html"
+pagination:
+  data: directus.blog
 
 ---
-<!DOCTYPE html>
+{% assign state_ipxq-5918_pagination = pagination %}
+{% assign state_ipxq-5918_items = pagination.items %}
+{% assign state_ipxq-5918_pages = pagination.pages %}<!DOCTYPE html>
 <html lang="">
 <head>
 <meta charset="UTF-8">
@@ -16,15 +19,19 @@ permalink: "/index.html"
 <meta name="og:description" property="og:description" content=""/>
 <meta name="og:image" property="og:image" content=""/>
 </head>
-<body id="i56k"><H1 id="i8dp">All blog posts:<br/></H1><div id="ibd4"><div id="ipek" class="field">Label: <span id="iaaq">Dynamic</span><br/></div><div id="ibwz6" class="field">Title: <span id="ico1j">Dynamic</span><br/></div><div id="i7x85" class="field">Text: <span id="iqu22">Dynamic</span><br/></div><div id="ieud7" class="field">Image: <span id="iqx2l">Dynamic</span><br/></div></div><select id="iws4f"><option id="irqpb" label="test"></option></select><div></div><div undefined="{% liquid
-    assign var_itn2f_2 = page.lang
-    echo var_itn2f_2
-  %}" id="itn2f" shortcode-name="image" shortcode-attributes="test1, test2" shortcode_name="aaa xxx" shortcode_attributes="bbb yyy">{% aaa xxx bbb yyy %}</div><div id="iqd8if"><div id="ixcx1r">Insert your text here a<br/></div></div><img webc:is="eleventy-image" src="/assets/test.webp" id="i9q7pu"/></body><script>var items = document.querySelectorAll('#iws4f');
-          for (var i = 0, len = items.length; i < len; i++) {
-            (function(){
-this.addEventListener('mousedown', function (event) {
-                            event.preventDefault();
-                        });
-}.bind(items[i]))();
-          }</script>
+<body id="ipxq">{% liquid
+    assign var_ih31_7 = state_ih31-8432___data
+    assign state_ih31-8432_ih31-pw51om0mcxb = var_ih31_7
+  %}{% liquid
+    assign var_ih31_6 = directus.blog
+    %}
+    {% for state_ih31-8432___data in var_ih31_6 %}
+  {% liquid
+    assign var_ih31_5 = state_ih31-8432_ih31-pw51om0mcxb.id
+    %}
+    {% if var_ih31_5 and var_ih31_5 != blank and var_ih31_5 != empty %}
+  <div class="">{% liquid
+    assign var_ih31_4 = state_ih31-8432___data.label
+    echo var_ih31_4
+  %}</div>{% endif %}{% endfor %}</body>
 </html>
