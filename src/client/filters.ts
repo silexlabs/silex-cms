@@ -44,7 +44,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   const imageFilters: Filter[] = [{
     type: 'filter',
     id: 'image',
-    label: 'Image (11ty)',
+    label: 'image (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string'),
     apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
@@ -103,7 +103,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   const i18nFilters: Filter[] = [{
     type: 'filter',
     id: 'locale_url',
-    label: 'Locale URL (11ty)',
+    label: 'locale_url (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
@@ -112,7 +112,7 @@ export default function(config, opts: EleventyPluginOptions): void {
   }, {
     type: 'filter',
     id: 'locale_links',
-    label: 'Locale links (11ty)',
+    label: 'locale_links (11ty)',
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => ([{ url: input, lang: 'en', label: 'English' }, { url: input, lang: 'fr', label: 'Français' }]),
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['locale_link'], kind: 'list' }),
