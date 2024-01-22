@@ -65,7 +65,7 @@ export default function(config, opts: EleventyPluginOptions): void {
           <label>Alt (select a custom state)
             <select name="alt">
               ${
-        states
+  states
     .filter(token => token.type === 'state' && token.exposed)
     .map((state: State) => {
       const value = getStateVariableName(state.componentId, state.storedStateId)
