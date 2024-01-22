@@ -229,7 +229,20 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
   if(!filters.length) return ''
   return ' | ' + filters.map(token => {
     const options = token.options ? Object.entries(token.options)
-      .map(([key, value]) => handleFilterOption(token, key, value as string)) : []
+      // Order the filter's options by the order they appear in the filter's optionsKeys
+      .map(([key, value]) => ({
+        key,
+        value: value,
+        order: token.optionsKeys?.indexOf(key),
+      }))
+      .sort((a, b) => {
+        if(a.order === undefined && b.order === undefined) return 0
+        if(a.order === undefined) return 1
+        if(b.order === undefined) return -1
+        return a.order - b.order
+      })
+      // Convert the options to liquid
+      .map(({key, value}) => handleFilterOption(token, key, value as string)) : []
     return `${token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
     .join(' | ')
@@ -267,10 +280,10 @@ function handleFilterOption(filter: Filter, key: string, value: string): string 
         }
       })
         .join('.')
-      return filter.quotedOptions.includes(key) ? quote(result) : result
+      return filter.quotedOptions?.includes(key) ? quote(result) : result
     }
   } catch(e) {
     // Ignore
   }
-  return filter.quotedOptions.includes(key) ? quote(value) : value
+  return filter.quotedOptions?.includes(key) ? quote(value) : value
 }

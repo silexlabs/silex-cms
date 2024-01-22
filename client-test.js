@@ -16,7 +16,7 @@ export default function (config, options = {}) {
         id: 'directus',
         type: 'graphql',
         label: 'Directus API',
-        url: 'https://eco-starter.2.internet2000.net/cms/graphql',
+        url: 'https://eco-starter.eco2.i2k.site/cms/graphql',
         method: 'POST',
         headers: {},
       }, {

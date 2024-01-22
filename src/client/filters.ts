@@ -1,4 +1,4 @@
-import { Field, Filter, Options, State, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { Field, Filter, Options, State, getContext, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 import { html } from 'lit-html'
 
@@ -26,7 +26,6 @@ export default function(config, opts: EleventyPluginOptions): void {
         return str
       },
       options: {},
-      quotedOptions: [],
     }, {
       type: 'filter',
       id: 'slugify',
@@ -37,7 +36,6 @@ export default function(config, opts: EleventyPluginOptions): void {
         return str.toString().toLowerCase().replace(/\s+/g, '-')
       },
       options: {},
-      quotedOptions: [],
     })
   })
 
@@ -49,12 +47,15 @@ export default function(config, opts: EleventyPluginOptions): void {
     apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
     quotedOptions: ['alt'],
+    optionsKeys: ['alt', 'sizes', 'widths'],
     options: {
       alt: '',
       sizes: '',
       widths: '',
     },
     optionsForm: (input: Field | null, options: Options) => {
+      const selected = config.getEditor().getSelected()
+      const states = getContext(selected, config.getEditor().DataSourceManager.getDataTree()) as State[]
       return html`
         <form>
           <details>
@@ -64,12 +65,12 @@ export default function(config, opts: EleventyPluginOptions): void {
           <label>Alt (select a custom state)
             <select name="alt">
               ${
-  config.getEditor().DataSourceManager.getDataTree().getContext()
+        states
     .filter(token => token.type === 'state' && token.exposed)
     .map((state: State) => {
       const value = getStateVariableName(state.componentId, state.storedStateId)
       const component = (() => {
-        let c = config.getEditor().getSelected()
+        let c = selected
         while(c) {
           if(getPersistantId(c) === state.componentId) return c
           c = c.parent()
@@ -107,7 +108,6 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
-    quotedOptions: [],
     options: {},
   }, {
     type: 'filter',
@@ -116,7 +116,6 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => ([{ url: input, lang: 'en', label: 'English' }, { url: input, lang: 'fr', label: 'Français' }]),
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['locale_link'], kind: 'list' }),
-    quotedOptions: [],
     options: {},
   }]
 }
