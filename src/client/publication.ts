@@ -399,7 +399,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
     })))
 
   if (statesPrivate.length > 0 || statesPublic.length > 0) {
-    const tagName = component.get('tagName')
+    const tagName = component.get('tagName')?.toLowerCase()
     if (tagName) {
       // Convenience key value object
       const statesObj = statesPrivate
@@ -454,10 +454,6 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
           value: echoBlock(component, tokens),
         }))
       )
-      if(tagName === 'ADDRESS') {
-        console.log('attributes', {attributes, originalAttributes, component, tagName})
-      }
-
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
