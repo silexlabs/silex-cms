@@ -15,6 +15,10 @@ import { buildAttributes, getFrontMatter, isAttribute } from './publication'
 //  }
 //})
 
+// Prevent lit-html from being imported
+// This is because it breakes the tests since lit-html is a peer dependency (?)
+jest.mock('lit-html', () => ({}))
+
 test('Front matter of a simple page', () => {
   expect(() => getFrontMatter({}, 'page-1', '')).not.toThrow()
   expect(getFrontMatter({}, 'page-1', '')).toEqual(dedent`
