@@ -112,7 +112,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
       model: {
         defaults: {
           traits: [
-            ...editor.DomComponents.getType('image').model.prototype.defaults.traits,
+            ...(editor.DomComponents.getType('image')?.model.prototype.defaults.traits || []),
             {
               type: 'text',
               label: 'Width',

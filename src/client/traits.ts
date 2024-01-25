@@ -22,7 +22,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
           defaults: {
             traits: [
               // Keep the type original traits
-              ...editor.DomComponents.getType(type.id)?.model.prototype.defaults.traits,
+              ...(editor.DomComponents.getType(type.id)?.model.prototype.defaults.traits || []),
               // Add the new trait
               {
                 label: LABEL,
@@ -53,7 +53,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
 
     // inspired by https://github.com/olivmonnier/grapesjs-plugin-header/blob/master/src/components.js
     editor.TraitManager.addType(UNWRAP_ID, {
-      createInput({ trait }) {
+      createInput() {
         // Create a new element container and add some content
         const el = document.createElement('div')
         // update the UI when a page is added/renamed/removed
@@ -64,7 +64,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
       },
       // Update the component based on UI changes
       // `elInput` is the result HTMLElement you get from `createInput`
-      onEvent({ elInput, component, event }) {
+      onEvent({ elInput, component }) {
         const value = (elInput.querySelector(`#${UNWRAP_ID}`) as HTMLInputElement)?.checked
         component.set(UNWRAP_ID, value)
       },
