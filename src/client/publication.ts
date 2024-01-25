@@ -5,6 +5,7 @@ import { assignBlock, echoBlock, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { UNWRAP_ID } from './traits'
 //import { ClientSideFile, ClientSideFileType, ClientSideFileWithContent, PublicationData } from '@silexlabs/silex/src/ts/types'
 
 // FIXME: should be imported from silex
@@ -46,6 +47,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
     })
 
     // Generate 11ty data files
+    // FIXME: should this be in the publication transformers?
     const editor = config.getEditor()
     editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
   })
@@ -398,7 +400,9 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       state: getState(component, stateId, true),
     })))
 
-  if (statesPrivate.length > 0 || statesPublic.length > 0) {
+  const unwrap = component.get(UNWRAP_ID)
+
+  if (statesPrivate.length > 0 || statesPublic.length > 0 || unwrap) {
     const tagName = component.get('tagName')?.toLowerCase()
     if (tagName) {
       // Convenience key value object
@@ -454,6 +458,9 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
           value: echoBlock(component, tokens),
         }))
       )
+      if(unwrap) {
+        return `${before}${innerHtml}${after}`
+      }
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
