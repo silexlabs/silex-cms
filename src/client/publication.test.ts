@@ -3,7 +3,7 @@
  */
 
 import dedent from 'dedent'
-import {expect, test} from '@jest/globals'
+import {expect, jest, test} from '@jest/globals'
 import { buildAttributes, getFrontMatter, isAttribute } from './publication'
 //import grapesjs, { Page } from 'grapesjs'
 //import { DataSourceEditor, DataSourceEditorOptions, getState } from '@silexlabs/grapesjs-data-source'
