@@ -24,13 +24,31 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
             label: 'Shortcode attributes',
             name: 'shortcode_attributes',
             placeholder: 'param1, "example param 2"',
+          }, {
+            type: 'checkbox',
+            label: 'Is paired',
+            name: 'shortcode_is_paired',
           }],
         },
       },
     })
     function updateShortcode(component) {
-      const { shortcode_attributes, shortcode_name } = component.get('attributes')
-      component.components(`{% ${shortcode_name} ${shortcode_attributes ?? ''} %}`)
+      const { shortcode_attributes, shortcode_name, shortcode_is_paired } = component.get('attributes')
+      const componentsToKeep = component.components()
+        .filter(c => c.view?.el?.nodeType === 1)
+      component.components(shortcode_is_paired ? `
+        {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
+          <div class="replace_content"></div>
+        {% end${shortcode_name} %}
+      ` : `
+        {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
+      `)
+      const replaceContentDiv = component.components().find(c => c.getClasses().includes('replace_content'))
+      if (!replaceContentDiv) {
+        console.error('No replace_content found', { component, componentsToKeep })
+        return
+      }
+      replaceContentDiv.replaceWith(componentsToKeep)
     }
     editor.TraitManager.addType('shortcode-name', {
       onEvent({ component }) {
@@ -55,12 +73,12 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
         defaults: {
           tagName: 'select',
           droppable: true,
-          // Prevent the drop down from opening on click
-          script: function() {
-            this.addEventListener('mousedown', event => {
-              event.preventDefault()
-            })
-          },
+          // // Prevent the drop down from opening on click
+          // script: function() {
+          //   this.addEventListener('mousedown', event => {
+          //     event.preventDefault()
+          //   })
+          // },
         },
       },
     })
