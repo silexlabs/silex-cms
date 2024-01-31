@@ -33,7 +33,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
             setTimeout(() => {
               // FIXME: why do we need a timeout?
               if (model.parent() === this || model === this) {
-                console.log('add or remove', this)
                 pending = true
                 updateShortcode(this)
                 pending = false
@@ -44,7 +43,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
       },
     })
     function updateShortcode(component) {
-      console.log('updateShortcode', { component })
       const { shortcode_attributes, shortcode_name } = component.get('attributes')
       const componentsToKeep = component.components()
         .filter(c => c.view?.el?.nodeType === 1)
@@ -69,15 +67,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
     }
     editor.TraitManager.addType('shortcode-name', {
       onEvent({ component }) {
-        console.log('onEvent', { component })
-        updateShortcode(component)
-      },
-      onUpdate({ component }) {
-        console.log('onUpdate', { component })
-        updateShortcode(component)
-      },
-      onRender({ component }) {
-        console.log('onRender', { component })
         updateShortcode(component)
       },
     })
