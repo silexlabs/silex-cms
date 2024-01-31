@@ -24,34 +24,60 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
             label: 'Shortcode attributes',
             name: 'shortcode_attributes',
             placeholder: 'param1, "example param 2"',
-          }, {
-            type: 'checkbox',
-            label: 'Is paired',
-            name: 'shortcode_is_paired',
           }],
+        },
+        init() {
+          let pending = false
+          editor.on('component:add component:remove component:mount', model => {
+            if (pending) return
+            setTimeout(() => {
+              // FIXME: why do we need a timeout?
+              if (model.parent() === this || model === this) {
+                console.log('add or remove', this)
+                pending = true
+                updateShortcode(this)
+                pending = false
+              }
+            }, 500)
+          })
         },
       },
     })
     function updateShortcode(component) {
-      const { shortcode_attributes, shortcode_name, shortcode_is_paired } = component.get('attributes')
+      console.log('updateShortcode', { component })
+      const { shortcode_attributes, shortcode_name } = component.get('attributes')
       const componentsToKeep = component.components()
         .filter(c => c.view?.el?.nodeType === 1)
-      component.components(shortcode_is_paired ? `
-        {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
-          <div class="replace_content"></div>
-        {% end${shortcode_name} %}
-      ` : `
-        {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
-      `)
-      const replaceContentDiv = component.components().find(c => c.getClasses().includes('replace_content'))
-      if (!replaceContentDiv) {
-        console.error('No replace_content found', { component, componentsToKeep })
-        return
+      if (componentsToKeep.length) {
+        // Paired shortcode
+        component.components(`
+          {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
+            <div class="replace_content"></div>
+          {% end${shortcode_name} %}
+        `)
+        const replaceContentDiv = component.components().find(c => c.getClasses().includes('replace_content'))
+        if (!replaceContentDiv) {
+          console.error('No replace_content found', { component, componentsToKeep })
+          return
+        }
+        replaceContentDiv.replaceWith(componentsToKeep)
+      } else {
+        component.components(`
+          {% ${shortcode_name} ${shortcode_attributes ?? ''} %}
+        `)
       }
-      replaceContentDiv.replaceWith(componentsToKeep)
     }
     editor.TraitManager.addType('shortcode-name', {
       onEvent({ component }) {
+        console.log('onEvent', { component })
+        updateShortcode(component)
+      },
+      onUpdate({ component }) {
+        console.log('onUpdate', { component })
+        updateShortcode(component)
+      },
+      onRender({ component }) {
+        console.log('onRender', { component })
         updateShortcode(component)
       },
     })
