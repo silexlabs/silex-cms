@@ -46,10 +46,12 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
       //transformFile: (file) => transformFile(file),
     })
 
-    // Generate 11ty data files
-    // FIXME: should this be in the publication transformers?
-    const editor = config.getEditor()
-    editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
+    if(options.enable11ty) {
+      // Generate 11ty data files
+      // FIXME: should this be in the publication transformers?
+      const editor = config.getEditor()
+      editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
+    }
   })
 }
 
@@ -151,7 +153,7 @@ export function getBodyStates(page: Page): string {
   // Render the body states
   const body = page.getMainComponent()
   const pagination = getState(body, 'pagination', true)
-  if (pagination?.expression.length > 0) {
+  if (pagination && pagination.expression.length > 0) {
     //const block = getLiquidBlock(body, pagination.expression)
     const bodyId = getPersistantId(body)
     if (bodyId) {
@@ -391,13 +393,13 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
   const statesPrivate = getRealStates(dataTree, getStateIds(component, false)
     .map(stateId => ({
       stateId,
-      state: getState(component, stateId, false),
+      state: getState(component, stateId, false)!,
     })))
 
   const statesPublic = getRealStates(dataTree, getStateIds(component, true)
     .map(stateId => ({
       stateId,
-      state: getState(component, stateId, true),
+      state: getState(component, stateId, true)!,
     })))
 
   const unwrap = component.get(UNWRAP_ID)

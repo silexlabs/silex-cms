@@ -9,15 +9,17 @@ function expect(condition: boolean, message: string) {
   }
 }
 
-export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
+export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
     const dm = (config.getEditor() as DataSourceEditor).DataSourceManager
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
-    expect(!dm.get('eleventy'), 'The eleventy data source has already been registered')
-    dm.add(new EleventyDataSource(), {merge: false})
-    expect(!!dm.get('eleventy'), 'The eleventy data source should be registered')
+    if(opts.enable11ty) {
+      expect(!dm.get('eleventy'), 'The eleventy data source has already been registered')
+      dm.add(new EleventyDataSource(), {merge: false})
+      expect(!!dm.get('eleventy'), 'The eleventy data source should be registered')
+    }
   })
 }
 

@@ -3,7 +3,6 @@
  */
 
 import DataSourcePlugin from '@silexlabs/grapesjs-data-source'
-import { GraphQLOptions } from '@silexlabs/grapesjs-data-source/src/datasources/GraphQL'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions } from '../client'
 import { Editor, EditorConfig } from 'grapesjs'
@@ -33,20 +32,18 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     view: {
       el: () => config.getEditor().Panels.getPanel('views-container')?.view.el,
       button: () => config.getEditor().Panels.getPanel('views')!.get('buttons')!.get('open-tm'),
+      defaultFixed: true,
+      // Show all editors by default
+      disableStates: false,
+      disableAttributes: false,
+      disableProperties: false,
     },
     // Liquid filters
     filters: 'liquid',
     // Default data source
-    dataSources: [
-      {
-        id: 'countries api', // FIXME: the ID is displayed in the completion, not the label
-        type: 'graphql',
-        label: 'Countries API',
-        url: 'https://countries.trevorblades.com/graphql',
-        method: 'POST',
-        headers: {},
-      } as GraphQLOptions
-    ],
+    dataSources: [],
+    // Enable 11ty publication and filters
+    enable11ty: true,
     // 11ty plugins
     fetchPlugin: {
       duration: '1s',

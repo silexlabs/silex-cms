@@ -13,6 +13,10 @@ import blocks from './client/blocks'
 import traits from './client/traits'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
+  // Enable the publication to 11ty
+  // If false, the publication will not publish to 11ty and do not display 11ty data
+  // Default: true
+  enable11ty?: boolean,
   // 11ty fetch plugin options
   // https://www.11ty.dev/docs/plugins/fetch/
   // Default: { duration: '1d', type: 'json' }

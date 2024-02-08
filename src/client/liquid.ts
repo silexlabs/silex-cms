@@ -19,6 +19,9 @@ export type Condition = BinaryCondition | UnaryCondition
  */
 export function echoBlock(component: Component, expression: Expression): string {
   if(expression.length === 0) throw new Error('Expression is empty')
+  if(expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
+    return expression[0].options?.value as string ?? ''
+  }
   const statements = getLiquidBlock(component, expression)
   return `{% liquid
     ${

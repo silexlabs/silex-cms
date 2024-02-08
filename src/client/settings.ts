@@ -1,7 +1,7 @@
 import { DataSourceEditor, DataSourceId, Field } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { html } from 'lit-html'
-import { Silex11tyPluginWebsiteSettings } from '../client'
+import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 //import { createRef } from 'lit/directives/ref.js'
 //import { StepsSelector } from '@silexlabs/steps-selector'
 //import { renderExpression } from '@silexlabs/grapesjs-data-source'
@@ -12,7 +12,8 @@ interface FieldsByDataSource {
 }
 
 //const pageDataInputRef = createRef<StepsSelector>()
-export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
+export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
+  if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
     config.addSettings({
       id: 'eleventy',
