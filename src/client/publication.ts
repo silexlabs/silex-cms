@@ -42,7 +42,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
     config.addPublicationTransformers({
       renderComponent: (component, toHtml) => renderComponent(config, component, toHtml),
       transformPermalink: this.options.enable11ty ? (path, type) => transformPermalink(path, type, options) : undefined,
-      transformPath: (path, type) => this.options.enable11ty ? transformPath(path, type, options) : undefined,
+      transformPath: this.options.enable11ty ? (path, type) => transformPath(path, type, options) : undefined,
       //transformFile: (file) => transformFile(file),
     })
 
