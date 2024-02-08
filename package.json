@@ -1,6 +1,6 @@
 {
   "name": "@silexlabs/silex-cms",
-  "version": "0.0.83",
+  "version": "0.0.84",
   "description": "Silex plugin",
   "main": "dist/server.js",
   "module": "dist/client.js",
