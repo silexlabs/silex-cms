@@ -41,8 +41,8 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
       renderComponent: (component, toHtml) => renderComponent(config, component, toHtml),
-      transformPermalink: this.options.enable11ty ? (path, type) => transformPermalink(path, type, options) : undefined,
-      transformPath: this.options.enable11ty ? (path, type) => transformPath(path, type, options) : undefined,
+      transformPermalink: options.enable11ty ? (path, type) => transformPermalink(path, type, options) : undefined,
+      transformPath: options.enable11ty ? (path, type) => transformPath(path, type, options) : undefined,
       //transformFile: (file) => transformFile(file),
     })
 

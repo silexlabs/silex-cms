@@ -69,7 +69,6 @@ And expose the plugin to the front end:
 // silex-server.js
 const StaticPlugin = require('@silexlabs/silex/dist/plugins/server/plugins/server/StaticPlugin').default
 const node_modules = require('node_modules-path')
-console.log('node_modules', node_modules('@silexlabs/silex-cms'))
 module.exports = function(config, options) {
   config.addPlugin(StaticPlugin, {
     routes: [
