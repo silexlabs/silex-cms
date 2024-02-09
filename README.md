@@ -136,12 +136,14 @@ module.exports = function(eleventyConfig) {
 
 ## Options
 
-You can pass an object containing all options of [the GrapesJs DataSource plugin](https://github.com/silexlabs/grapesjs-data-source)
+You can pass an object containing all options of [the GrapesJs DataSource plugin](https://github.com/silexlabs/grapesjs-data-source#options)
 
 Here are additional options specific to this plugin:
 
 |Option|Description|Default|
-|-|-|-
+|-|-|-|
+| `dataSources` and other data source options | An array of data sources to use in the CMS. Check [Data Source plugin optsion](https://github.com/silexlabs/grapesjs-data-source?tab=readme-ov-file#options) | `[]` |
+| `enable11ty` | Enable the 11ty integration. If false, the publication will not publish to 11ty and do not display 11ty data. | `true` |
 |`fetchPlugin`|Options to pass to [11ty fetch plugin](https://www.11ty.dev/docs/plugins/fetch/)|`{ duration: '1d', type: 'json' }`|
 |`imagePlugin`|Enable filters which assume that your eleventy site has the [11ty image plugin installed](https://www.11ty.dev/docs/plugins/image/)|`false`|
 |`i18nPlugin`|Enable filters which assume that your eleventy site has the [11ty i18n plugin installed](https://www.11ty.dev/docs/plugins/i18n/)|`false`|
