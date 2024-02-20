@@ -1,6 +1,7 @@
 ---
 pagination:
-  data: directus.blog
+  data: countries_api.continents
+  size: 1
 
 ---
 {% assign state_ipxq-5918_pagination = pagination %}
@@ -18,20 +19,9 @@ pagination:
 <meta name="og:title" property="og:title" content=""/>
 <meta name="og:description" property="og:description" content=""/>
 <meta name="og:image" property="og:image" content=""/>
-</head>
-<body id="ipxq">{% liquid
-    assign var_ih31_3 = state_ih31-8432___data
-    assign state_ih31-8432_ih31-pw51om0mcxb = var_ih31_3
-  %}{% liquid
-    assign var_ih31_2 = directus.blog
-    %}
-    {% for state_ih31-8432___data in var_ih31_2 %}
-  {% liquid
-    assign var_ih31_1 = state_ih31-8432_ih31-pw51om0mcxb.id
-    %}
-    {% if var_ih31_1 and var_ih31_1 != blank and var_ih31_1 != empty %}
-  {% liquid
-    assign var_ih31_0 = state_ih31-8432___data.label
-    echo var_ih31_0
-  %}{% endif %}{% endfor %}Insert your text here aaa<br/>Insert your text here bbb<br/></body>
+<link href="https://fonts.googleapis.com" rel="preconnect" ><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin ></head>
+<body id="ipxq">Insert your text here{% liquid
+    assign var_iubw_0 = state_ipxq-5918_pages
+    echo var_iubw_0
+  %}Insert your text here bbb<br/></body>
 </html>

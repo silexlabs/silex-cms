@@ -13,6 +13,9 @@ import blocks from './client/blocks'
 import traits from './client/traits'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
+  // Enable the publication to 11ty version > 2
+  // Default: true
+  esModule?: boolean,
   // Enable the publication to 11ty
   // If false, the publication will not publish to 11ty and do not display 11ty data
   // Default: true

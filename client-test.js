@@ -3,8 +3,26 @@ import CmsPlugin from '../client.js'
 // A test client config
 export default function (config, options = {}) {
   const opts = {
-    dataSources: [],
-    enable11ty: false, // For now don't publish for 11ty
+    dataSources: [
+      {
+        id: 'countries_api',
+        type: 'graphql',
+        label: 'Countries API',
+        url: 'https://countries.trevorblades.com/graphql',
+        method: 'POST',
+        headers: {},
+      }, {
+        id: 'sanity',
+        type: 'graphql',
+        label: 'Sanity API',
+        url: 'https://gl93e3h9.api.sanity.io/v2023-08-01/graphql/production/default',
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer skGP3qsWCXgPPTqmvIyAdeFhACwWKt94Eq3oCexQNvalA291L03mfLLq0DFHN9pVxhPuTVSs5vfDucKpWZHKRGGKwBdou4QYW32yNBBkHJjl2QGnn67KtdaqRCo7vhxlBObbZdFVylCgtO2M6c4lvkal0owBpVO4PCcMxeUC38z1r8pjvTXJ',
+        },
+      }
+    ],
+    enable11ty: true,
     image: true,
     i18n: true,
     filters: [

@@ -253,6 +253,15 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
  * Generate the data file for a given page
  */
 function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>, options: EleventyPluginOptions): string {
+  const esModule = options.esModule === true || typeof options.esModule === 'undefined'
+  const fetchImportStatement = (() => {
+    if(options.fetchPlugin) {
+      return esModule ? `import EleventyFetch from '@11ty/eleventy-fetch'` : `const EleventyFetch = require('@11ty/eleventy-fetch')`
+    }
+    return ''
+  })()
+  const exportStatement = esModule ? 'export default' : 'module.exports ='
+
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
     if (dataSource) {
@@ -263,8 +272,8 @@ function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string,
     }
   }).join('\n')
   return `
-const EleventyFetch = require('@11ty/eleventy-fetch')
-module.exports = async function () {
+${ fetchImportStatement }
+${ exportStatement } async function () {
   const result = {}
   ${content}
   return result

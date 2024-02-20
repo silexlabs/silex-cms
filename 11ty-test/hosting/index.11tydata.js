@@ -1,10 +1,10 @@
 
-const EleventyFetch = require('@11ty/eleventy-fetch')
-module.exports = async function () {
+import EleventyFetch from '@11ty/eleventy-fetch'
+export default async function () {
   const result = {}
   
   try {
-    result['directus'] = (await EleventyFetch(`https://eco-starter.eco2.i2k.site/cms/graphql?cache_buster=190923`, {
+    result['countries_api'] = (await EleventyFetch(`https://countries.trevorblades.com/graphql?cache_buster=725440`, {
       ...{"duration":"1s","type":"json"},
       fetchOptions: {
         headers: {
@@ -14,10 +14,9 @@ module.exports = async function () {
         body: JSON.stringify({
           query: `query {
   __typename
-  blog {
+  continents {
     __typename
-    label
-    id
+
 
   }
 
@@ -26,12 +25,11 @@ module.exports = async function () {
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, 'directus', 'https://eco-starter.eco2.i2k.site/cms/graphql?cache_buster=190923', 'POST', `query {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, 'countries_api', 'https://countries.trevorblades.com/graphql?cache_buster=725440', 'POST', `query {
   __typename
-  blog {
+  continents {
     __typename
-    label
-    id
+
 
   }
 
