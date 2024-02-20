@@ -256,7 +256,7 @@ function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string,
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchImportStatement = (() => {
     if(options.fetchPlugin) {
-      return esModule ? `import EleventyFetch from '@11ty/eleventy-fetch'` : `const EleventyFetch = require('@11ty/eleventy-fetch')`
+      return esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')'
     }
     return ''
   })()
