@@ -23,8 +23,8 @@ export interface EleventyPluginOptions extends DataSourceEditorOptions {
   fetchPlugin?: object,
   // Image plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/image/
-  // Default: false
-  imagePlugin?: boolean,
+  // Default: 'transform'
+  imagePlugin?: false | 'webc' | 'transform',
   // Internationalization plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/i18n/
   // Default: false

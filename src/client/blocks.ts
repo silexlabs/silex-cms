@@ -1,6 +1,7 @@
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { EleventyPluginOptions } from '../client'
 
-export default function(config: ClientConfig/*, opts: EleventyPluginOptions */): void {
+export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:grapesjs:end', () => {
     const editor = config.getEditor()
     // **
@@ -130,32 +131,38 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
     })
     // **
     // Image web component
-    editor.BlockManager.add('eleventy-img', {
-      label: 'eleventy-img',
-      category: 'Eleventy',
-      attributes: { class: 'fa fa-image' },
-      id: 'eleventy-img',
-      content: { type: 'eleventy-img' },
-      // The component `image` is activatable (shows the Asset Manager).
-      activate: true,
-      // select: true, // Default with `activate: true`
-    })
-    editor.DomComponents.addType('eleventy-img', {
-      extend: 'image',
-      model: {
-        defaults: {
-          traits: [
-            ...(editor.DomComponents.getType('image')?.model.prototype.defaults.traits || []),
-            {
-              type: 'text',
-              label: 'Width',
-              name: 'width',
-              placeholder: '100, 200',
-            },
-          ],
-          attributes: { 'webc:is': 'eleventy-image' },
+    if(opts.imagePlugin) {
+      // Add an attribute for the webc version
+      const attributes = opts.imagePlugin === 'webc' ? { 'webc:is': 'eleventy-image' } : {}
+      // Add the block
+      editor.BlockManager.add('eleventy-img', {
+        label: 'eleventy-img',
+        category: 'Eleventy',
+        attributes: { class: 'fa fa-image' },
+        id: 'eleventy-img',
+        content: { type: 'eleventy-img' },
+        // The component `image` is activatable (shows the Asset Manager).
+        activate: true,
+        // select: true, // Default with `activate: true`
+      })
+      // Add the component type
+      editor.DomComponents.addType('eleventy-img', {
+        extend: 'image',
+        model: {
+          defaults: {
+            traits: [
+              ...(editor.DomComponents.getType('image')?.model.prototype.defaults.traits || []),
+              {
+                type: 'text',
+                label: 'Width',
+                name: 'width',
+                placeholder: '100, 200',
+              },
+            ],
+            attributes,
+          },
         },
-      },
-    })
+      })
+    }
   })
 }
