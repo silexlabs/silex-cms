@@ -3,7 +3,6 @@ import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { html } from 'lit-html'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 //import { createRef } from 'lit/directives/ref.js'
-//import { StepsSelector } from '@silexlabs/steps-selector'
 //import { renderExpression } from '@silexlabs/grapesjs-data-source'
 
 interface FieldsByDataSource {

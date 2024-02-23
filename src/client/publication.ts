@@ -198,8 +198,8 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     if(pageData.type !== ClientSideFileType.HTML) throw new Error(`File for path ${path} is not HTML`)
     const dataFile = Object.keys(query).length > 0 ? {
       type: ClientSideFileType.OTHER,
-      path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.js`, 'html'),
-      //path: `/${page.getName() || 'index'}.11tydata.js`,
+      path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.mjs`, 'html'),
+      //path: `/${page.getName() || 'index'}.11tydata.mjs`,
       content: getDataFile(editor, page, query, options),
     } : null
 
@@ -218,7 +218,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
         if (dataFile) {
           return [pageFile, {
             ...dataFile,
-            path: dataFile.path.replace(/\.11tydata\.js$/, `-${lang}.11tydata.js`),
+            path: dataFile.path.replace(/\.11tydata\.mjs$/, `-${lang}.11tydata.mjs`),
           }] // It is important to keep pageFile first, see bellow
         }
         return pageFile
