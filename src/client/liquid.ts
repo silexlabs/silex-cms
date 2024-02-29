@@ -246,7 +246,7 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
       })
       // Convert the options to liquid
       .map(({key, value}) => handleFilterOption(token, key, value as string)) : []
-    return `${token.id}${options.length ? `: ${options.join(', ')}` : ''}`
+    return `${token.filterName ?? token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
     .join(' | ')
 }
