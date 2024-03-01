@@ -200,7 +200,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       type: ClientSideFileType.OTHER,
       path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.mjs`, 'html'),
       //path: `/${page.getName() || 'index'}.11tydata.mjs`,
-      content: getDataFile(editor, page, query, options),
+      content: getDataFile(editor, page, null, query, options),
     } : null
 
     if(languages && languages.length > 0) {
@@ -219,6 +219,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
           return [pageFile, {
             ...dataFile,
             path: dataFile.path.replace(/\.11tydata\.mjs$/, `-${lang}.11tydata.mjs`),
+            content: getDataFile(editor, page, lang, query, options),
           }] // It is important to keep pageFile first, see bellow
         }
         return pageFile
@@ -252,7 +253,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
 /**
  * Generate the data file for a given page
  */
-function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string, string>, options: EleventyPluginOptions): string {
+function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchImportStatement = (() => {
     if(options.fetchPlugin) {
@@ -265,7 +266,7 @@ function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string,
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
     if (dataSource) {
-      return queryToDataFile(dataSource, queryStr, options, page)
+      return queryToDataFile(dataSource, queryStr, options, page, lang)
     } else {
       console.error('No data source for id', dataSourceId)
       throw new Error(`No data source for id ${dataSourceId}`)
@@ -273,7 +274,11 @@ function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string,
   }).join('\n')
   return `
 ${ fetchImportStatement }
-${ exportStatement } async function () {
+${ exportStatement } async function (configData) {
+  const data = {
+    ...configData,
+    lang: '${lang || ''}',
+  }
   const result = {}
   ${content}
   return result
@@ -284,7 +289,7 @@ ${ exportStatement } async function () {
 /**
  * Generate the fetch call for a given page
  */
-function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page): string {
+function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -292,7 +297,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const s2s = dataSource.get('serverToServer')
   const url = s2s ? s2s.url : dataSource.get('url')
   // Add a cache buster to avoid caching between pages, this will still cache between 11ty builds
-  const urlWithCacheBuster = `${url}${url.includes('?') ? '&' : '?'}page_id_for_cache=${page.getId()}`
+  const urlWithCacheBuster = `${url}${url.includes('?') ? '&' : '?'}page_id_for_cache=${page.getId()}${lang ? `-${lang}` : ''}`
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
   // Check that the content-type is set
