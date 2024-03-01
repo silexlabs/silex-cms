@@ -265,7 +265,7 @@ function getDataFile(editor: DataSourceEditor, page: Page, query: Record<string,
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = editor.DataSourceManager.get(dataSourceId)
     if (dataSource) {
-      return queryToDataFile(dataSource, queryStr, options)
+      return queryToDataFile(dataSource, queryStr, options, page)
     } else {
       console.error('No data source for id', dataSourceId)
       throw new Error(`No data source for id ${dataSourceId}`)
@@ -284,7 +284,7 @@ ${ exportStatement } async function () {
 /**
  * Generate the fetch call for a given page
  */
-function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions): string {
+function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -292,7 +292,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const s2s = dataSource.get('serverToServer')
   const url = s2s ? s2s.url : dataSource.get('url')
   // Add a cache buster to avoid caching between pages, this will still cache between 11ty builds
-  const urlWithCacheBuster = url + (url.includes('?') ? '&' : '?') + 'cache_buster=' + Math.round(Math.random() * 1000000)
+  const urlWithCacheBuster = `${url}${url.includes('?') ? '&' : '?'}page_id_for_cache=${page.getId()}`
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
   // Check that the content-type is set
