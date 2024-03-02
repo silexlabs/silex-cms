@@ -57,7 +57,6 @@ export default function(config, opts: EleventyPluginOptions): void {
       const selected = config.getEditor().getSelected()
       const states = getContext(selected, config.getEditor().DataSourceManager.getDataTree()) as State[]
       return html`
-        <form>
           <details>
             <summary>Help</summary>
             Check <a href="https://www.11ty.dev/docs/plugins/image/" target="_blank">11ty's docs about image plugin</a> for more information.
@@ -85,18 +84,14 @@ export default function(config, opts: EleventyPluginOptions): void {
     })
     .join('\n')
 }
-            </select>
-          </label>
-          <label>Sizes attribute
-            <input type="text" name="sizes" value="${options.sizes}" />
-          </label>
-          <label>Widths (JSON)
-            <input type="text" name="widths" value="${options.widths}" />
-          </label>
-        <div class="buttons">
-          <input type="reset" value="Cancel">
-          <input type="submit" value="Apply">
-        </div>
+          </select>
+        </label>
+        <label>Sizes attribute
+          <input type="text" name="sizes" value="${options.sizes}" />
+        </label>
+        <label>Widths (JSON)
+          <input type="text" name="widths" value="${options.widths}" />
+        </label>
       `
     },
   }]
@@ -108,7 +103,15 @@ export default function(config, opts: EleventyPluginOptions): void {
     validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string') && input?.kind === 'scalar',
     apply: (input: unknown/*, options: Options*/) => input,
     output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
-    options: {},
+    options: {
+      locale: '',
+    },
+    quotedOptions: ['locale'],
+    optionsForm: (input: Field | null, options: Options) => html`
+      <label>Locale
+        <input type="text" name="locale" value="${options.locale}" />
+      </label>
+    `,
   }, {
     type: 'filter',
     id: 'locale_links',
