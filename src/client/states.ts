@@ -33,7 +33,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
         // items: [], // Array of current page’s chunk of data
         setState(body, 'items', {
           hidden: true,
-          label: 'Current items',
+          label: 'pagination.items',
           expression: [{
             label: 'Unused items label',
             type: 'property',
@@ -49,7 +49,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
         // pages: [], // Array of all chunks of paginated data (in order)
         setState(body, 'pages', {
           hidden: true,
-          label: 'All items',
+          label: 'pagination.pages',
           expression: [{
             label: 'Unused pages label',
             type: 'property',
