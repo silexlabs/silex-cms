@@ -77,6 +77,14 @@ export interface Silex11tyPluginWebsiteSettings extends WebsiteSettings {
   eleventyNavigationOrder?: number,
   eleventyNavigationParent?: string,
   eleventyNavigationUrl?: string,
+  // SEO
+  eleventySeoTitle?: string,
+  eleventySeoDescription?: string,
+  eleventyFavicon?: string,
+  // Social
+  eleventyOGImage?: string,
+  eleventyOGTitle?: string,
+  eleventyOGDescription?: string,
 }
 
 export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {

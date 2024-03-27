@@ -1,16 +1,29 @@
-import { DataSourceEditor, DataSourceId, Field } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, DataSourceId, Field, StateEditor } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { html } from 'lit-html'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
-//import { createRef } from 'lit/directives/ref.js'
-//import { renderExpression } from '@silexlabs/grapesjs-data-source'
+import { html } from 'lit'
+import { ref } from 'lit/directives/ref.js'
 
 interface FieldsByDataSource {
   dataSourceId: DataSourceId
   fields: Field[]
 }
 
-//const pageDataInputRef = createRef<StepsSelector>()
+/**
+ * Handle the formdata event to update the settings
+ * FIXME: this should be handled by the StateEditor component
+ */
+function handleFormdataEvent(settingName: string) {
+  return (el) => {
+    setTimeout(() => {
+      el?.closest('form')?.addEventListener('formdata', (event: FormDataEvent) => {
+        const formData = event.formData
+        formData.set(settingName, (el as StateEditor).value)
+      })
+    })
+  }
+}
+
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
@@ -33,10 +46,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
               }
             })
         })
-        // Create the selector for the page data
-        // const page = config.getEditor().Pages.getSelected()
-        // const body = page.getMainComponent()
-        // const pageDataInput = renderExpression(body, config.getEditor().DataSourceManager.dataTree, 'xxxx', 'Page data', true, pageDataInputRef)
         return html`
     <style>
       form.silex-form input[type="checkbox"] {
@@ -111,6 +120,65 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             <input type="text" name="eleventyNavigationUrl" .value=${settings.eleventyNavigationUrl ?? ''}/>
           </label>
         </label>
+        <label class="silex-form__element">
+          <h3>SEO</h3>
+          <state-editor
+            id="eleventySeoTitle"
+            name="eleventySeoTitle"
+            value=${settings.eleventySeoTitle ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventySeoTitle'))}
+          >
+            <label slot="label">Title</label>
+          </state-editor>
+          <state-editor
+            id="eleventySeoDescription"
+            name="eleventySeoDescription"
+            value=${settings.eleventySeoDescription ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventySeoDescription'))}
+          >
+            <label slot="label">Description</label>
+          </state-editor>
+          <state-editor
+            id="eleventyFavicon"
+            name="eleventyFavicon"
+            value=${settings.eleventyFavicon ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventyFavicon'))}
+          >
+            <label slot="label">Favicon</label>
+          </state-editor>
+        </label>
+        <label class="silex-form__element">
+          <h3>Social</h3>
+          <state-editor
+            id="eleventyOGImage"
+            name="eleventyOGImage"
+            value=${settings.eleventyOGImage ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventyOGImage'))}
+          >
+            <label slot="label">OG Image</label>
+          </state-editor>
+          <state-editor
+            id="eleventyOGTitle"
+            name="eleventyOGTitle"
+            value=${settings.eleventyOGTitle ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventyOGTitle'))}
+          >
+            <label slot="label">OG Title</label>
+          </state-editor>
+          <state-editor
+            id="eleventyOGDescription"
+            name="eleventyOGDescription"
+            value=${settings.eleventyOGDescription ?? ''}
+            .editor=${config.getEditor()}
+            ${ref(handleFormdataEvent('eleventyOGDescription'))}
+          >
+            <label slot="label">OG Description</label>
+          </state-editor>
       </div>
     </div>
     `

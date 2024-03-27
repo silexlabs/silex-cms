@@ -1,7 +1,7 @@
 import { DataSourceEditor, Field, IDataSource, Type } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 import Backbone from 'backbone'
-import { ClientConfig } from '@silexlabs/silex'
+import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 
 function expect(condition: boolean, message: string) {
   if(!condition) {

@@ -50,6 +50,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
       // Generate 11ty data files
       // FIXME: should this be in the publication transformers?
       const editor = config.getEditor()
+      editor.on('silex:publish:page', data => transformPage(data))
       editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
     }
   })
@@ -167,6 +168,35 @@ export function getBodyStates(page: Page): string {
     }
   }
   return ''
+}
+
+export function transformPage(data: { page, siteSettings, pageSettings }): void {
+  const { pageSettings, page } = data
+  const body = page.getMainComponent()
+  if (pageSettings.eleventySeoTitle) {
+    const expression = JSON.parse(pageSettings.eleventySeoTitle)
+    if(expression.length) pageSettings.title = echoBlock(body, expression)
+  }
+  if (pageSettings.eleventySeoDescription) {
+    const expression = JSON.parse(pageSettings.eleventySeoDescription)
+    if(expression.length) pageSettings.description = echoBlock(body, expression)
+  }
+  if (pageSettings.eleventyFavicon) {
+    const expression = JSON.parse(pageSettings.eleventyFavicon)
+    if(expression.length) pageSettings.favicon = echoBlock(body, expression)
+  }
+  if (pageSettings.eleventyOGImage) {
+    const expression = JSON.parse(pageSettings.eleventyOGImage)
+    if(expression.length) pageSettings['og:image'] = echoBlock(body, expression)
+  }
+  if (pageSettings.eleventyOGTitle) {
+    const expression = JSON.parse(pageSettings.eleventyOGTitle)
+    if(expression.length) pageSettings['og:title'] = echoBlock(body, expression)
+  }
+  if (pageSettings.eleventyOGDescription) {
+    const expression = JSON.parse(pageSettings.eleventyOGDescription)
+    if(expression.length) pageSettings['og:description'] = echoBlock(body, expression)
+  }
 }
 
 /**
