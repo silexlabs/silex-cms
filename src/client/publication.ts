@@ -351,7 +351,7 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
       }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', '${method}', \`${queryStr}\`)
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', 'Page name: ${page.getName() || 'index'}', 'Page id: ${page.getId()}')
     throw e
   }
 `
