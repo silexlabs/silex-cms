@@ -486,7 +486,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
       const states = statesPublic
         .map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
         .join('\n')
-      const before = (states ?? '') + (forStart ?? '') + (ifStart ?? '')
+      const before = (forStart ?? '') + (states ?? '') + (ifStart ?? '')
       const after =  (ifEnd ?? '') + (forEnd ?? '')
 
       // Attributes
