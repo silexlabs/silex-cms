@@ -38,7 +38,7 @@
     "rollup-plugin-tslint": "^0.2.2",
     "ts-jest": "^29.1.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   },
   "peerDependencies": {
     "@silexlabs/silex": "^3.0.0-alpha.134",
@@ -46,7 +46,7 @@
     "lit-html": "3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.89",
+    "@silexlabs/grapesjs-data-source": "^0.0.90",
     "dedent": "^1.5.1",
     "deepmerge": "^4.3.1"
   },
