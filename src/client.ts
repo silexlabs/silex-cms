@@ -20,6 +20,9 @@ export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // If false, the publication will not publish to 11ty and do not display 11ty data
   // Default: true
   enable11ty?: boolean,
+  // Add cache buster to graphql queries
+  // Default: false
+  cacheBuster?: boolean,
   // 11ty fetch plugin options
   // https://www.11ty.dev/docs/plugins/fetch/
   // Default: { duration: '1d', type: 'json' }

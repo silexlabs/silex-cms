@@ -144,6 +144,7 @@ Here are additional options specific to this plugin:
 | `dataSources` and other data source options | An array of data sources to use in the CMS. Check [Data Source plugin optsion](https://github.com/silexlabs/grapesjs-data-source?tab=readme-ov-file#options) | `[]` |
 | `enable11ty` | Enable the 11ty integration. If false, the publication will not publish to 11ty and do not display 11ty data. | `true` |
 | `esModules` | Enable ES modules in the 11ty data files which is needed for **11ty version > 2**. If false, the data files will be CommonJS modules. | `true` |
+| `cacheBuster` | Add cache buster to graphql queries | `false` |
 |`fetchPlugin`|Options to pass to [11ty fetch plugin](https://www.11ty.dev/docs/plugins/fetch/)|`{ duration: '1d', type: 'json' }`|
 |`imagePlugin`|Enable the 11ty image block and an `image` filter, both assume that your eleventy site has the [11ty image plugin installed](https://www.11ty.dev/docs/plugins/image/). Values can be `false` (off), `webc` or `transform` (check 11ty image docs)|`false`|
 |`i18nPlugin`|Enable filters which assume that your eleventy site has the [11ty i18n plugin installed](https://www.11ty.dev/docs/plugins/i18n/)|`false`|
