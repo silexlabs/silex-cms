@@ -19,6 +19,7 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
+    - run: echo "Running on ${{ matrix.os }} with Node.js ${{ matrix.node-version }}, tag ${{ github.ref }}"
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
