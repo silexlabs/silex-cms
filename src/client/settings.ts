@@ -90,7 +90,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             <input type="number" name="eleventyPageSize" .value=${settings.eleventyPageSize ?? 1}/>
           </label>
           <label class="silex-form__element">Reverse
-            <input type="checkbox" name="eleventyPageReverse" ?checked=${!!settings.eleventyPageReverse ?? false}/>
+            <input type="checkbox" name="eleventyPageReverse" ?checked=${!!settings.eleventyPageReverse}/>
           </label>
           <label class="silex-form__element">Permalink
             <input type="text" name="eleventyPermalink" .value=${settings.eleventyPermalink ?? ''}/>

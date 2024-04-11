@@ -152,7 +152,7 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
  */
 export function getBodyStates(page: Page): string {
   // Render the body states
-  const body = page.getMainComponent()
+  const body = page.getMainComponent() as Component
   const pagination = getState(body, 'pagination', true)
   if (pagination && pagination.expression.length > 0) {
     //const block = getLiquidBlock(body, pagination.expression)

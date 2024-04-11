@@ -16,7 +16,7 @@
     "build:watch": "nodemon -e ts,js --watch src -x \"$npm_execpath run build\"",
     "build:client": "rollup -c rollup.client.config.mjs",
     "build:server": "rollup -c rollup.server.config.mjs",
-    "lint": "eslint src/**/*.[jt]s",
+    "lint": "eslint src/**/* --config .eslintrc.js",
     "lint:fix": "$npm_execpath run lint -- --fix",
     "test": "jest --rootDir src --config jest.config.js",
     "test:watch": "$npm_execpath run test -- --watch"
@@ -41,12 +41,12 @@
     "typescript": "^5.4.4"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.134",
-    "grapesjs": "0.21.7",
-    "lit-html": "3.0.2"
+    "@silexlabs/silex": "^3.0.0-alpha.150",
+    "grapesjs": "^0.21.10",
+    "lit-html": "^3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.92",
+    "@silexlabs/grapesjs-data-source": "^0.0.93",
     "dedent": "^1.5.1",
     "deepmerge": "^4.3.1"
   },
