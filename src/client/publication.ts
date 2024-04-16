@@ -280,17 +280,9 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
   })
 }
 
-/**
- * Generate the data file for a given page
- */
 function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
-  const fetchImportStatement = (() => {
-    if(options.fetchPlugin) {
-      return esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')'
-    }
-    return ''
-  })()
+  const fetchImportStatement = options.fetchPlugin ? (esModule ? "import EleventyFetch from '@11ty/eleventy-fetch'" : "const EleventyFetch = require('@11ty/eleventy-fetch')") : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
@@ -304,21 +296,18 @@ function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, 
   }).join('\n')
   return `
 ${ fetchImportStatement }
-${ exportStatement } async function (configData) {
+${ exportStatement } async function (configData: any) {
   const data = {
     ...configData,
     lang: '${lang || ''}',
   }
-  const result = {}
+  const result: Record<string, any> = {}
   ${content}
   return result
 }
   `
 }
 
-/**
- * Generate the fetch call for a given page
- */
 function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
@@ -326,20 +315,21 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   }
   const s2s = dataSource.get('serverToServer')
   const url = s2s ? s2s.url : dataSource.get('url')
-  // Add a cache buster to avoid caching between pages, this will still cache between 11ty builds
   const urlWithCacheBuster = options.cacheBuster ? `${url}${url.includes('?') ? '&' : '?'}page_id_for_cache=${page.getId()}${lang ? `-${lang}` : ''}` : url
   const method = s2s ? s2s.method : dataSource.get('method')
   const headers = s2s ? s2s.headers : dataSource.get('headers')
-  // Check that the content-type is set
-  if(headers && !Object.keys(headers).find(key => key.toLowerCase() === 'content-type')) {
+  if (headers && !Object.keys(headers).find(key => key.toLowerCase() === 'content-type')) {
     console.warn('11ty plugin for Silex: no content-type in headers of the graphql query. I will set it to application/json for you. To avoid this warning, add a header with key "content-type" and value "application/json" in silex config.')
     headers['content-type'] = 'application/json'
   }
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
+
+  const fetchFunction = options.fetchPlugin ? 'EleventyFetch' : 'fetch'
+  const fetchOptions = options.fetchPlugin ? `{ ...${JSON.stringify(options.fetchPlugin)},` : '{'
   return `
   try {
-    result['${dataSource.id}'] = (await EleventyFetch(\`${urlWithCacheBuster}\`, {
-      ${options.fetchPlugin ? `...${JSON.stringify(options.fetchPlugin)},` : ''}
+    result['${dataSource.id}'] = (await ${fetchFunction}(\`${urlWithCacheBuster}\`, {
+      ${fetchOptions}
       fetchOptions: {
         headers: {
           ${headersStr}
