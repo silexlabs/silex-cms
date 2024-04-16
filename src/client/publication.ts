@@ -296,7 +296,7 @@ function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, 
   }).join('\n')
   return `
 ${ fetchImportStatement }
-${ exportStatement } async function (configData: any) {
+${ exportStatement } async function (configData) {
   const data = {
     ...configData,
     lang: '${lang || ''}',
