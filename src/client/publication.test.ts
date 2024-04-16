@@ -131,6 +131,9 @@ test('getDataFile', () => {
     page,
     'fr',
   )
+  // check that we have as much { as } in the result
+  expect(result1.split('{').length).toBe(result1.split('}').length)
+  expect(result1.split('(').length).toBe(result1.split(')').length)
   expect(result1).toContain('EleventyFetch(')
   const result2 = queryToDataFile(
     editor,
@@ -146,6 +149,9 @@ test('getDataFile', () => {
     'fr',
   )
   expect(result2).not.toContain('EleventyFetch')
+  // check that we have as much { as } in the result
+  expect(result2.split('{').length).toBe(result2.split('}').length)
+  expect(result2.split('(').length).toBe(result2.split(')').length)
   const result3 = queryToDataFile(
     editor,
     query,

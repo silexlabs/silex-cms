@@ -328,7 +328,7 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
 
   const fetchFunction = options.fetchPlugin ? 'EleventyFetch' : 'fetch'
-  const fetchOptions = `{
+  const fetchOptions = `
     headers: {
       ${headersStr}
     },
@@ -336,13 +336,15 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
     body: JSON.stringify({
       query: \`${queryStr}\`,
     })
-  }`
+  `
   return `
   try {
     result['${dataSource.id}'] = (await ${fetchFunction}(\`${urlWithCacheBuster}\`, {
       ${options.fetchPlugin ? `
-      fetchOptions: ${fetchOptions},
-      ` : fetchOptions}
+      fetchOptions: {
+        ${fetchOptions},
+      }` : fetchOptions
+      }
     })).data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', 'Page name: ${page.getName() || 'index'}', 'Page id: ${page.getId()}')
