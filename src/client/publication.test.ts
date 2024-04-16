@@ -4,7 +4,10 @@
 
 import dedent from 'dedent'
 import {expect, jest, test} from '@jest/globals'
-import { buildAttributes, getFrontMatter, isAttribute } from './publication'
+import { buildAttributes, getFrontMatter, isAttribute, queryToDataFile } from './publication'
+import DataSource from './DataSource'
+import { IDataSourceModel } from '@silexlabs/grapesjs-data-source'
+import { Page } from 'grapesjs'
 //import grapesjs, { Page } from 'grapesjs'
 //import { DataSourceEditor, DataSourceEditorOptions, getState } from '@silexlabs/grapesjs-data-source'
 //
@@ -92,4 +95,68 @@ test('buildAttributes', () => {
     value: 'new-value',
   }])
   expect(attributes).toEqual('href="new-value" class="original-value new-value"')
+})
+
+test('getDataFile', () => {
+  const editor = {
+    get: jest.fn((name) => {
+      switch (name) {
+        case 'type': return 'graphql'
+        case 'serverToServer': return {
+          url: 'http://localhost:8055',
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+      }
+      throw new Error(`Unit test error, unknown name: ${name}`)
+    }),
+  } as unknown as IDataSourceModel
+  const page = {
+    getName: () => 'page name example',
+    getId: () => 'page id example',
+  } as unknown as Page
+  const query = 'query str example'
+  const result1 = queryToDataFile(
+    editor,
+    query,
+    {
+      cacheBuster: false,
+      dataSources: [],
+      view: {},
+      filters: [],
+      fetchPlugin: {},
+    },
+    page,
+    'fr',
+  )
+  expect(result1).toContain('EleventyFetch(')
+  const result2 = queryToDataFile(
+    editor,
+    query,
+    {
+      cacheBuster: false,
+      dataSources: [],
+      view: {},
+      filters: [],
+      fetchPlugin: false,
+    },
+    page,
+    'fr',
+  )
+  expect(result2).not.toContain('EleventyFetch')
+  const result3 = queryToDataFile(
+    editor,
+    query,
+    {
+      cacheBuster: false,
+      dataSources: [],
+      view: {},
+      filters: [],
+    },
+    page,
+    'fr',
+  )
+  expect(result3).not.toContain('EleventyFetch')
 })

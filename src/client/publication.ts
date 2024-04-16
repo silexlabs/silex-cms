@@ -301,14 +301,17 @@ ${ exportStatement } async function (configData: any) {
     ...configData,
     lang: '${lang || ''}',
   }
-  const result: Record<string, any> = {}
+  const result = {}
   ${content}
   return result
 }
   `
 }
 
-function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null): string {
+/**
+ * Exported for unit tests
+ */
+export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -325,20 +328,21 @@ function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
 
   const fetchFunction = options.fetchPlugin ? 'EleventyFetch' : 'fetch'
-  const fetchOptions = options.fetchPlugin ? `{ ...${JSON.stringify(options.fetchPlugin)},` : '{'
+  const fetchOptions = `{
+    headers: {
+      ${headersStr}
+    },
+    method: '${method}',
+    body: JSON.stringify({
+      query: \`${queryStr}\`,
+    })
+  }`
   return `
   try {
     result['${dataSource.id}'] = (await ${fetchFunction}(\`${urlWithCacheBuster}\`, {
-      ${fetchOptions}
-      fetchOptions: {
-        headers: {
-          ${headersStr}
-        },
-        method: '${method}',
-        body: JSON.stringify({
-          query: \`${queryStr}\`,
-        })
-      }
+      ${options.fetchPlugin ? `
+      fetchOptions: ${fetchOptions},
+      ` : fetchOptions}
     })).data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', 'Page name: ${page.getName() || 'index'}', 'Page id: ${page.getId()}')

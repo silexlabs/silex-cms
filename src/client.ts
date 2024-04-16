@@ -26,7 +26,7 @@ export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // 11ty fetch plugin options
   // https://www.11ty.dev/docs/plugins/fetch/
   // Default: { duration: '1d', type: 'json' }
-  fetchPlugin?: object,
+  fetchPlugin?: object | false,
   // Image plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/image/
   // Default: 'transform'
