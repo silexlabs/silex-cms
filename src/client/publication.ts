@@ -36,7 +36,7 @@ interface RealState {
   tokens: Token[]
 }
 
-export default function(config: ClientConfig, options: EleventyPluginOptions) {
+export default function (config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
@@ -46,7 +46,7 @@ export default function(config: ClientConfig, options: EleventyPluginOptions) {
       //transformFile: (file) => transformFile(file),
     })
 
-    if(options.enable11ty) {
+    if (options.enable11ty) {
       // Generate 11ty data files
       // FIXME: should this be in the publication transformers?
       const editor = config.getEditor()
@@ -102,7 +102,7 @@ export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: str
   // User provided a permalink explicitely
   if (permalink) {
     return permalink
-  } else if(isCollectionPage) {
+  } else if (isCollectionPage) {
     // Let 11ty handle the permalink
     return null
   } else if (isHome) {
@@ -175,27 +175,27 @@ export function transformPage(data: { page, siteSettings, pageSettings }): void 
   const body = page.getMainComponent()
   if (pageSettings.eleventySeoTitle) {
     const expression = JSON.parse(pageSettings.eleventySeoTitle)
-    if(expression.length) pageSettings.title = echoBlock(body, expression)
+    if (expression.length) pageSettings.title = echoBlock(body, expression)
   }
   if (pageSettings.eleventySeoDescription) {
     const expression = JSON.parse(pageSettings.eleventySeoDescription)
-    if(expression.length) pageSettings.description = echoBlock(body, expression)
+    if (expression.length) pageSettings.description = echoBlock(body, expression)
   }
   if (pageSettings.eleventyFavicon) {
     const expression = JSON.parse(pageSettings.eleventyFavicon)
-    if(expression.length) pageSettings.favicon = echoBlock(body, expression)
+    if (expression.length) pageSettings.favicon = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGImage) {
     const expression = JSON.parse(pageSettings.eleventyOGImage)
-    if(expression.length) pageSettings['og:image'] = echoBlock(body, expression)
+    if (expression.length) pageSettings['og:image'] = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGTitle) {
     const expression = JSON.parse(pageSettings.eleventyOGTitle)
-    if(expression.length) pageSettings['og:title'] = echoBlock(body, expression)
+    if (expression.length) pageSettings['og:title'] = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGDescription) {
     const expression = JSON.parse(pageSettings.eleventyOGDescription)
-    if(expression.length) pageSettings['og:description'] = echoBlock(body, expression)
+    if (expression.length) pageSettings['og:description'] = echoBlock(body, expression)
   }
 }
 
@@ -221,11 +221,11 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     })
 
     // Find the page in the published data
-    if(!data.files) throw new Error('No files in publication data')
+    if (!data.files) throw new Error('No files in publication data')
     const path = transformPaths(editor, `/${slug}.html`, 'html')
     const pageData = data.files.find(file => file.path === path) as ClientSideFileWithContent | undefined
-    if(!pageData) throw new Error(`No file for path ${path}`)
-    if(pageData.type !== ClientSideFileType.HTML) throw new Error(`File for path ${path} is not HTML`)
+    if (!pageData) throw new Error(`No file for path ${path}`)
+    if (pageData.type !== ClientSideFileType.HTML) throw new Error(`File for path ${path} is not HTML`)
     const dataFile = Object.keys(query).length > 0 ? {
       type: ClientSideFileType.OTHER,
       path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.mjs`, 'html'),
@@ -233,7 +233,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
       content: getDataFile(editor, page, null, query, options),
     } : null
 
-    if(languages && languages.length > 0) {
+    if (languages && languages.length > 0) {
       const pages: ClientSideFileWithContent[] = languages.flatMap(lang => {
         // Change the HTML
         const frontMatter = getFrontMatter(settings, slug, page.getName(), lang)
@@ -282,7 +282,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
 
 function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
-  const fetchImportStatement = options.fetchPlugin ? (esModule ? "import EleventyFetch from '@11ty/eleventy-fetch'" : "const EleventyFetch = require('@11ty/eleventy-fetch')") : ''
+  const fetchImportStatement = options.fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
@@ -295,8 +295,8 @@ function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, 
     }
   }).join('\n')
   return `
-${ fetchImportStatement }
-${ exportStatement } async function (configData) {
+${fetchImportStatement}
+${exportStatement} async function (configData) {
   const data = {
     ...configData,
     lang: '${lang || ''}',
@@ -344,7 +344,7 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
       fetchOptions: {
         ${fetchOptions},
       }` : fetchOptions
-      }
+}
     })).data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', 'Page name: ${page.getName() || 'index'}', 'Page id: ${page.getId()}')
@@ -357,7 +357,7 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
  * Make stored states into real states
  * Filter out hidden states and empty expressions
  */
-function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: StoredState}[]): {stateId: StateId, label: string, tokens: State[]}[] {
+function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: StoredState }[]): { stateId: StateId, label: string, tokens: State[] }[] {
   return states
     .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
@@ -374,7 +374,7 @@ function getRealStates(dataTree: DataTree, states: {stateId: StateId, state: Sto
  * Exported for unit tests
  */
 export function isAttribute(label: string): boolean {
-  if(!label) return false
+  if (!label) return false
   return !Object.values(Properties).includes(label as Properties)
 }
 
@@ -384,7 +384,7 @@ export function isAttribute(label: string): boolean {
  * Append to the original attributes
  * Exported for unit tests
  */
-export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: {stateId: StateId, label: string, value: string}[] ): string {
+export function buildAttributes(originalAttributes: Record<string, string>, attributeStates: { stateId: StateId, label: string, value: string }[]): string {
   const attributesArr = Object.entries(originalAttributes)
     // Start with the original attributes
     .map(([label, value]) => ({
@@ -398,7 +398,7 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
     .reduce((final, { stateId, label, value }) => {
       const existing = final.find(({ label: existingLabel }) => existingLabel === label)
       if (existing) {
-        if(ATTRIBUTE_MULTIPLE_VALUES.includes(label)) {
+        if (ATTRIBUTE_MULTIPLE_VALUES.includes(label)) {
           // Add to the original value
           existing.value += ' ' + value
         } else {
@@ -415,7 +415,7 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
       }
       // Return the original array
       return final
-    }, [] as ({stateId: StateId, value: string | boolean, label: string})[])
+    }, [] as ({ stateId: StateId, value: string | boolean, label: string })[])
   // Build final result
   return attributesArr
     // Convert to key="value" string
@@ -483,7 +483,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         .map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
         .join('\n')
       const before = (states ?? '') + (forStart ?? '') + (ifStart ?? '')
-      const after =  (ifEnd ?? '') + (forEnd ?? '')
+      const after = (ifEnd ?? '') + (forEnd ?? '')
 
       // Attributes
       const originalAttributes = component.get('attributes') as Record<string, string>
@@ -500,7 +500,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
           value: echoBlock(component, tokens),
         }))
       )
-      if(unwrap) {
+      if (unwrap) {
         return `${before}${innerHtml}${after}`
       }
       return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`

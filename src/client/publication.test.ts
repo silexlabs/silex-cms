@@ -3,9 +3,8 @@
  */
 
 import dedent from 'dedent'
-import {expect, jest, test} from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import { buildAttributes, getFrontMatter, isAttribute, queryToDataFile } from './publication'
-import DataSource from './DataSource'
 import { IDataSourceModel } from '@silexlabs/grapesjs-data-source'
 import { Page } from 'grapesjs'
 //import grapesjs, { Page } from 'grapesjs'
@@ -89,7 +88,7 @@ test('buildAttributes', () => {
     stateId: 'href-id',
     label: 'href',
     value: 'new-value',
-  },{
+  }, {
     stateId: 'class-id',
     label: 'class',
     value: 'new-value',
@@ -101,14 +100,14 @@ test('getDataFile', () => {
   const editor = {
     get: jest.fn((name) => {
       switch (name) {
-        case 'type': return 'graphql'
-        case 'serverToServer': return {
-          url: 'http://localhost:8055',
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
+      case 'type': return 'graphql'
+      case 'serverToServer': return {
+        url: 'http://localhost:8055',
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
       }
       throw new Error(`Unit test error, unknown name: ${name}`)
     }),
