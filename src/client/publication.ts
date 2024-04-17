@@ -327,27 +327,51 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
   }
   const headersStr = headers ? Object.entries(headers).map(([key, value]) => `'${key}': \`${value}\`,`).join('\n') : ''
 
-  const fetchFunction = options.fetchPlugin ? 'EleventyFetch' : 'fetch'
-  const fetchOptions = `
-    headers: {
-      ${headersStr}
-    },
-    method: '${method}',
-    body: JSON.stringify({
+  const fetchOptions = {
+    key: dataSource.id as string,
+    method,
+    url: urlWithCacheBuster,
+    headers: headersStr,
+    query: `JSON.stringify({
       query: \`${queryStr}\`,
-    })
-  `
-  return `
-  try {
-    result['${dataSource.id}'] = (await ${fetchFunction}(\`${urlWithCacheBuster}\`, {
-      ${options.fetchPlugin ? `
-      fetchOptions: {
-        ${fetchOptions},
-      }` : fetchOptions
+    })`, // Let 11ty interpolate the query wich let us add variables in the plugin config
+  }
+  return options.fetchPlugin ? makeFetchCallEleventy(fetchOptions) : makeFetchCall(fetchOptions)
 }
+
+export function makeFetchCall(options: {key: string, url: string, method: string, headers: string, query: string}): string {
+  return dedent`
+  try {
+    result['${options.key}'] = (await (await fetch(\`${options.url}\`, {
+
+    headers: {
+      ${options.headers}
+    },
+    method: '${options.method}',
+    body: ${options.query}
+    })).json()).data
+  } catch (e) {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
+    throw e
+  }
+`
+}
+
+export function makeFetchCallEleventy(options: {key: string, url: string, method: string, headers: string, query: string}): string {
+  return dedent`
+  try {
+    result['${options.key}'] = (await EleventyFetch(\`${options.url}\`, {
+
+    fetchOptions: {
+      headers: {
+        ${options.headers}
+      },
+      method: '${options.method}',
+      body: ${options.query},
+    }
     })).data
   } catch (e) {
-    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSource.id}', '${urlWithCacheBuster}', 'Page name: ${page.getName() || 'index'}', 'Page id: ${page.getId()}')
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
     throw e
   }
 `

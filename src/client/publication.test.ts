@@ -97,7 +97,9 @@ test('buildAttributes', () => {
 })
 
 test('getDataFile', () => {
-  const editor = {
+  const dataSourceId = 'data source id example'
+  const dataSource = {
+    id: dataSourceId,
     get: jest.fn((name) => {
       switch (name) {
       case 'type': return 'graphql'
@@ -118,7 +120,7 @@ test('getDataFile', () => {
   } as unknown as Page
   const query = 'query str example'
   const result1 = queryToDataFile(
-    editor,
+    dataSource,
     query,
     {
       cacheBuster: false,
@@ -134,8 +136,29 @@ test('getDataFile', () => {
   expect(result1.split('{').length).toBe(result1.split('}').length)
   expect(result1.split('(').length).toBe(result1.split(')').length)
   expect(result1).toContain('EleventyFetch(')
+  expect(result1).toEqual(dedent`
+
+
+  try {
+    result['${dataSourceId}'] = (await EleventyFetch(\`http://localhost:8055\`, {
+
+    fetchOptions: {
+      headers: {
+        'content-type': \`application/json\`,
+      },
+      method: 'POST',
+      body: JSON.stringify({
+      query: \`${query}\`,
+    }),
+    }
+    })).data
+  } catch (e) {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')
+    throw e
+  }
+  `)
   const result2 = queryToDataFile(
-    editor,
+    dataSource,
     query,
     {
       cacheBuster: false,
@@ -152,7 +175,7 @@ test('getDataFile', () => {
   expect(result2.split('{').length).toBe(result2.split('}').length)
   expect(result2.split('(').length).toBe(result2.split(')').length)
   const result3 = queryToDataFile(
-    editor,
+    dataSource,
     query,
     {
       cacheBuster: false,
@@ -164,4 +187,24 @@ test('getDataFile', () => {
     'fr',
   )
   expect(result3).not.toContain('EleventyFetch')
+
+  expect(result3).toEqual(dedent`
+
+
+  try {
+    result['${dataSourceId}'] = (await (await fetch(\`http://localhost:8055\`, {
+
+    headers: {
+      'content-type': \`application/json\`,
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      query: \`${query}\`,
+    })
+    })).json()).data
+  } catch (e) {
+    console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')
+    throw e
+  }
+  `)
 })
