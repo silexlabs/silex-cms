@@ -336,7 +336,7 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
       query: \`${queryStr}\`,
     })`, // Let 11ty interpolate the query wich let us add variables in the plugin config
   }
-  return options.fetchPlugin ? makeFetchCallEleventy(fetchOptions) : makeFetchCall(fetchOptions)
+  return options.fetchPlugin ? makeFetchCallEleventy(fetchOptions, options.fetchPlugin) : makeFetchCall(fetchOptions)
 }
 
 export function makeFetchCall(options: {key: string, url: string, method: string, headers: string, query: string}): string {
@@ -357,11 +357,11 @@ export function makeFetchCall(options: {key: string, url: string, method: string
 `
 }
 
-export function makeFetchCallEleventy(options: {key: string, url: string, method: string, headers: string, query: string}): string {
+export function makeFetchCallEleventy(options: {key: string, url: string, method: string, headers: string, query: string}, fetchPlugin: object): string {
   return dedent`
   try {
     result['${options.key}'] = (await EleventyFetch(\`${options.url}\`, {
-
+    ...${JSON.stringify(fetchPlugin)},
     fetchOptions: {
       headers: {
         ${options.headers}
