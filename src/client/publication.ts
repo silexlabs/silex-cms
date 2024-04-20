@@ -362,6 +362,7 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
   try {
     result['${options.key}'] = (await EleventyFetch(\`${options.url}\`, {
     ...${JSON.stringify(fetchPlugin)},
+    type: 'json',
     fetchOptions: {
       headers: {
         ${options.headers}
