@@ -141,7 +141,8 @@ test('getDataFile', () => {
 
   try {
     result['${dataSourceId}'] = (await EleventyFetch(\`http://localhost:8055\`, {
-
+    ...{},
+    type: 'json',
     fetchOptions: {
       headers: {
         'content-type': \`application/json\`,
