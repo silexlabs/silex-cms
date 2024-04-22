@@ -111,7 +111,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         defaults: {
           tagName: 'option',
           droppable: false,
-          draggable: 'select, optgroup',
+          //draggable: 'select, optgroup', // Sometimes we need a container between the select and the option to have states inside the loop
           traits: [
             {
               type: 'text',
