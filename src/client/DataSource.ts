@@ -39,6 +39,7 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
    * Implement IDatasource
    */
   async connect(): Promise<void> {}
+  isConnected(): boolean { return true }
 
   /**
    * Implement IDatasource

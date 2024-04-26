@@ -2,7 +2,7 @@ import { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { optionsToGrapesJsConfig, getZeroConfig } from './client/config'
 import publication from './client/publication'
-import settings from './client/settings'
+import pageSettings from './client/page-settings'
 import { Plugin } from '@silexlabs/silex-plugins'
 import states from './client/states'
 import DataSource from './client/DataSource'
@@ -102,7 +102,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   // Add the plugins can access editor.DataSourceManager
   config.addPlugin([
     DataSource as Plugin,
-    settings as Plugin,
+    pageSettings as Plugin,
     states as Plugin,
     filters as Plugin,
     publication as Plugin,

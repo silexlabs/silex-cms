@@ -2,7 +2,6 @@ import { DataSourceEditor, DataSourceId, Field, StateEditor } from '@silexlabs/g
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit'
-import { ref } from 'lit/directives/ref.js'
 
 interface FieldsByDataSource {
   dataSourceId: DataSourceId
@@ -13,14 +12,13 @@ interface FieldsByDataSource {
  * Handle the formdata event to update the settings
  * FIXME: this should be handled by the StateEditor component
  */
-function handleFormdataEvent(settingName: string) {
-  return (el) => {
-    setTimeout(() => {
-      el?.closest('form')?.addEventListener('formdata', (event: FormDataEvent) => {
-        const formData = event.formData
-        formData.set(settingName, (el as StateEditor).value)
-      })
-    })
+function handleFormdataEvent(event: FormDataEvent) {
+  const el = this
+  const settingName = el.getAttribute('name')
+  console.log('handleFormdataEvent', {el, settingName})
+  return (event: FormDataEvent) => {
+    const formData = event.formData
+    formData.set(settingName, (el as StateEditor).value)
   }
 }
 
@@ -127,7 +125,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventySeoTitle"
             value=${settings.eleventySeoTitle ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventySeoTitle'))}
           >
             <label slot="label">Title</label>
           </state-editor>
@@ -136,7 +133,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventySeoDescription"
             value=${settings.eleventySeoDescription ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventySeoDescription'))}
           >
             <label slot="label">Description</label>
           </state-editor>
@@ -145,7 +141,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyFavicon"
             value=${settings.eleventyFavicon ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventyFavicon'))}
           >
             <label slot="label">Favicon</label>
           </state-editor>
@@ -157,7 +152,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyOGImage"
             value=${settings.eleventyOGImage ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventyOGImage'))}
           >
             <label slot="label">OG Image</label>
           </state-editor>
@@ -166,7 +160,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyOGTitle"
             value=${settings.eleventyOGTitle ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventyOGTitle'))}
           >
             <label slot="label">OG Title</label>
           </state-editor>
@@ -175,7 +168,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyOGDescription"
             value=${settings.eleventyOGDescription ?? ''}
             .editor=${config.getEditor()}
-            ${ref(handleFormdataEvent('eleventyOGDescription'))}
           >
             <label slot="label">OG Description</label>
           </state-editor>
