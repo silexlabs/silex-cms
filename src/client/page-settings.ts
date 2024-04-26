@@ -8,20 +8,6 @@ interface FieldsByDataSource {
   fields: Field[]
 }
 
-/**
- * Handle the formdata event to update the settings
- * FIXME: this should be handled by the StateEditor component
- */
-function handleFormdataEvent(event: FormDataEvent) {
-  const el = this
-  const settingName = el.getAttribute('name')
-  console.log('handleFormdataEvent', {el, settingName})
-  return (event: FormDataEvent) => {
-    const formData = event.formData
-    formData.set(settingName, (el as StateEditor).value)
-  }
-}
-
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
@@ -55,8 +41,8 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       }
     </style>
     <div id="settings-eleventy" class="silex-hideable silex-hidden">
-      <div class="gjs-sm-sector-title">11ty Plugin</div>
-      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-cms">11ty plugin for Silex</a> <strong>is installed</strong>. It integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator with Silex.</div>
+      <div class="gjs-sm-sector-title">Silex CMS</div>
+      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-cms">Silex CMS</a> integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator and your favorite headless CMS with Silex.</div>
       <div class="silex-form__group col2">
         <label class="silex-form__element">
           <h3>Create pages from data</h3>

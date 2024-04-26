@@ -7,6 +7,8 @@ import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions } from '../client'
 import { Editor, EditorConfig } from 'grapesjs'
 
+const settingsEl = document.createElement('div')
+
 /**
  * Get the config for the data source plugin out of the client config
  */
@@ -32,6 +34,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     view: {
       el: () => config.getEditor().Panels.getPanel('views-container')?.view.el,
       button: () => config.getEditor().Panels.getPanel('views')!.get('buttons')!.get('open-tm'),
+      settingsEl: () => settingsEl,
       defaultFixed: true,
       // Show all editors by default
       disableStates: false,
