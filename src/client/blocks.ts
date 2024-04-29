@@ -119,12 +119,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
               name: 'value',
               placeholder: 'Value',
             },
-            {
-              type: 'text',
-              label: 'Label',
-              name: 'label',
-              placeholder: 'Label',
-            },
           ],
         },
       },
