@@ -16,9 +16,17 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
     if(opts.enable11ty) {
-      expect(!dm.get('eleventy'), 'The eleventy data source has already been registered')
-      dm.add(new EleventyDataSource(), {merge: false})
-      expect(!!dm.get('eleventy'), 'The eleventy data source should be registered')
+      const eleventyDs = dm.add(new EleventyDataSource(), {merge: false})
+      // FIXME: Workaround: the added instance is not a Backbone model
+      eleventyDs.isConnected = eleventyDs.get('isConnected')
+      eleventyDs.getQuery = eleventyDs.get('getQuery')
+      eleventyDs.getTypes = eleventyDs.get('getTypes')
+      eleventyDs.getQueryables = eleventyDs.get('getQueryables')
+      eleventyDs.connect = eleventyDs.get('connect')
+      eleventyDs.id = eleventyDs.get('id')
+      eleventyDs.cid = eleventyDs.get('cid')
+      eleventyDs.hidden = eleventyDs.get('hidden')
+      eleventyDs.set('url', '')
     }
   })
 }
@@ -34,6 +42,8 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
    * This is used to retrieve the data source from the editor
    */
   id = 'eleventy'
+  label = 'Eleventy'
+  hidden = true
 
   /**
    * Implement IDatasource

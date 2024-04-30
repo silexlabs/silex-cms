@@ -12,14 +12,14 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
     config.addSettings({
-      id: 'eleventy',
-      label: 'Eleventy',
+      id: 'cms',
+      label: 'CMS',
       render: (settings: Silex11tyPluginWebsiteSettings) => {
         const queryables = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree().getAllQueryables()
         const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
         setTimeout(() => {
           // Update the settings form when the selection changed without recreating the form
-          (document.querySelectorAll('#settings-eleventy input') as NodeListOf<HTMLInputElement>)
+          (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
             .forEach((input: HTMLInputElement) => {
               switch (input.type) {
               case 'checkbox':
@@ -40,8 +40,8 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         border: none;
       }
     </style>
-    <div id="settings-eleventy" class="silex-hideable silex-hidden">
-      <div class="gjs-sm-sector-title">Silex CMS</div>
+    <div id="settings-cms" class="silex-hideable silex-hidden">
+      <div class="gjs-sm-sector-title">Silex CMS - Page settings</div>
       <div class="silex-help">The <a href="https://github.com/silexlabs/silex-cms">Silex CMS</a> integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator and your favorite headless CMS with Silex.</div>
       <div class="silex-form__group col2">
         <label class="silex-form__element">

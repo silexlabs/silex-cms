@@ -3,7 +3,6 @@ import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from "../client
 import { html } from "lit-html";
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
-  console.log('settingsEl', opts)
   config.on('silex:startup:end', () => {
     config.addSettings({
       id: 'cms',
