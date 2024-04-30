@@ -1,4 +1,4 @@
-import { DataSourceEditor, DataSourceId, Field, StateEditor } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, DataSourceId, Field } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit'

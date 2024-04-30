@@ -1,13 +1,13 @@
-import { ClientConfig } from "@silexlabs/silex/src/ts/client/config";
-import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from "../client";
-import { html } from "lit-html";
+import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { EleventyPluginOptions } from '../client'
+import { html } from 'lit-html'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
     config.addSettings({
       id: 'cms',
       label: 'CMS',
-      render: (settings: Silex11tyPluginWebsiteSettings) => {
+      render: () => {
         return html`
         <div id="settings-cms" class="silex-hideable silex-hidden">
           <div class="gjs-sm-sector-title">Silex CMS</div>

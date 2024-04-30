@@ -3,12 +3,6 @@ import { EleventyPluginOptions } from '../client'
 import Backbone from 'backbone'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 
-function expect(condition: boolean, message: string) {
-  if(!condition) {
-    throw new Error(message)
-  }
-}
-
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
     const dm = (config.getEditor() as DataSourceEditor).DataSourceManager
