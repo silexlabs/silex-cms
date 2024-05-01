@@ -38,11 +38,12 @@ interface RealState {
 
 export default function (config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
+    const editor = config.getEditor()
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
-      renderComponent: (component, toHtml) => renderComponent(config, component, toHtml),
-      transformPermalink: options.enable11ty ? (path, type) => transformPermalink(path, type, options) : undefined,
-      transformPath: options.enable11ty ? (path, type) => transformPath(path, type, options) : undefined,
+      renderComponent: (component, toHtml) => withNotification(() => renderComponent(config, component, toHtml), editor, component.getId()),
+      transformPermalink: options.enable11ty ? (path, type) => withNotification(() => transformPermalink(path, type, options), editor, null) : undefined,
+      transformPath: options.enable11ty ? (path, type) => withNotification(() => transformPath(path, type, options), editor, null) : undefined,
       //transformFile: (file) => transformFile(file),
     })
 
@@ -50,8 +51,8 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
       // Generate 11ty data files
       // FIXME: should this be in the publication transformers?
       const editor = config.getEditor()
-      editor.on('silex:publish:page', data => transformPage(data))
-      editor.on('silex:publish:data', data => transformFiles(editor as unknown as DataSourceEditor, options, data))
+      editor.on('silex:publish:page', data => withNotification(() => transformPage(data), editor, null))
+      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor as unknown as DataSourceEditor, options, data), editor, null))
     }
   })
 }
@@ -383,6 +384,7 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
  * Filter out hidden states and empty expressions
  */
 function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: StoredState }[]): { stateId: StateId, label: string, tokens: State[] }[] {
+  console.log('getRealStates', states)
   return states
     .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
@@ -390,7 +392,10 @@ function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: St
     .map(({ stateId, state }) => ({
       stateId,
       label: state.label || stateId,
-      tokens: state.expression.map(token => fromStored(token, dataTree)),
+      tokens: state.expression.map(token => {
+        const componentId = state.expression[0].type === 'state' ? state.expression[0].componentId : null
+        return fromStored(token, dataTree, componentId)
+      }),
     }))
 }
 
@@ -449,11 +454,11 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
     .join(' ')
 }
 
-function withNotification<T>(cbk: () => T, editor: Editor, componentId: string): T {
+function withNotification<T>(cbk: () => T, editor: Editor, componentId: string | null): T {
   try {
     return cbk()
   } catch (e) {
-    editor.trigger('notifications:add', {
+    editor.runCommand('notifications:add', {
       type: 'error',
       message: `Error rendering component: ${e.message}`,
       group: NOTIFICATION_GROUP,
