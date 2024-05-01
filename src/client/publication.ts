@@ -1,6 +1,6 @@
 import dedent from 'dedent'
-import { Component, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, Properties, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { Component, Editor, Page } from 'grapesjs'
+import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, NOTIFICATION_GROUP, Properties, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -449,23 +449,36 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
     .join(' ')
 }
 
+function withNotification<T>(cbk: () => T, editor: Editor, componentId: string): T {
+  try {
+    return cbk()
+  } catch (e) {
+    editor.trigger('notifications:add', {
+      type: 'error',
+      message: `Error rendering component: ${e.message}`,
+      group: NOTIFICATION_GROUP,
+      componentId,
+    })
+    throw e
+  }
+}
 /**
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
   const dataTree = (config.getEditor() as unknown as DataSourceEditor).DataSourceManager.getDataTree()
 
-  const statesPrivate = getRealStates(dataTree, getStateIds(component, false)
+  const statesPrivate = withNotification(() => getRealStates(dataTree, getStateIds(component, false)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, false)!,
-    })))
+    }))), config.getEditor(), component.getId())
 
-  const statesPublic = getRealStates(dataTree, getStateIds(component, true)
+  const statesPublic = withNotification(() => getRealStates(dataTree, getStateIds(component, true)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, true)!,
-    })))
+    }))), config.getEditor(), component.getId())
 
   const unwrap = component.get(UNWRAP_ID)
 
