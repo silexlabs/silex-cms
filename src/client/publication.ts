@@ -384,7 +384,6 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
  * Filter out hidden states and empty expressions
  */
 function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: StoredState }[]): { stateId: StateId, label: string, tokens: State[] }[] {
-  console.log('getRealStates', states)
   return states
     .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
