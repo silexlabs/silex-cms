@@ -41,18 +41,22 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
     const editor = config.getEditor()
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
+      // Render the components when they are published
+      // Will run even with enable11ty = false in order to enable HTML attributes
       renderComponent: (component, toHtml) => withNotification(() => renderComponent(config, component, toHtml), editor, component.getId()),
-      transformPermalink: options.enable11ty ? (path, type) => withNotification(() => transformPermalink(path, type, options), editor, null) : undefined,
-      transformPath: options.enable11ty ? (path, type) => withNotification(() => transformPath(path, type, options), editor, null) : undefined,
+      // Transform the paths to be published according to options.urls
+      transformPermalink: options.enable11ty ? (path, type) => withNotification(() => transformPermalink(editor as DataSourceEditor, path, type, options), editor, null) : undefined,
+      // Transform the paths to be published according to options.dir
+      transformPath: options.enable11ty ? (path, type) => withNotification(() => transformPath(editor as DataSourceEditor, path, type, options), editor, null) : undefined,
+      // Transform the files content
       //transformFile: (file) => transformFile(file),
     })
 
     if (options.enable11ty) {
       // Generate 11ty data files
-      // FIXME: should this be in the publication transformers?
-      const editor = config.getEditor()
-      editor.on('silex:publish:page', data => withNotification(() => transformPage(data), editor, null))
-      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor as unknown as DataSourceEditor, options, data), editor, null))
+      // FIXME: should this be in the publication transformers
+      editor.on('silex:publish:page', data => withNotification(() => transformPage(editor as DataSourceEditor, data), editor, null))
+      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor as DataSourceEditor, options, data), editor, null))
     }
   })
 }
@@ -171,7 +175,10 @@ export function getBodyStates(page: Page): string {
   return ''
 }
 
-export function transformPage(data: { page, siteSettings, pageSettings }): void {
+export function transformPage(editor: DataSourceEditor, data: { page, siteSettings, pageSettings }): void {
+  // Do nothing if there is no data source, just a static site
+  if(!editor.DataSourceManager.getAll().length) return
+
   const { pageSettings, page } = data
   const body = page.getMainComponent()
   if (pageSettings.eleventySeoTitle) {
@@ -206,6 +213,9 @@ export function transformPage(data: { page, siteSettings, pageSettings }): void 
  * Exported for unit tests
  */
 export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
+  // Do nothing if there is no data source, just a static site
+  if(!editor.DataSourceManager.getAll().length) return
+
   editor.Pages.getAll().forEach(page => {
     // Get the page properties
     const slug = slugify(page.getName() || 'index')
@@ -281,6 +291,16 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
   })
 }
 
+/**
+ * Generate the data file for a given silex page
+ * This file will be used by 11ty to generate the final website's page
+ * 11ty will use this file to get the data from the data sources
+ * - Language
+ * - Native fetch or 11ty-fetch plugin
+ * - esModule or commonjs
+ * - Cache buster
+ *
+ */
 function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchImportStatement = options.fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
@@ -563,7 +583,10 @@ function toPath(path: (string | undefined)[]) {
     .join('/')
 }
 
-function transformPermalink(path: string, type: string, options: EleventyPluginOptions): string {
+function transformPermalink(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+  // Do nothing if there is no data source, just a static site
+  if(!editor.DataSourceManager.getAll().length) return path
+
   switch (type) {
   case 'html':
     return toPath([
@@ -586,7 +609,10 @@ function transformPermalink(path: string, type: string, options: EleventyPluginO
   }
 }
 
-function transformPath(path: string, type: string, options: EleventyPluginOptions): string {
+function transformPath(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+  // Do nothing if there is no data source, just a static site
+  if(!editor.DataSourceManager.getAll().length) return path
+
   switch (type) {
   case 'html':
     return toPath([
