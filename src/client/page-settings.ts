@@ -1,16 +1,62 @@
-import { DataSourceEditor, DataSourceId, Field } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, DataSourceId, Field, removeState, setState } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+//import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit'
+import { Page } from 'grapesjs'
 
 interface FieldsByDataSource {
   dataSourceId: DataSourceId
   fields: Field[]
 }
 
+/**
+ * Set the state on the body component
+ * This is only useful to build the GraphQL query
+ */
+function stateOnBody(editor, value, name, body) {
+  if (value) {
+    let expression
+    try {
+      expression = JSON.parse(value)
+    } catch (e) {
+      console.error(`Invalid JSON for ${name}`, e)
+      removeState(body, name)
+      editor.runCommand('notifications:add', {
+        type: 'error',
+        message: `Invalid JSON for ${name}`,
+        group: 'Errors in your settings',
+      })
+    }
+    setState(body, name, {
+      label: name,
+      hidden: true,
+      expression,
+    })
+  } else {
+    removeState(body, name)
+  }
+}
+
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
+    const editor = config.getEditor()
+    editor.on('silex:settings:save:start' /*ClientEvent.SETTINGS_SAVE_START*/, (page: Page) => {
+      console.log('settings', page)
+      const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings
+      if (settings) {
+        // Set the state on the body component
+        // This is only useful to build the GraphQL query
+        const body = page.getMainComponent()
+        stateOnBody(editor, settings.eleventySeoTitle, 'eleventySeoTitle', body)
+        stateOnBody(editor, settings.eleventySeoDescription, 'eleventySeoDescription', body)
+        stateOnBody(editor, settings.eleventyFavicon, 'eleventyFavicon', body)
+        stateOnBody(editor, settings.eleventyOGImage, 'eleventyOGImage', body)
+        stateOnBody(editor, settings.eleventyOGTitle, 'eleventyOGTitle', body)
+        stateOnBody(editor, settings.eleventyOGDescription, 'eleventyOGDescription', body)
+      }
+    })
     config.addSettings({
       id: 'cms',
       label: 'CMS',
