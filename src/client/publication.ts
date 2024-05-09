@@ -6,6 +6,7 @@ import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { UNWRAP_ID } from './traits'
+import { EleventyDataSourceId } from './DataSource'
 //import { ClientSideFile, ClientSideFileType, ClientSideFileWithContent, PublicationData } from '@silexlabs/silex/src/ts/types'
 
 // FIXME: should be imported from silex
@@ -45,9 +46,9 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
       // Will run even with enable11ty = false in order to enable HTML attributes
       renderComponent: (component, toHtml) => withNotification(() => renderComponent(config, component, toHtml), editor, component.getId()),
       // Transform the paths to be published according to options.urls
-      transformPermalink: options.enable11ty ? (path, type) => withNotification(() => transformPermalink(editor as DataSourceEditor, path, type, options), editor, null) : undefined,
+      transformPermalink: options.enable11ty ? (path, type) => withNotification(() => transformPermalink(editor, path, type, options), editor, null) : undefined,
       // Transform the paths to be published according to options.dir
-      transformPath: options.enable11ty ? (path, type) => withNotification(() => transformPath(editor as DataSourceEditor, path, type, options), editor, null) : undefined,
+      transformPath: options.enable11ty ? (path, type) => withNotification(() => transformPath(editor, path, type, options), editor, null) : undefined,
       // Transform the files content
       //transformFile: (file) => transformFile(file),
     })
@@ -55,10 +56,21 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
     if (options.enable11ty) {
       // Generate 11ty data files
       // FIXME: should this be in the publication transformers
-      editor.on('silex:publish:page', data => withNotification(() => transformPage(editor as DataSourceEditor, data), editor, null))
-      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor as DataSourceEditor, options, data), editor, null))
+      editor.on('silex:publish:page', data => withNotification(() => transformPage(editor, data), editor, null))
+      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor, options, data), editor, null))
     }
   })
+}
+
+/**
+ * Check if the 11ty publication is enabled
+ */
+function enable11ty(editor: Editor): boolean {
+  return (editor as DataSourceEditor)
+    .DataSourceManager
+    .getAll()
+    .filter(ds => ds.id !== EleventyDataSourceId)
+    .length > 0
 }
 
 /**
@@ -76,7 +88,7 @@ function makeAttribute(key, value): string {
  * Comes from silex but didn't manage to import
  * FIXME: expose this from silex
  */
-function transformPaths(editor: DataSourceEditor, path: string, type): string {
+function transformPaths(editor: Editor, path: string, type): string {
   const config = editor.getModel().get('config')
   return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
@@ -175,9 +187,9 @@ export function getBodyStates(page: Page): string {
   return ''
 }
 
-export function transformPage(editor: DataSourceEditor, data: { page, siteSettings, pageSettings }): void {
+export function transformPage(editor: Editor, data: { page, siteSettings, pageSettings }): void {
   // Do nothing if there is no data source, just a static site
-  if(!editor.DataSourceManager.getAll().length) return
+  if(!enable11ty(editor)) return
 
   const { pageSettings, page } = data
   const body = page.getMainComponent()
@@ -212,9 +224,12 @@ export function transformPage(editor: DataSourceEditor, data: { page, siteSettin
  * This hook is called just before the files are written to the file system
  * Exported for unit tests
  */
-export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
+export function transformFiles(editor: Editor, options: EleventyPluginOptions, data: PublicationData): void {
   // Do nothing if there is no data source, just a static site
-  if(!editor.DataSourceManager.getAll().length) return
+  if(!enable11ty(editor)) return
+
+  // Type safe data source manager
+  const dsm = (editor as DataSourceEditor).DataSourceManager
 
   editor.Pages.getAll().forEach(page => {
     // Get the page properties
@@ -223,7 +238,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     const languages = settings.silexLanguagesList?.split(',').map(lang => lang.trim()).filter(lang => !!lang)
 
     // Create the data file for this page
-    const query = editor.DataSourceManager.getPageQuery(page)
+    const query = dsm.getPageQuery(page)
     // Remove empty data source queries
     Object.entries(query).forEach(([key, value]) => {
       if (value.length === 0) {
@@ -301,13 +316,14 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
  * - Cache buster
  *
  */
-function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
+function getDataFile(editor: Editor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchImportStatement = options.fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
+  const dsm = (editor as DataSourceEditor).DataSourceManager
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
-    const dataSource = editor.DataSourceManager.get(dataSourceId)
+    const dataSource = dsm.get(dataSourceId)
     if (dataSource) {
       return queryToDataFile(dataSource, queryStr, options, page, lang)
     } else {
@@ -490,7 +506,7 @@ function withNotification<T>(cbk: () => T, editor: Editor, componentId: string |
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
-  const dataTree = (config.getEditor() as unknown as DataSourceEditor).DataSourceManager.getDataTree()
+  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
 
   const statesPrivate = withNotification(() => getRealStates(dataTree, getStateIds(component, false)
     .map(stateId => ({
@@ -583,9 +599,9 @@ function toPath(path: (string | undefined)[]) {
     .join('/')
 }
 
-function transformPermalink(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPermalink(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
-  if(!editor.DataSourceManager.getAll().length) return path
+  if(!enable11ty(editor)) return path
 
   switch (type) {
   case 'html':
@@ -609,9 +625,9 @@ function transformPermalink(editor: DataSourceEditor, path: string, type: string
   }
 }
 
-function transformPath(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPath(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
-  if(!editor.DataSourceManager.getAll().length) return path
+  if(!enable11ty(editor)) return path
 
   switch (type) {
   case 'html':

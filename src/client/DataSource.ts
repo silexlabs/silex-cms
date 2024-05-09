@@ -25,17 +25,19 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   })
 }
 
+export const EleventyDataSourceId = 'eleventy'
+
 class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implements IDataSource {
   /**
    * FIXME: this is required because _.uniqueId in backbone gives the same id as the one in the main app (c1), so we probably use a different underscore instance?
    */
-  cid = 'eleventy'
+  cid = EleventyDataSourceId
 
   /**
    * Unique identifier of the data source
    * This is used to retrieve the data source from the editor
    */
-  id = 'eleventy'
+  id = EleventyDataSourceId
   label = 'Eleventy'
   hidden = true
 
