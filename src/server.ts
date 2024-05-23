@@ -1,10 +1,10 @@
-const StaticPlugin = require('@silexlabs/silex/dist/plugins/server/plugins/server/StaticPlugin').default
+import StaticPlugin from '@silexlabs/silex/dist/plugins/server/plugins/server/StaticPlugin'
 
-module.exports = (config) => {
-  // For source map
+export default (config) => {
   config.addPlugin(StaticPlugin, {
     routes: [
       {
+        // For source map
         route: '/client.js.map',
         path: __dirname + '/../dist/client.js.map',
       }, {
