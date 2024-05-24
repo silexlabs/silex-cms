@@ -616,7 +616,7 @@ function transformPermalink(editor: Editor, path: string, type: string, options:
   case 'css': {
     return toPath([
       options.urls?.css,
-      path.replace(/^\/?css\//, ''),
+      path.replace(/^\.?\/?css\//, ''),
     ])
   }
   default:
