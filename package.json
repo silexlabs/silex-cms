@@ -47,7 +47,7 @@
     "lit-html": "^3.0.2"
   },
   "dependencies": {
-    "@silexlabs/grapesjs-data-source": "^0.0.105",
+    "@silexlabs/grapesjs-data-source": "^0.0.106",
     "dedent": "^1.5.3",
     "deepmerge": "^4.3.1"
   },
