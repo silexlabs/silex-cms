@@ -24,8 +24,8 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-eslint": "^9.0.5",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
@@ -47,6 +47,7 @@
     "lit-html": "^3.0.2"
   },
   "dependencies": {
+    "@humanwhocodes/retry": "^0.3.0",
     "@silexlabs/grapesjs-data-source": "^0.0.106",
     "dedent": "^1.5.3",
     "deepmerge": "^4.3.1"

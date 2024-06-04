@@ -1,4 +1,4 @@
-import env from './env.js'
+//import env from './env.js'
 import CmsPlugin from '../client.js'
 
 // A test client config

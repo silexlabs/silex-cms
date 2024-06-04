@@ -125,7 +125,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     })
     // **
     // Image web component
-    if(opts.imagePlugin) {
+    if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
       // Add an attribute for the webc version
       const attributes = opts.imagePlugin === 'webc' ? { 'webc:is': 'eleventy-image' } : {}
       // Add the block

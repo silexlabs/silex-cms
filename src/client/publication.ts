@@ -37,6 +37,13 @@ interface RealState {
   tokens: Token[]
 }
 
+function getFetchPluginOptions(options: EleventyPluginOptions, settings: Silex11tyPluginWebsiteSettings): object | false {
+  if(settings.eleventyFetch) {
+    return options.fetchPlugin || {}
+  }
+  return options.fetchPlugin ?? false
+}
+
 export default function (config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
     const editor = config.getEditor()
@@ -318,14 +325,15 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
  */
 function getDataFile(editor: Editor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
-  const fetchImportStatement = options.fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
+  const fetchPlugin = getFetchPluginOptions(options, editor.getModel().get('settings'))
+  const fetchImportStatement = fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
   const dsm = (editor as DataSourceEditor).DataSourceManager
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = dsm.get(dataSourceId)
     if (dataSource) {
-      return queryToDataFile(dataSource, queryStr, options, page, lang)
+      return queryToDataFile(dataSource, queryStr, options, page, lang, fetchPlugin)
     } else {
       console.error('No data source for id', dataSourceId)
       throw new Error(`No data source for id ${dataSourceId}`)
@@ -348,7 +356,7 @@ ${exportStatement} async function (configData) {
 /**
  * Exported for unit tests
  */
-export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null): string {
+export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null, fetchPlugin: object | false): string {
   if (dataSource.get('type') !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
@@ -373,7 +381,7 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
       query: \`${queryStr}\`,
     })`, // Let 11ty interpolate the query wich let us add variables in the plugin config
   }
-  return options.fetchPlugin ? makeFetchCallEleventy(fetchOptions, options.fetchPlugin) : makeFetchCall(fetchOptions)
+  return fetchPlugin ? makeFetchCallEleventy(fetchOptions, fetchPlugin) : makeFetchCall(fetchOptions)
 }
 
 export function makeFetchCall(options: {key: string, url: string, method: string, headers: string, query: string}): string {

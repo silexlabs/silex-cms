@@ -131,6 +131,7 @@ test('getDataFile', () => {
     },
     page,
     'fr',
+    {},
   )
   // check that we have as much { as } in the result
   expect(result1.split('{').length).toBe(result1.split('}').length)
@@ -170,6 +171,7 @@ test('getDataFile', () => {
     },
     page,
     'fr',
+    false,
   )
   expect(result2).not.toContain('EleventyFetch')
   // check that we have as much { as } in the result
@@ -186,6 +188,7 @@ test('getDataFile', () => {
     },
     page,
     'fr',
+    false,
   )
   expect(result3).not.toContain('EleventyFetch')
 

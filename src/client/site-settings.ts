@@ -1,5 +1,5 @@
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { EleventyPluginOptions } from '../client'
+import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit-html'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
@@ -8,7 +8,15 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       id: 'cms',
       label: 'CMS',
       render: () => {
+        const settings = config.getEditor().getModel().get('settings') as Silex11tyPluginWebsiteSettings
+        console.log('settings', settings)
         return html`
+        <style>
+          #settings-cms label {
+            display: block;
+            margin-bottom: 10px;
+          }
+        </style>
         <div id="settings-cms" class="silex-hideable silex-hidden">
           <div class="gjs-sm-sector-title">Silex CMS</div>
           <div class="silex-help">
@@ -16,7 +24,28 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             <p>By adding data sources to your website you activate <a target="_blank" href="https://www.11ty.dev/docs/">11ty static site generator</a> integration. When you wil publish your website, the generated files assume you build the site with 11ty and possibly with Gitlab pages.</p>
           </div>
             ${opts.view?.settingsEl ? (opts.view.settingsEl as () => HTMLElement)() : ''}
-          </div>
+            <div class="gjs-sm-sector-title">11ty Config</div>
+              <div class="silex-help">
+                <p>These settings are used to configure the <a target="_blank" href="https://www.11ty.dev/docs/">11ty static site generator</a> integration.</p>
+                <p>Depending on your 11ty configuration, you may need to adjust these settings, it will enable or disable features in Silex.</p>
+              </div>
+              <div class="silex-help">
+                <p>⚠️ You need to reload Silex for these settings to take effect.</p>
+              </div>
+              <label for="silex-form__element">
+                <span>I18N Plugin</span>
+                <input type="checkbox" name="eleventyI18n" ?checked=${settings.eleventyI18n}>
+              </label>
+              <label for="silex-form__element">
+                <span>Fetch Plugin</span>
+                <input type="checkbox" name="eleventyFetch" ?checked=${settings.eleventyFetch}>
+              </label>
+              <label for="silex-form__element">
+                <span>Image Plugin</span>
+                <input type="checkbox" name="eleventyImage" ?checked=${settings.eleventyImage}>
+              </label>
+            <div class="silex-form__group col2">
+            </div>
           </div>
         </div>
         `

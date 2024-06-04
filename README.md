@@ -157,6 +157,8 @@ Here are additional options specific to this plugin:
 |`urls.css`|Url of the folder containing the CSS files, Silex will use this to generate links to the CSS files.|`css`|
 |`urls.assets`|Url of the folder containing the assets files, Silex will use this to generate links to the assets files.|`assets`|
 
+> Note that `fetchPlugin`, `imagePlugin` and `i18nPlugin` can be activated on a per-site basis in the website settings.
+
 ## Dev notes
 
 Hidden states

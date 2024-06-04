@@ -89,6 +89,10 @@ export interface Silex11tyPluginWebsiteSettings extends WebsiteSettings {
   eleventyOGImage?: string,
   eleventyOGTitle?: string,
   eleventyOGDescription?: string,
+  // Client side settings
+  eleventyI18n?: boolean,
+  eleventyFetch?: boolean,
+  eleventyImage?: boolean,
 }
 
 export default function (config: ClientConfig, options: Partial<EleventyPluginOptions> = {}) {
