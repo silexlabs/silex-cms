@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@humanwhocodes/retry": "^0.3.0",
-    "@silexlabs/grapesjs-data-source": "^0.0.106",
+    "@silexlabs/grapesjs-data-source": "^0.0.107",
     "dedent": "^1.5.3",
     "deepmerge": "^4.3.1"
   },
