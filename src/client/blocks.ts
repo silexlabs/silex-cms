@@ -124,8 +124,23 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         },
       },
     })
+  })
+  // After the website is loaded (because we need its settings)
+  config.on('silex:startup:end', () => {
+    const editor = config.getEditor()
     // Image web component
     if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
+      // Add the block
+      editor.BlockManager.add('eleventy-img', {
+        label: 'eleventy-img',
+        category: 'Eleventy',
+        attributes: { class: 'fa fa-image' },
+        id: 'eleventy-img',
+        content: { type: 'eleventy-img' },
+        // The component `image` is activatable (shows the Asset Manager).
+        activate: true,
+        // select: true, // Default with `activate: true`
+      })
       // Add an attribute for the webc version
       const attributes = opts.imagePlugin === 'webc' ? { 'webc:is': 'eleventy-image' } : {}
       // Add the component type
@@ -145,24 +160,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             attributes,
           },
         },
-      })
-    }
-  })
-  // After the website is loaded (because we need its settings)
-  config.on('silex:startup:end', () => {
-    const editor = config.getEditor()
-    // Image web component
-    if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
-      // Add the block
-      editor.BlockManager.add('eleventy-img', {
-        label: 'eleventy-img',
-        category: 'Eleventy',
-        attributes: { class: 'fa fa-image' },
-        id: 'eleventy-img',
-        content: { type: 'eleventy-img' },
-        // The component `image` is activatable (shows the Asset Manager).
-        activate: true,
-        // select: true, // Default with `activate: true`
       })
     }
   })
