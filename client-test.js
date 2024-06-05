@@ -35,8 +35,9 @@ export default function (config, options = {}) {
       //},
     ],
     enable11ty: true,
-    //image: true,
-    //i18n: true,
+    imagePlugin: false,
+    i18nPlugin: false,
+    fetchPlugin: false,
     filters: [
       'generic',
       'liquid',

@@ -2,7 +2,9 @@ import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions } from '../client'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
-  config.on('silex:grapesjs:end', () => {
+  // After the editor is ready
+  // And the website is loaded (because we need its settings)
+  config.on('silex:startup:end', () => {
     const editor = config.getEditor()
     // **
     // Shortcode
