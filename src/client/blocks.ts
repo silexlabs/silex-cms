@@ -3,8 +3,7 @@ import { EleventyPluginOptions } from '../client'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   // After the editor is ready
-  // And the website is loaded (because we need its settings)
-  config.on('silex:startup:end', () => {
+  config.on('silex:grapesjs:end', () => {
     const editor = config.getEditor()
     // **
     // Shortcode
@@ -125,22 +124,10 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         },
       },
     })
-    // **
     // Image web component
     if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
       // Add an attribute for the webc version
       const attributes = opts.imagePlugin === 'webc' ? { 'webc:is': 'eleventy-image' } : {}
-      // Add the block
-      editor.BlockManager.add('eleventy-img', {
-        label: 'eleventy-img',
-        category: 'Eleventy',
-        attributes: { class: 'fa fa-image' },
-        id: 'eleventy-img',
-        content: { type: 'eleventy-img' },
-        // The component `image` is activatable (shows the Asset Manager).
-        activate: true,
-        // select: true, // Default with `activate: true`
-      })
       // Add the component type
       editor.DomComponents.addType('eleventy-img', {
         extend: 'image',
@@ -158,6 +145,24 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             attributes,
           },
         },
+      })
+    }
+  })
+  // After the website is loaded (because we need its settings)
+  config.on('silex:startup:end', () => {
+    const editor = config.getEditor()
+    // Image web component
+    if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
+      // Add the block
+      editor.BlockManager.add('eleventy-img', {
+        label: 'eleventy-img',
+        category: 'Eleventy',
+        attributes: { class: 'fa fa-image' },
+        id: 'eleventy-img',
+        content: { type: 'eleventy-img' },
+        // The component `image` is activatable (shows the Asset Manager).
+        activate: true,
+        // select: true, // Default with `activate: true`
       })
     }
   })
