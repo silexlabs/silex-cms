@@ -9,7 +9,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       label: 'CMS',
       render: () => {
         const settings = config.getEditor().getModel().get('settings') as Silex11tyPluginWebsiteSettings
-        console.log('settings', settings)
         return html`
         <style>
           #settings-cms label {
@@ -34,15 +33,15 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
               </div>
               <label for="silex-form__element">
                 <span>I18N Plugin</span>
-                <input type="checkbox" name="eleventyI18n" ?checked=${settings.eleventyI18n}>
+                <input type="checkbox" name="eleventyI18n" ?checked=${settings.eleventyI18n || opts.i18nPlugin} ?disabled=${!!opts.i18nPlugin}>
               </label>
               <label for="silex-form__element">
                 <span>Fetch Plugin</span>
-                <input type="checkbox" name="eleventyFetch" ?checked=${settings.eleventyFetch}>
+                <input type="checkbox" name="eleventyFetch" ?checked=${settings.eleventyFetch || opts.fetchPlugin} ?disabled=${!!opts.fetchPlugin}>
               </label>
               <label for="silex-form__element">
                 <span>Image Plugin</span>
-                <input type="checkbox" name="eleventyImage" ?checked=${settings.eleventyImage}>
+                <input type="checkbox" name="eleventyImage" ?checked=${settings.eleventyImage || opts.imagePlugin} ?disabled=${!!opts.imagePlugin}>
               </label>
             <div class="silex-form__group col2">
             </div>

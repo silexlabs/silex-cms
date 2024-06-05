@@ -43,7 +43,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   config.on('silex:startup:end', () => {
     const editor = config.getEditor()
     editor.on('silex:settings:save:start' /*ClientEvent.SETTINGS_SAVE_START*/, (page: Page) => {
-      console.log('settings', page)
       const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings
       if (settings) {
         // Set the state on the body component
