@@ -8,7 +8,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       id: 'cms',
       label: 'CMS',
       render: () => {
-        const settings = config.getEditor().getModel().get('settings') as Silex11tyPluginWebsiteSettings
+        const settings = (config.getEditor().getModel().get('settings') || {}) as Silex11tyPluginWebsiteSettings
         return html`
         <style>
           #settings-cms label {

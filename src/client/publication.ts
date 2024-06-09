@@ -241,7 +241,7 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
   editor.Pages.getAll().forEach(page => {
     // Get the page properties
     const slug = slugify(page.getName() || 'index')
-    const settings = page.get('settings') as Silex11tyPluginWebsiteSettings ?? {}
+    const settings = (page.get('settings') ?? {}) as Silex11tyPluginWebsiteSettings
     const languages = settings.silexLanguagesList?.split(',').map(lang => lang.trim()).filter(lang => !!lang)
 
     // Create the data file for this page
@@ -325,7 +325,7 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
  */
 function getDataFile(editor: Editor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
-  const fetchPlugin = getFetchPluginOptions(options, editor.getModel().get('settings'))
+  const fetchPlugin = getFetchPluginOptions(options, editor.getModel().get('settings') || {})
   const fetchImportStatement = fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
   const dsm = (editor as DataSourceEditor).DataSourceManager

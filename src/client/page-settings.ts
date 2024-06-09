@@ -43,7 +43,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   config.on('silex:startup:end', () => {
     const editor = config.getEditor()
     editor.on('silex:settings:save:start' /*ClientEvent.SETTINGS_SAVE_START*/, (page: Page) => {
-      const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings
+      const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined
       if (settings) {
         // Set the state on the body component
         // This is only useful to build the GraphQL query

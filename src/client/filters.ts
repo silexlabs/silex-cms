@@ -8,10 +8,10 @@ export default function(config, opts: EleventyPluginOptions): void {
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
-    if (opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
+    if (opts.imagePlugin || config.getEditor().getModel().get('settings')?.eleventyImage) {
       dm.filters.push(...imageFilters)
     }
-    if (opts.i18nPlugin || config.getEditor().getModel().get('settings').eleventyI18n) {
+    if (opts.i18nPlugin || config.getEditor().getModel().get('settings')?.eleventyI18n) {
       dm.filters.push(...i18nFilters)
     }
     // Eleventy provided filters: https://www.11ty.dev/docs/filters/#eleventy-provided-filters

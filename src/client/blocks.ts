@@ -129,7 +129,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   config.on('silex:startup:end', () => {
     const editor = config.getEditor()
     // Image web component
-    if(opts.imagePlugin || config.getEditor().getModel().get('settings').eleventyImage) {
+    if(opts.imagePlugin || config.getEditor().getModel().get('settings')?.eleventyImage) {
       // Add the block
       editor.BlockManager.add('eleventy-img', {
         label: 'eleventy-img',

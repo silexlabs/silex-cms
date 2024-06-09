@@ -9,7 +9,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
       if(!body) return // This happens when the current page is deleted
       // Do not show "Body's " prefix for states on the body
       body.set(COMPONENT_NAME_PREFIX, '')
-      const settings = page.get('settings') as Silex11tyPluginWebsiteSettings
+      const settings = page.get('settings') as Silex11tyPluginWebsiteSettings | undefined
       if (settings?.eleventyPageData) {
         const [dataSourceId, fieldId] = settings.eleventyPageData.split('.')
         const dataSource = config.getEditor().DataSourceManager.get(dataSourceId)
