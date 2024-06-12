@@ -18,35 +18,33 @@ export type Condition = BinaryCondition | UnaryCondition
  * Generate liquid instructions which echo the value of an expression
  */
 export function echoBlock(component: Component, expression: Expression): string {
-  if(expression.length === 0) throw new Error('Expression is empty')
-  if(expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
+  if (expression.length === 0) throw new Error('Expression is empty')
+  if (expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
     return expression[0].options?.value as string ?? ''
   }
   const statements = getLiquidBlock(component, expression)
   return `{% liquid
-    ${
-  statements
-    .map(({ liquid }) => liquid)
-    .join('\n\t')
-}
-    echo ${ statements[statements.length - 1].variableName }
+    ${statements
+      .map(({ liquid }) => liquid)
+      .join('\n\t')
+    }
+    echo ${statements[statements.length - 1].variableName}
   %}`
 }
 
 /**
  * Generate liquid instructions which echo the value of an expression, on 1 line
  */
-export function echoBlock1line(component: Component | null | undefined, expression: Expression): string {
-  if(expression.length === 0) throw new Error('Expression is empty')
-  if(expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
+export function echoBlock1line(component: Component, expression: Expression): string {
+  if (expression.length === 0) throw new Error('Expression is empty')
+  if (expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
     return expression[0].options?.value as string ?? ''
   }
   const statements = getLiquidBlock(component, expression)
-  return `{% ${
-    statements
-      .map(({ liquid }) => liquid)
-      .join(' %}{% ')
-    } %}{{ ${ statements[statements.length - 1].variableName } }}`
+  return `{% ${statements
+    .map(({ liquid }) => liquid)
+    .join(' %}{% ')
+    } %}{{ ${statements[statements.length - 1].variableName} }}`
 }
 
 /**
@@ -54,17 +52,16 @@ export function echoBlock1line(component: Component | null | undefined, expressi
  * This is used for components states
  */
 export function assignBlock(stateId: StateId, component: Component, expression: Expression): string {
-  if(expression.length === 0) throw new Error('Expression is empty')
+  if (expression.length === 0) throw new Error('Expression is empty')
   const statements = getLiquidBlock(component, expression)
   const persistantId = getPersistantId(component)
-  if(!persistantId) throw new Error('This component has no persistant ID')
+  if (!persistantId) throw new Error('This component has no persistant ID')
   return `{% liquid
-    ${
-  statements
-    .map(({liquid}) => liquid)
-    .join('\n\t')
-}
-    assign ${ getStateVariableName(persistantId, stateId) } = ${ statements[statements.length - 1].variableName }
+    ${statements
+      .map(({ liquid }) => liquid)
+      .join('\n\t')
+    }
+    assign ${getStateVariableName(persistantId, stateId)} = ${statements[statements.length - 1].variableName}
   %}`
 }
 
@@ -73,7 +70,7 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
  * This is used for components states
  */
 export function loopBlock(dataTree: DataTree, component: Component, expression: Expression): [start: string, end: string] {
-  if(expression.length === 0) throw new Error('Expression is empty')
+  if (expression.length === 0) throw new Error('Expression is empty')
   // Check data to loop over
   const field = getExpressionResultType(expression, component, dataTree)
   if (!field) throw new Error(`Expression ${expression.map(token => token.label).join(' -> ')} is invalid`)
@@ -81,18 +78,17 @@ export function loopBlock(dataTree: DataTree, component: Component, expression: 
   const statements = getLiquidBlock(component, expression)
   const loopDataVariableName = statements[statements.length - 1].variableName
   const persistantId = getPersistantId(component)
-  if(!persistantId) {
+  if (!persistantId) {
     console.error('Component', component, 'has no persistant ID. Persistant ID is required to get component states.')
     throw new Error('This component has no persistant ID')
   }
   return [`{% liquid
-    ${
-  statements
-    .map(({liquid}) => liquid)
-    .join('\n\t')
-}
+    ${statements
+      .map(({ liquid }) => liquid)
+      .join('\n\t')
+    }
     %}
-    {% for ${getStateVariableName(persistantId, '__data')} in ${ loopDataVariableName } %}
+    {% for ${getStateVariableName(persistantId, '__data')} in ${loopDataVariableName} %}
   `, '{% endfor %}']
 }
 
@@ -102,15 +98,15 @@ export function loopBlock(dataTree: DataTree, component: Component, expression: 
  */
 export function ifBlock(component: Component, condition: Condition): [start: string, end: string] {
   // Check the first expression
-  if(condition.expression.length === 0) throw new Error('If block expression is empty')
+  if (condition.expression.length === 0) throw new Error('If block expression is empty')
 
   // Check the operator
   const unary = Object.values(UnariOperator).includes(condition.operator as UnariOperator) ? condition as UnaryCondition : null
   const binary = Object.values(BinariOperator).includes(condition.operator as BinariOperator) ? condition as BinaryCondition : null
-  if(!unary && !binary) throw new Error(`If block operator is invalid: ${condition.operator}`)
+  if (!unary && !binary) throw new Error(`If block operator is invalid: ${condition.operator}`)
 
   // Check the second expression
-  if(binary && binary.expression2.length === 0) return ['', '']
+  if (binary && binary.expression2.length === 0) return ['', '']
 
   // Get liquid for the first expression
   const statements = getLiquidBlock(component, condition.expression)
@@ -118,40 +114,39 @@ export function ifBlock(component: Component, condition: Condition): [start: str
 
   // Get liquid for the second 
   let lastVariableName2 = ''
-  if(binary) {
+  if (binary) {
     statements.push(...getLiquidBlock(component, binary.expression2))
     lastVariableName2 = statements[statements.length - 1].variableName
   }
 
   // Get liquid for the whole if block
   return [`{% liquid
-    ${
-  statements
-    .map(({liquid}) => liquid)
-    .join('\n\t')
-}
+    ${statements
+      .map(({ liquid }) => liquid)
+      .join('\n\t')
+    }
     %}
-    {% if ${ unary ? getUnaryOp(lastVariableName, unary.operator) : getBinaryOp(lastVariableName, lastVariableName2, binary!.operator) } %}
+    {% if ${unary ? getUnaryOp(lastVariableName, unary.operator) : getBinaryOp(lastVariableName, lastVariableName2, binary!.operator)} %}
   `, '{% endif %}']
 }
 
 function getUnaryOp(variableName: string, operator: UnariOperator): string {
-  switch(operator) {
-  case UnariOperator.TRUTHY: return `${variableName} and ${variableName} != blank and ${variableName} != empty`
-  case UnariOperator.FALSY: return `not ${variableName}`
-  case UnariOperator.EMPTY_ARR: return `${variableName}.size == 0`
-  case UnariOperator.NOT_EMPTY_ARR: return `${variableName}.size > 0`
+  switch (operator) {
+    case UnariOperator.TRUTHY: return `${variableName} and ${variableName} != blank and ${variableName} != empty`
+    case UnariOperator.FALSY: return `not ${variableName}`
+    case UnariOperator.EMPTY_ARR: return `${variableName}.size == 0`
+    case UnariOperator.NOT_EMPTY_ARR: return `${variableName}.size > 0`
   }
 }
 
 function getBinaryOp(variableName: string, variableName2: string, operator: BinariOperator): string {
-  switch(operator) {
-  case BinariOperator.EQUAL: return `${variableName} == ${variableName2}`
-  case BinariOperator.NOT_EQUAL: return `${variableName} != ${variableName2}`
-  case BinariOperator.GREATER_THAN: return `${variableName} > ${variableName2}`
-  case BinariOperator.LESS_THAN: return `${variableName} < ${variableName2}`
-  case BinariOperator.GREATER_THAN_OR_EQUAL: return `${variableName} >= ${variableName2}`
-  case BinariOperator.LESS_THAN_OR_EQUAL: return `${variableName} <= ${variableName2}`
+  switch (operator) {
+    case BinariOperator.EQUAL: return `${variableName} == ${variableName2}`
+    case BinariOperator.NOT_EQUAL: return `${variableName} != ${variableName2}`
+    case BinariOperator.GREATER_THAN: return `${variableName} > ${variableName2}`
+    case BinariOperator.LESS_THAN: return `${variableName} < ${variableName2}`
+    case BinariOperator.GREATER_THAN_OR_EQUAL: return `${variableName} >= ${variableName2}`
+    case BinariOperator.LESS_THAN_OR_EQUAL: return `${variableName} <= ${variableName2}`
   }
 }
 
@@ -160,16 +155,16 @@ let numNextVar = 0
  * Convert an expression to liquid code
  */
 export function getLiquidBlock(component: Component, expression: Expression): { variableName: string, liquid: string }[] {
-  if(expression.length === 0) return []
+  if (expression.length === 0) return []
   const result = [] as { variableName: string, liquid: string }[]
   const firstToken = expression[0]
   let lastVariableName = ''
-  if(firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
-  if(firstToken.type === 'property' && firstToken.dataSourceId && firstToken.dataSourceId !== 'eleventy') {
+  if (firstToken.type === 'filter') throw new Error('Expression cannot start with a filter')
+  if (firstToken.type === 'property' && firstToken.dataSourceId && firstToken.dataSourceId !== 'eleventy') {
     lastVariableName = firstToken.dataSourceId as string
   }
   const rest = [...expression]
-  while(rest.length) {
+  while (rest.length) {
     // Move all tokens until the first filter
     const firstFilterIndex = rest.findIndex(token => token.type === 'filter')
     const variableExpression = firstFilterIndex === -1 ? rest.splice(0) : rest.splice(0, firstFilterIndex)
@@ -201,51 +196,50 @@ export function getNextVariableName(component: Component, numNextVar: number): s
  * Example of return value: `countries.continent.countries | first.name`
  */
 export function getLiquidStatement(expression: Expression, variableName: string, lastVariableName: string = ''): string {
-  if(expression.length === 0) throw new Error('Expression cannot be empty')
+  if (expression.length === 0) throw new Error('Expression cannot be empty')
   // Split expression in 2: properties and filters
   const firstFilterIndex = expression.findIndex(token => token.type === 'filter')
-  if(firstFilterIndex === 0) throw new Error('Expression cannot start with a filter')
+  if (firstFilterIndex === 0) throw new Error('Expression cannot start with a filter')
   const properties = (firstFilterIndex < 0 ? expression : expression.slice(0, firstFilterIndex)) as (Property | State)[]
   const filters = firstFilterIndex > 0 ? expression.slice(firstFilterIndex) as Filter[] : []
   // Check that no properties or state come after filter
-  if(filters.find(token => token.type !== 'filter')) {
+  if (filters.find(token => token.type !== 'filter')) {
     throw new Error('A filter cannot be followed by a property or state')
   }
   // Start with the assign statement
-  return `assign ${variableName} = ${
-    lastVariableName ? `${ lastVariableName }.` : ''
-  }${
+  return `assign ${variableName} = ${lastVariableName ? `${lastVariableName}.` : ''
+    }${
     // Add all the properties
     getLiquidStatementProperties(properties)
-  }${
+    }${
     // Add all the filters
     getLiquidStatementFilters(filters)
-  }`
+    }`
 }
 
 export function getLiquidStatementProperties(properties: (Property | State)[]): string {
   return properties.map((token, index) => {
     switch (token.type) {
-    case 'state': {
-      if (index !== 0) throw new Error('State can only be the first token in an expression')
-      return getStateVariableName(token.componentId, token.storedStateId)
-    }
-    case 'property': {
-      if(token.fieldId === FIXED_TOKEN_ID) {
-        return `"${token.options?.value ?? ''}"`
+      case 'state': {
+        if (index !== 0) throw new Error('State can only be the first token in an expression')
+        return getStateVariableName(token.componentId, token.storedStateId)
       }
-      return token.fieldId
-    }
-    default: {
-      throw new Error(`Only state or property can be used in an expression, got ${(token as Token).type}`)
-    }
+      case 'property': {
+        if (token.fieldId === FIXED_TOKEN_ID) {
+          return `"${token.options?.value ?? ''}"`
+        }
+        return token.fieldId
+      }
+      default: {
+        throw new Error(`Only state or property can be used in an expression, got ${(token as Token).type}`)
+      }
     }
   })
     .join('.')
 }
 
 export function getLiquidStatementFilters(filters: Filter[]): string {
-  if(!filters.length) return ''
+  if (!filters.length) return ''
   return ' | ' + filters.map(token => {
     const options = token.options ? Object.entries(token.options)
       // Order the filter's options by the order they appear in the filter's optionsKeys
@@ -255,13 +249,13 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
         order: token.optionsKeys?.indexOf(key),
       }))
       .sort((a, b) => {
-        if(a.order === undefined && b.order === undefined) return 0
-        if(a.order === undefined) return 1
-        if(b.order === undefined) return -1
+        if (a.order === undefined && b.order === undefined) return 0
+        if (a.order === undefined) return 1
+        if (b.order === undefined) return -1
         return a.order - b.order
       })
       // Convert the options to liquid
-      .map(({key, value}) => handleFilterOption(token, key, value as string)) : []
+      .map(({ key, value }) => handleFilterOption(token, key, value as string)) : []
     return `${token.filterName ?? token.id}${options.length ? `: ${options.join(', ')}` : ''}`
   })
     .join(' | ')
@@ -273,35 +267,35 @@ export function getLiquidStatementFilters(filters: Filter[]): string {
  * Escape existing quotes
  */
 function quote(value: string): string {
-  if(value.startsWith('"') && value.endsWith('"')) return value
+  if (value.startsWith('"') && value.endsWith('"')) return value
   return `"${value.replace(/"/g, '\\"')}"`
 }
 
 function handleFilterOption(filter: Filter, key: string, value: string): string {
   try {
     const json = JSON.parse(value)
-    if(isExpression(json)) {
+    if (isExpression(json)) {
       const expression = json as Expression
       const result = expression.map(token => {
-        switch(token.type) {
-        case 'property': {
-          if(token.fieldId === FIXED_TOKEN_ID) {
-            return `"${token.options?.value ?? ''}"`
+        switch (token.type) {
+          case 'property': {
+            if (token.fieldId === FIXED_TOKEN_ID) {
+              return `"${token.options?.value ?? ''}"`
+            }
+            return token.fieldId
           }
-          return token.fieldId
-        }
-        case 'state': {
-          return getStateVariableName(token.componentId, token.storedStateId)
-        }
-        case 'filter': {
-          throw new Error('Filter cannot be used in a filter option')
-        }
+          case 'state': {
+            return getStateVariableName(token.componentId, token.storedStateId)
+          }
+          case 'filter': {
+            throw new Error('Filter cannot be used in a filter option')
+          }
         }
       })
         .join('.')
       return filter.quotedOptions?.includes(key) ? quote(result) : result
     }
-  } catch(e) {
+  } catch (e) {
     // Ignore
   }
   return filter.quotedOptions?.includes(key) ? quote(value) : value

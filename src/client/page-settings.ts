@@ -5,11 +5,6 @@ import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client
 import { html } from 'lit'
 import { Page } from 'grapesjs'
 
-interface FieldsByDataSource {
-  dataSourceId: DataSourceId
-  fields: Field[]
-}
-
 /**
  * Set the state on the body component
  * This is only useful to build the GraphQL query
