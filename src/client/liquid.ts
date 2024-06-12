@@ -34,6 +34,22 @@ export function echoBlock(component: Component, expression: Expression): string 
 }
 
 /**
+ * Generate liquid instructions which echo the value of an expression, on 1 line
+ */
+export function echoBlock1line(component: Component | null | undefined, expression: Expression): string {
+  if(expression.length === 0) throw new Error('Expression is empty')
+  if(expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
+    return expression[0].options?.value as string ?? ''
+  }
+  const statements = getLiquidBlock(component, expression)
+  return `{% ${
+    statements
+      .map(({ liquid }) => liquid)
+      .join(' %}{% ')
+    } %}{{ ${ statements[statements.length - 1].variableName } }}`
+}
+
+/**
  * Generate liquid instructions which define a variable for later use
  * This is used for components states
  */

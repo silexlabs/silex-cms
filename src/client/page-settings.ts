@@ -87,43 +87,37 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     </style>
     <div id="settings-cms" class="silex-hideable silex-hidden">
       <div class="gjs-sm-sector-title">Silex CMS - Page settings</div>
-      <div class="silex-help">The <a href="https://github.com/silexlabs/silex-cms">Silex CMS</a> integrates <a href="https://www.11ty.dev/docs/">11ty</a> static site generator and your favorite headless CMS with Silex.</div>
+      <div class="silex-help">
+        The "Silex CMS" feature integrates <a target="_blank" href="https://www.11ty.dev/">11ty</a> static site generator and your favorite headless CMS with Silex.
+        <br>Read the <a target="_blank" href="https://docs.silex.me/en/user/cms">documentation</a> to learn more.
+      </div>
       <div class="silex-form__group col2">
         <label class="silex-form__element">
           <h3>Create pages from data</h3>
-          <p class="silex-help">The <a href="https://www.11ty.dev/docs/pagination/">Pagination feature</a> is used for iterating over any data to create multiple output files.</p>
-          <label class="silex-form__element">Page data
-            <select name="eleventyPageData" id="pageDataSelect">
-              <option value="" ?selected=${!collectionPageData?.id}>None</option>
-              ${queryables
-    .filter(field => field.kind === 'list')
-    .reduce((groups, field) => {
-      const group = groups.find(g => g.dataSourceId === field.dataSourceId)
-      if (group) {
-        group.fields.push(field)
-      } else {
-        groups.push({ dataSourceId: field.dataSourceId || 'Unknown', fields: [field] })
-      }
-      return groups
-    }, [] as FieldsByDataSource[])
-    .map(group => html`
-                  <optgroup label=${group.dataSourceId}>
-                    ${group.fields.map(field => html`
-                      <option .value=${`${field.dataSourceId}.${field.id}`} .data-field=${JSON.stringify(field)} ?selected=${collectionPageData?.id === field.id}>${field.id}</option>
-                    `)}
-                  </optgroup>
-                `)}
-            </select>
-          </label>
+          <p class="silex-help">Pagination allows you to iterate over data and create multiple webiste pages from a single page in Silex. </p>
+          <state-editor
+            id="eleventyPageData"
+            name="eleventyPageData"
+            value=${settings.eleventyPageData ?? ''}
+            .editor=${config.getEditor()}
+            no-filters
+          >
+            <label slot="label">Data</label>
+          </state-editor>
           <label class="silex-form__element">Size
             <input type="number" name="eleventyPageSize" .value=${settings.eleventyPageSize ?? 1}/>
           </label>
           <label class="silex-form__element">Reverse
             <input type="checkbox" name="eleventyPageReverse" ?checked=${!!settings.eleventyPageReverse}/>
           </label>
-          <label class="silex-form__element">Permalink
-            <input type="text" name="eleventyPermalink" .value=${settings.eleventyPermalink ?? ''}/>
-          </label>
+          <state-editor
+            id="eleventyPermalink"
+            name="eleventyPermalink"
+            value=${settings.eleventyPermalink ?? ''}
+            .editor=${config.getEditor()}
+          >
+            <label slot="label">Permalink</label>
+          </state-editor>
           <label class="silex-form__element">Available languages
             <p class="silex-help">Silex can duplicate this page for each language and generate a different URL for each language.</p>
             <p class="silex-help">Provide a comma separated list of languages. For example: <code>en,fr</code>. An empty value will deactivate this feature.</p>
@@ -132,7 +126,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         </label>
         <label class="silex-form__element">
           <h3>Navigation Plugin</h3>
-          <p class="silex-help">This 11ty plugin enables infinite-depth hierarchical navigation in Eleventy projects. Supports breadcrumbs too! <a href="https://www.11ty.dev/docs/plugins/navigation/">Read more about the Navigation Plugin</a>.</p>
+          <p class="silex-help">This 11ty plugin enables infinite-depth hierarchical navigation in Eleventy projects. Supports breadcrumbs too! <a target="_blank" href="https://www.11ty.dev/docs/plugins/navigation/">Read more about the Navigation Plugin</a>.</p>
           <label class="silex-form__element">Key
             <input type="text" name="eleventyNavigationKey" .value=${settings.eleventyNavigationKey ?? ''}/>
           </label>

@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Editor, Page } from 'grapesjs'
 import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, NOTIFICATION_GROUP, Properties, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
-import { assignBlock, echoBlock, ifBlock, loopBlock } from './liquid'
+import { assignBlock, echoBlock, getLiquidStatementProperties, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
@@ -147,9 +147,20 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
     // because it is in double quotes in the front matter
     ?.replace(/"/g, '\\"')
 
+  const data = (function() {
+    if(!settings?.eleventyPageData) return undefined
+    try {
+      const expression = JSON.parse(settings.eleventyPageData)
+      return getLiquidStatementProperties(expression)
+    } catch(e) {
+      // Probably not JSON (backward compat)
+      return settings?.eleventyPageData
+    }
+  })()
+
   return dedent`---
     ${settings?.eleventyPageData ? `pagination:
-      data: ${settings.eleventyPageData}
+      data: ${data}
       ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
       ${settings.eleventyPageReverse ? 'reverse: true' : ''}
     ` : ''}
