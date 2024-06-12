@@ -1,4 +1,4 @@
-import { DataSourceEditor, DataSourceId, Field, removeState, setState } from '@silexlabs/grapesjs-data-source'
+import { removeState, setState } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 //import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
@@ -55,8 +55,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       id: 'cms',
       label: 'CMS',
       render: (settings: Silex11tyPluginWebsiteSettings) => {
-        const queryables = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree().getAllQueryables()
-        const collectionPageData = queryables.find(field => `${field.dataSourceId}.${field.id}` === settings.eleventyPageData) ?? null
         setTimeout(() => {
           // Update the settings form when the selection changed without recreating the form
           (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
