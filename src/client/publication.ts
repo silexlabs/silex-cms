@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 import { Component, Editor, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression } from '@silexlabs/grapesjs-data-source'
+import { BinariOperator, DataSourceEditor, DataTree, Filter, IDataSourceModel, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, echoBlock1line, getPaginationData, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -119,12 +119,10 @@ function slugify(text) {
     .replace(/-+$/, '') // Trim - from end of text
 }
 
-export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: string): string | null {
-  const isCollectionPage = !!settings.eleventyPageData
-  const permalink = toExpression(settings.eleventyPermalink)
+export function getPermalink(permalink: (Property | Filter)[], isCollectionPage: boolean, slug: string): string | null {
   const isHome = slug === 'index'
   // User provided a permalink explicitely
-  if (permalink) {
+  if (permalink && permalink.length > 0) {
     return echoBlock1line(null, permalink)
   } else if (isCollectionPage) {
     // Let 11ty handle the permalink
@@ -142,13 +140,8 @@ export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: str
  * Get the front matter for a given page
  */
 export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, collection, lang = ''): string {
-  const permalink = getPermalink(settings, slug)
-    // Escape quotes in permalink
-    // because it is in double quotes in the front matter
-    ?.replace(/"/g, '\\"')
-
   const data = (function() {
-    if(!settings?.eleventyPageData) return undefined
+    if(!settings.eleventyPageData) return undefined
     const expression = toExpression(settings.eleventyPageData)
     if(expression) {
       if(expression.filter(token => token.type !== 'property').length > 0) {
@@ -158,14 +151,25 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
       return getPaginationData(expression as Property[])
     } else {
       // Probably not JSON (backward compat)
-      return settings?.eleventyPageData
+      return settings.eleventyPageData
     }
   })()
 
+  const isCollectionPage = !!data && data.length > 0
+  const permalinkExpression = toExpression(settings.eleventyPermalink)
+  if(permalinkExpression?.find(token => ['state', 'unknown'].includes(token.type))) {
+    console.error('Expression for permalink has to contain only properties', permalinkExpression.map(token => token.type))
+    throw new Error('Expression for permalink has to contain only properties')
+  }
+  const permalink = getPermalink(permalinkExpression as (Property | Filter)[], isCollectionPage, slug)
+    // Escape quotes in permalink
+    // because it is in double quotes in the front matter
+    ?.replace(/"/g, '\\"')
+
   return dedent`---
-    ${settings?.eleventyPageData ? `pagination:
+    ${data && data.length > 0 ? `pagination:
       data: ${data}
-      ${settings.eleventyPageSize ? `size: ${settings.eleventyPageSize}` : ''}
+      size: ${settings.eleventyPageSize ? settings.eleventyPageSize : '1'}
       ${settings.eleventyPageReverse ? 'reverse: true' : ''}
     ` : ''}
     ${permalink ? `permalink: "${permalink}"` : ''}

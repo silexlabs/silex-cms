@@ -60,6 +60,7 @@ test('Front matter of a collection page', () => {
   ---
   pagination:
     data: datasourceIdTest.continents
+    size: 1
   collection: "collectionTest"
   \n---\n`)
 })
@@ -73,6 +74,7 @@ test('Front matter of a collection page backward compatibility', () => {
   ---
   pagination:
     data: datasourceIdTest.continents
+    size: 1
   collection: "collectionTest"
   \n---\n`)
 })
@@ -89,6 +91,7 @@ test('Permalink', () => {
   ---
   pagination:
     data: datasourceIdTest.continents
+    size: 1
   permalink: "{% assign var_global_1 = datasourceIdTest.continents %}{{ var_global_1 }}"
   \n---\n`)
 })
@@ -105,6 +108,7 @@ test('Permalink with fixed string expression', () => {
   ---
   pagination:
     data: datasourceIdTest.continents
+    size: 1
   permalink: "/test/"
   \n---\n`)
 })
@@ -120,6 +124,7 @@ test('With languages', () => {
   ---
   pagination:
     data: directus.posts
+    size: 1
   lang: "fr"
   \n---\n`)
 })
