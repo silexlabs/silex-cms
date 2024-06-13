@@ -1,5 +1,6 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression, getExpressionResultType } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression, getExpressionResultType, toExpression } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
+import { EleventyDataSourceId } from './DataSource'
 
 export interface BinaryCondition {
   operator: BinariOperator,
@@ -35,7 +36,7 @@ export function echoBlock(component: Component, expression: Expression): string 
 /**
  * Generate liquid instructions which echo the value of an expression, on 1 line
  */
-export function echoBlock1line(component: Component, expression: Expression): string {
+export function echoBlock1line(component: Component | null | undefined, expression: Expression): string {
   if (expression.length === 0) throw new Error('Expression is empty')
   if (expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
     return expression[0].options?.value as string ?? ''
@@ -152,9 +153,25 @@ function getBinaryOp(variableName: string, variableName2: string, operator: Bina
 
 let numNextVar = 0
 /**
+ * Pagination data has no filter and no states in it
+ */
+export function getPaginationData(expression: Property[]): string {
+  const statement = getLiquidStatementProperties(expression)
+  const firstToken = expression[0]
+  if (firstToken) {
+    if (!firstToken.dataSourceId || firstToken.dataSourceId === EleventyDataSourceId) {
+      return statement
+    }
+    return `${firstToken.dataSourceId}.${statement}`
+  } else {
+    return ''
+  }
+}
+
+/**
  * Convert an expression to liquid code
  */
-export function getLiquidBlock(component: Component, expression: Expression): { variableName: string, liquid: string }[] {
+export function getLiquidBlock(component: Component | null | undefined, expression: Expression): { variableName: string, liquid: string }[] {
   if (expression.length === 0) return []
   const result = [] as { variableName: string, liquid: string }[]
   const firstToken = expression[0]
@@ -182,8 +199,8 @@ export function getLiquidBlock(component: Component, expression: Expression): { 
   return result
 }
 
-export function getNextVariableName(component: Component, numNextVar: number): string {
-  return `var_${component.ccid}_${numNextVar}`
+export function getNextVariableName(component: Component | null | undefined, numNextVar: number): string {
+  return `var_${component?.ccid || 'global'}_${numNextVar}`
 }
 
 /**
@@ -273,9 +290,8 @@ function quote(value: string): string {
 
 function handleFilterOption(filter: Filter, key: string, value: string): string {
   try {
-    const json = JSON.parse(value)
-    if (isExpression(json)) {
-      const expression = json as Expression
+    const expression = toExpression(value)
+    if (expression) {
       const result = expression.map(token => {
         switch (token.type) {
         case 'property': {

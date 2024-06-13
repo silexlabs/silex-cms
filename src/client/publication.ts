@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { Component, Editor, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, NOTIFICATION_GROUP, Properties, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName } from '@silexlabs/grapesjs-data-source'
-import { assignBlock, echoBlock, getLiquidStatementProperties, ifBlock, loopBlock } from './liquid'
+import { BinariOperator, DataSourceEditor, DataTree, IDataSourceModel, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression } from '@silexlabs/grapesjs-data-source'
+import { assignBlock, echoBlock, echoBlock1line, getPaginationData, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
@@ -121,11 +121,11 @@ function slugify(text) {
 
 export function getPermalink(settings: Silex11tyPluginWebsiteSettings, slug: string): string | null {
   const isCollectionPage = !!settings.eleventyPageData
-  const permalink = settings.eleventyPermalink
+  const permalink = toExpression(settings.eleventyPermalink)
   const isHome = slug === 'index'
   // User provided a permalink explicitely
   if (permalink) {
-    return permalink
+    return echoBlock1line(null, permalink)
   } else if (isCollectionPage) {
     // Let 11ty handle the permalink
     return null
@@ -149,10 +149,14 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
 
   const data = (function() {
     if(!settings?.eleventyPageData) return undefined
-    try {
-      const expression = JSON.parse(settings.eleventyPageData)
-      return getLiquidStatementProperties(expression)
-    } catch(e) {
+    const expression = toExpression(settings.eleventyPageData)
+    if(expression) {
+      if(expression.filter(token => token.type !== 'property').length > 0) {
+        console.error('Expression for pagination data has to contain only properties', expression.map(token => token.type))
+        throw new Error('Expression for pagination data has to contain only properties')
+      }
+      return getPaginationData(expression as Property[])
+    } else {
       // Probably not JSON (backward compat)
       return settings?.eleventyPageData
     }
@@ -212,28 +216,28 @@ export function transformPage(editor: Editor, data: { page, siteSettings, pageSe
   const { pageSettings, page } = data
   const body = page.getMainComponent()
   if (pageSettings.eleventySeoTitle) {
-    const expression = JSON.parse(pageSettings.eleventySeoTitle)
-    if (expression.length) pageSettings.title = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventySeoTitle)
+    if (expression && expression.length) pageSettings.title = echoBlock(body, expression)
   }
   if (pageSettings.eleventySeoDescription) {
-    const expression = JSON.parse(pageSettings.eleventySeoDescription)
-    if (expression.length) pageSettings.description = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventySeoDescription)
+    if (expression && expression.length) pageSettings.description = echoBlock(body, expression)
   }
   if (pageSettings.eleventyFavicon) {
-    const expression = JSON.parse(pageSettings.eleventyFavicon)
-    if (expression.length) pageSettings.favicon = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventyFavicon)
+    if (expression && expression.length) pageSettings.favicon = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGImage) {
-    const expression = JSON.parse(pageSettings.eleventyOGImage)
-    if (expression.length) pageSettings['og:image'] = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventyOGImage)
+    if (expression && expression.length) pageSettings['og:image'] = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGTitle) {
-    const expression = JSON.parse(pageSettings.eleventyOGTitle)
-    if (expression.length) pageSettings['og:title'] = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventyOGTitle)
+    if (expression && expression.length) pageSettings['og:title'] = echoBlock(body, expression)
   }
   if (pageSettings.eleventyOGDescription) {
-    const expression = JSON.parse(pageSettings.eleventyOGDescription)
-    if (expression.length) pageSettings['og:description'] = echoBlock(body, expression)
+    const expression = toExpression(pageSettings.eleventyOGDescription)
+    if (expression && expression.length) pageSettings['og:description'] = echoBlock(body, expression)
   }
 }
 

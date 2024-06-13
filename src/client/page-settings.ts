@@ -1,4 +1,4 @@
-import { removeState, setState } from '@silexlabs/grapesjs-data-source'
+import { removeState, setState, toExpression } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 //import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
@@ -11,11 +11,15 @@ import { Page } from 'grapesjs'
  */
 function stateOnBody(editor, value, name, body) {
   if (value) {
-    let expression
-    try {
-      expression = JSON.parse(value)
-    } catch (e) {
-      console.error(`Invalid JSON for ${name}`, e)
+    const expression = toExpression(value)
+    if(expression) {
+      setState(body, name, {
+        label: name,
+        hidden: true,
+        expression,
+      })
+    } else {
+      console.error(`Invalid JSON for ${name}`)
       removeState(body, name)
       editor.runCommand('notifications:add', {
         type: 'error',
@@ -23,11 +27,6 @@ function stateOnBody(editor, value, name, body) {
         group: 'Errors in your settings',
       })
     }
-    setState(body, name, {
-      label: name,
-      hidden: true,
-      expression,
-    })
   } else {
     removeState(body, name)
   }
@@ -49,6 +48,8 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         stateOnBody(editor, settings.eleventyOGImage, 'eleventyOGImage', body)
         stateOnBody(editor, settings.eleventyOGTitle, 'eleventyOGTitle', body)
         stateOnBody(editor, settings.eleventyOGDescription, 'eleventyOGDescription', body)
+        stateOnBody(editor, settings.eleventyPageData, 'eleventyPageData', body)
+        stateOnBody(editor, settings.eleventyPermalink, 'eleventyPermalink', body)
       }
     })
     config.addSettings({
