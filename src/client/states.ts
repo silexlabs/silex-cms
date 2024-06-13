@@ -97,5 +97,4 @@ function update(config) {
     removeState(body, 'items', true)
     removeState(body, 'pages', true)
   }
-
 }

@@ -21,6 +21,28 @@ import { Page } from 'grapesjs'
 // This is because it breakes the tests since lit-html is a peer dependency (?)
 jest.mock('lit-html', () => ({}))
 
+const PAGE_DATA_TEST = `[{
+  "options": { "filter": "{}" },
+  "type": "property",
+  "propType": "field",
+  "fieldId": "continents",
+  "label": "continents",
+  "typeIds": ["Continent"],
+  "dataSourceId": "datasourceIdTest",
+  "kind": "list"
+}]`
+
+const PAGE_DATA_FIXED_TEST = `[{
+  "type": "property",
+  "propType": "field",
+  "fieldId": "fixed",
+  "label": "Fixed value",
+  "kind": "scalar",
+  "typeIds": ["String"],
+  "options": { "value": "/test/" }
+}]`
+
+
 test('Front matter of a simple page', () => {
   expect(() => getFrontMatter({}, 'page-1', '')).not.toThrow()
   expect(getFrontMatter({}, 'page-1', '')).toEqual(dedent`
@@ -31,20 +53,33 @@ test('Front matter of a simple page', () => {
 
 test('Front matter of a collection page', () => {
   const settings = {
-    eleventyPageData: 'directus.posts',
+    eleventyPageData: PAGE_DATA_TEST,
   }
   expect(() => getFrontMatter(settings, 'page-1', 'collectionTest')).not.toThrow()
   expect(getFrontMatter(settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
-    data: directus.posts
+    data: datasourceIdTest.continents
+  collection: "collectionTest"
+  \n---\n`)
+})
+
+test('Front matter of a collection page backward compatibility', () => {
+  const settings = {
+    eleventyPageData: PAGE_DATA_TEST,
+  }
+  expect(() => getFrontMatter(settings, 'page-1', 'collectionTest')).not.toThrow()
+  expect(getFrontMatter(settings, 'page-1', 'collectionTest')).toEqual(dedent`
+  ---
+  pagination:
+    data: datasourceIdTest.continents
   collection: "collectionTest"
   \n---\n`)
 })
 
 test('Permalink', () => {
-  const eleventyPageData = 'directus.posts'
-  const eleventyPermalink = '/test/{{ permalink[0] }}-with-special-chars/'
+  const eleventyPageData = PAGE_DATA_TEST
+  const eleventyPermalink = PAGE_DATA_TEST
   const settings = {
     eleventyPageData,
     eleventyPermalink,
@@ -53,8 +88,24 @@ test('Permalink', () => {
   expect(getFrontMatter(settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
-    data: ${eleventyPageData}
-  permalink: "${eleventyPermalink}"
+    data: datasourceIdTest.continents
+  permalink: "{% assign var_global_1 = datasourceIdTest.continents %}{{ var_global_1 }}"
+  \n---\n`)
+})
+
+test('Permalink with fixed string expression', () => {
+  const eleventyPageData = PAGE_DATA_TEST
+  const eleventyPermalink = PAGE_DATA_FIXED_TEST
+  const settings = {
+    eleventyPageData,
+    eleventyPermalink,
+  }
+  expect(() => getFrontMatter(settings, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter(settings, 'page-1', '')).toEqual(dedent`
+  ---
+  pagination:
+    data: datasourceIdTest.continents
+  permalink: "/test/"
   \n---\n`)
 })
 
