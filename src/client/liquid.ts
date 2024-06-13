@@ -1,4 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, isExpression, getExpressionResultType, toExpression } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, getExpressionResultType, toExpression } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 import { EleventyDataSourceId } from './DataSource'
 
