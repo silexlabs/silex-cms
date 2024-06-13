@@ -94,7 +94,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyPageData"
             value=${settings.eleventyPageData ?? ''}
             .editor=${config.getEditor()}
-            no-filters
           >
             <label slot="label">Data</label>
           </state-editor>

@@ -20,67 +20,69 @@ function update(config) {
   const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined
   if (settings?.eleventyPageData) {
     try {
-      const pageData = toExpression(settings.eleventyPageData) as Property[] || null
-      const dataSourceId = pageData[0].dataSourceId
-      const type = getExpressionResultType(pageData, body, editor.DataSourceManager.getDataTree())
-      if (!type) {
-        console.error('Invalid type for eleventyPageData')
-        removeState(body, 'pagination', true)
-        editor.runCommand('notifications:add', {
-          type: 'error',
-          message: 'Invalid type for eleventyPageData',
-          group: 'Errors in your settings',
-          componentId: body.id,
-        })
-        return
+      const pageData = toExpression(settings.eleventyPageData) as (Property[] | null)
+      if (pageData && pageData.length > 0) {
+        const dataSourceId = pageData[0].dataSourceId
+        const type = getExpressionResultType(pageData, body, editor.DataSourceManager.getDataTree())
+        if (!type) {
+          console.error('Invalid type for eleventyPageData')
+          removeState(body, 'pagination', true)
+          editor.runCommand('notifications:add', {
+            type: 'error',
+            message: 'Invalid type for eleventyPageData',
+            group: 'Errors in your settings',
+            componentId: body.id,
+          })
+          return
+        }
+        if (type.kind === 'scalar') {
+          console.error('Invalid type for eleventyPageData: a list is required, got a scalar type')
+          removeState(body, 'pagination', true)
+          editor.runCommand('notifications:add', {
+            type: 'error',
+            message: 'Invalid type for eleventyPageData: a list is required, got a scalar type',
+            group: 'Errors in your settings',
+            componentId: body.id,
+          })
+          return
+        }
+        // Update body states with the new settings
+        setState(body, 'pagination', {
+          hidden: true,
+          label: 'Pagination',
+          expression: pageData
+        }, true, 0)
+        // Taken from the pagination object https://www.11ty.dev/docs/pagination/
+        // items: [], // Array of current page’s chunk of data
+        setState(body, 'items', {
+          hidden: true,
+          label: 'pagination.items',
+          expression: [{
+            label: 'Unused items label',
+            type: 'property',
+            propType: 'field',
+            fieldId: type.id,
+            dataSourceId,
+            typeIds: [type.id],
+            kind: 'list',
+          }]
+        }, true, 1)
+        // Taken from the pagination object https://www.11ty.dev/docs/pagination/
+        // pages: [], // Array of all chunks of paginated data (in order)
+        setState(body, 'pages', {
+          hidden: true,
+          label: 'pagination.pages',
+          expression: [{
+            label: 'Unused pages label',
+            type: 'property',
+            propType: 'field',
+            fieldId: type.id,
+            dataSourceId,
+            typeIds: [type.id],
+            kind: 'list',
+          }]
+        }, true, 2)
       }
-      if (type.kind === 'scalar') {
-        console.error('Invalid type for eleventyPageData: a list is required, got a scalar type')
-        removeState(body, 'pagination', true)
-        editor.runCommand('notifications:add', {
-          type: 'error',
-          message: 'Invalid type for eleventyPageData: a list is required, got a scalar type',
-          group: 'Errors in your settings',
-          componentId: body.id,
-        })
-        return
-      }
-      // Update body states with the new settings
-      setState(body, 'pagination', {
-        hidden: true,
-        label: 'Pagination',
-        expression: pageData
-      }, true, 0)
-      // Taken from the pagination object https://www.11ty.dev/docs/pagination/
-      // items: [], // Array of current page’s chunk of data
-      setState(body, 'items', {
-        hidden: true,
-        label: 'pagination.items',
-        expression: [{
-          label: 'Unused items label',
-          type: 'property',
-          propType: 'field',
-          fieldId: type.id,
-          dataSourceId,
-          typeIds: [type.id],
-          kind: 'list',
-        }]
-      }, true, 1)
-      // Taken from the pagination object https://www.11ty.dev/docs/pagination/
-      // pages: [], // Array of all chunks of paginated data (in order)
-      setState(body, 'pages', {
-        hidden: true,
-        label: 'pagination.pages',
-        expression: [{
-          label: 'Unused pages label',
-          type: 'property',
-          propType: 'field',
-          fieldId: type.id,
-          dataSourceId,
-          typeIds: [type.id],
-          kind: 'list',
-        }]
-      }, true, 2)
     } catch (e) {
       console.error('Invalid JSON for eleventyPageData', e)
       removeState(body, 'pagination', true)

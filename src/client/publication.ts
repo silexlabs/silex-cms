@@ -145,8 +145,7 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
     const expression = toExpression(settings.eleventyPageData)
     if(expression) {
       if(expression.filter(token => token.type !== 'property').length > 0) {
-        console.error('Expression for pagination data has to contain only properties', expression.map(token => token.type))
-        throw new Error('Expression for pagination data has to contain only properties')
+        console.warn('Expression for pagination data has to contain only properties', expression.map(token => token.type))
       }
       return getPaginationData(expression as Property[])
     } else {
@@ -157,9 +156,8 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
 
   const isCollectionPage = !!data && data.length > 0
   const permalinkExpression = toExpression(settings.eleventyPermalink)
-  if(permalinkExpression?.find(token => ['state', 'unknown'].includes(token.type))) {
-    console.error('Expression for permalink has to contain only properties', permalinkExpression.map(token => token.type))
-    throw new Error('Expression for permalink has to contain only properties')
+  if(permalinkExpression?.find(token => token.type === 'state')) {
+    console.warn('Expression for permalink has to contain only properties and filters', permalinkExpression.map(token => token.type))
   }
   const permalink = getPermalink(permalinkExpression as (Property | Filter)[], isCollectionPage, slug)
     // Escape quotes in permalink
