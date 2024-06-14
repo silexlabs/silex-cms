@@ -1,5 +1,5 @@
 import dedent from 'dedent'
-import { Component, Editor, Page } from 'grapesjs'
+import { Component, Page } from 'grapesjs'
 import { BinariOperator, DataSourceEditor, DataTree, Filter, IDataSourceModel, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, echoBlock1line, getPaginationData, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
@@ -46,7 +46,7 @@ function getFetchPluginOptions(options: EleventyPluginOptions, settings: Silex11
 
 export default function (config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
-    const editor = config.getEditor()
+    const editor = config.getEditor() as DataSourceEditor
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
       // Render the components when they are published
@@ -72,8 +72,8 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
 /**
  * Check if the 11ty publication is enabled
  */
-function enable11ty(editor: Editor): boolean {
-  return (editor as DataSourceEditor)
+function enable11ty(editor: DataSourceEditor): boolean {
+  return editor
     .DataSourceManager
     .getAll()
     .filter(ds => ds.id !== EleventyDataSourceId)
@@ -95,7 +95,7 @@ function makeAttribute(key, value): string {
  * Comes from silex but didn't manage to import
  * FIXME: expose this from silex
  */
-function transformPaths(editor: Editor, path: string, type): string {
+function transformPaths(editor: DataSourceEditor, path: string, type): string {
   const config = editor.getModel().get('config')
   return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
@@ -119,11 +119,24 @@ function slugify(text) {
     .replace(/-+$/, '') // Trim - from end of text
 }
 
-export function getPermalink(permalink: (Property | Filter)[], isCollectionPage: boolean, slug: string): string | null {
+export function getPermalink(page: Page, permalink: Token[], isCollectionPage: boolean, slug: string): string | null {
   const isHome = slug === 'index'
   // User provided a permalink explicitely
   if (permalink && permalink.length > 0) {
-    return echoBlock1line(null, permalink)
+    const body = page.getMainComponent() as Component
+    return echoBlock1line(body, permalink.map(token => {
+      // Replace states which will be one from ./states.ts
+      if(token.type === 'state') {
+        const state = getState(body, token.storedStateId, true)
+        if(!state) throw new Error('State not found on body')
+        return {
+          ...state.expression[0],
+          dataSourceId: undefined,
+          fieldId: token.label,
+        } as Property
+      }
+      return token
+    }))
   } else if (isCollectionPage) {
     // Let 11ty handle the permalink
     return null
@@ -139,7 +152,7 @@ export function getPermalink(permalink: (Property | Filter)[], isCollectionPage:
 /**
  * Get the front matter for a given page
  */
-export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: string, collection, lang = ''): string {
+export function getFrontMatter(page: Page, settings: Silex11tyPluginWebsiteSettings, slug: string, collection, lang = ''): string {
   const data = (function() {
     if(!settings.eleventyPageData) return undefined
     const expression = toExpression(settings.eleventyPageData)
@@ -156,10 +169,8 @@ export function getFrontMatter(settings: Silex11tyPluginWebsiteSettings, slug: s
 
   const isCollectionPage = !!data && data.length > 0
   const permalinkExpression = toExpression(settings.eleventyPermalink)
-  if(permalinkExpression?.find(token => token.type === 'state')) {
-    console.warn('Expression for permalink has to contain only properties and filters', permalinkExpression.map(token => token.type))
-  }
-  const permalink = getPermalink(permalinkExpression as (Property | Filter)[], isCollectionPage, slug)
+  // Here permalinkExpression contains filters and properties. It contains 11ty data source states too
+  const permalink = getPermalink(page, permalinkExpression as (Property | Filter)[], isCollectionPage, slug)
     // Escape quotes in permalink
     // because it is in double quotes in the front matter
     ?.replace(/"/g, '\\"')
@@ -211,7 +222,7 @@ export function getBodyStates(page: Page): string {
   return ''
 }
 
-export function transformPage(editor: Editor, data: { page, siteSettings, pageSettings }): void {
+export function transformPage(editor: DataSourceEditor, data: { page, siteSettings, pageSettings }): void {
   // Do nothing if there is no data source, just a static site
   if(!enable11ty(editor)) return
 
@@ -248,12 +259,12 @@ export function transformPage(editor: Editor, data: { page, siteSettings, pageSe
  * This hook is called just before the files are written to the file system
  * Exported for unit tests
  */
-export function transformFiles(editor: Editor, options: EleventyPluginOptions, data: PublicationData): void {
+export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
   // Do nothing if there is no data source, just a static site
   if(!enable11ty(editor)) return
 
   // Type safe data source manager
-  const dsm = (editor as DataSourceEditor).DataSourceManager
+  const dsm = editor.DataSourceManager
 
   editor.Pages.getAll().forEach(page => {
     // Get the page properties
@@ -286,7 +297,7 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
     if (languages && languages.length > 0) {
       const pages: ClientSideFileWithContent[] = languages.flatMap(lang => {
         // Change the HTML
-        const frontMatter = getFrontMatter(settings, slug, page.getName(), lang)
+        const frontMatter = getFrontMatter(page, settings, slug, page.getName(), lang)
         const bodyStates = getBodyStates(page)
         const pageFile = {
           type: ClientSideFileType.HTML,
@@ -314,7 +325,7 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
       data.files.push(...newPages)
     } else {
       // Change the HTML
-      const frontMatter = getFrontMatter(settings, slug, page.getName())
+      const frontMatter = getFrontMatter(page, settings, slug, page.getName())
       const bodyStates = getBodyStates(page)
 
       // Update the page before it is published
@@ -340,12 +351,12 @@ export function transformFiles(editor: Editor, options: EleventyPluginOptions, d
  * - Cache buster
  *
  */
-function getDataFile(editor: Editor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
+function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchPlugin = getFetchPluginOptions(options, editor.getModel().get('settings') || {})
   const fetchImportStatement = fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
-  const dsm = (editor as DataSourceEditor).DataSourceManager
+  const dsm = editor.DataSourceManager
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
     const dataSource = dsm.get(dataSourceId)
@@ -514,7 +525,7 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
     .join(' ')
 }
 
-function withNotification<T>(cbk: () => T, editor: Editor, componentId: string | null): T {
+function withNotification<T>(cbk: () => T, editor: DataSourceEditor, componentId: string | null): T {
   try {
     return cbk()
   } catch (e) {
@@ -531,19 +542,21 @@ function withNotification<T>(cbk: () => T, editor: Editor, componentId: string |
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
-  const dataTree = (config.getEditor() as DataSourceEditor).DataSourceManager.getDataTree()
+  const editor = config.getEditor() as DataSourceEditor
+
+  const dataTree = editor.DataSourceManager.getDataTree()
 
   const statesPrivate = withNotification(() => getRealStates(dataTree, getStateIds(component, false)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, false)!,
-    }))), config.getEditor(), component.getId())
+    }))), editor, component.getId())
 
   const statesPublic = withNotification(() => getRealStates(dataTree, getStateIds(component, true)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, true)!,
-    }))), config.getEditor(), component.getId())
+    }))), editor, component.getId())
 
   const unwrap = component.get(UNWRAP_ID)
 
@@ -624,7 +637,7 @@ function toPath(path: (string | undefined)[]) {
     .join('/')
 }
 
-function transformPermalink(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPermalink(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
   if(!enable11ty(editor)) return path
 
@@ -650,7 +663,7 @@ function transformPermalink(editor: Editor, path: string, type: string, options:
   }
 }
 
-function transformPath(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPath(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
   if(!enable11ty(editor)) return path
 

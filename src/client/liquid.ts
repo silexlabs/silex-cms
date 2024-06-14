@@ -36,7 +36,7 @@ export function echoBlock(component: Component, expression: Expression): string 
 /**
  * Generate liquid instructions which echo the value of an expression, on 1 line
  */
-export function echoBlock1line(component: Component | null | undefined, expression: Expression): string {
+export function echoBlock1line(component: Component, expression: Expression): string {
   if (expression.length === 0) throw new Error('Expression is empty')
   if (expression.length === 1 && expression[0].type === 'property' && expression[0].fieldId === FIXED_TOKEN_ID) {
     return expression[0].options?.value as string ?? ''
@@ -171,7 +171,7 @@ export function getPaginationData(expression: Property[]): string {
 /**
  * Convert an expression to liquid code
  */
-export function getLiquidBlock(component: Component | null | undefined, expression: Expression): { variableName: string, liquid: string }[] {
+export function getLiquidBlock(component: Component, expression: Expression): { variableName: string, liquid: string }[] {
   if (expression.length === 0) return []
   const result = [] as { variableName: string, liquid: string }[]
   const firstToken = expression[0]
@@ -199,8 +199,8 @@ export function getLiquidBlock(component: Component | null | undefined, expressi
   return result
 }
 
-export function getNextVariableName(component: Component | null | undefined, numNextVar: number): string {
-  return `var_${component?.ccid || 'global'}_${numNextVar}`
+export function getNextVariableName(component: Component, numNextVar: number): string {
+  return `var_${component.ccid}_${numNextVar}`
 }
 
 /**

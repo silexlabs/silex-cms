@@ -1,9 +1,28 @@
-import { removeState, setState, toExpression } from '@silexlabs/grapesjs-data-source'
+import { DataSourceEditor, removeState, setState, toExpression } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 //import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit'
 import { Page } from 'grapesjs'
+import {ref, createRef, Ref} from 'lit/directives/ref.js'
+
+const paginationWarning: Ref<HTMLElement> = createRef()
+
+/**
+ * Main function to add the settings to the page
+ */
+export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
+  if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
+  config.on('silex:startup:end', () => {
+    const editor = config.getEditor() as DataSourceEditor
+    editor.on(/* ClientEvent.SETTINGS_SAVE_START */'silex:settings:save:start', (page: Page) => updateBodyStates(editor, page))
+    config.addSettings({
+      id: 'cms',
+      label: 'CMS',
+      render: (settings: Silex11tyPluginWebsiteSettings) => render(settings, config),
+    }, 'page')
+  })
+}
 
 /**
  * Set the state on the body component
@@ -32,44 +51,46 @@ function stateOnBody(editor, value, name, body) {
   }
 }
 
-export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
-  if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
-  config.on('silex:startup:end', () => {
-    const editor = config.getEditor()
-    editor.on('silex:settings:save:start' /*ClientEvent.SETTINGS_SAVE_START*/, (page: Page) => {
-      const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined
-      if (settings) {
-        // Set the state on the body component
-        // This is only useful to build the GraphQL query
-        const body = page.getMainComponent()
-        stateOnBody(editor, settings.eleventySeoTitle, 'eleventySeoTitle', body)
-        stateOnBody(editor, settings.eleventySeoDescription, 'eleventySeoDescription', body)
-        stateOnBody(editor, settings.eleventyFavicon, 'eleventyFavicon', body)
-        stateOnBody(editor, settings.eleventyOGImage, 'eleventyOGImage', body)
-        stateOnBody(editor, settings.eleventyOGTitle, 'eleventyOGTitle', body)
-        stateOnBody(editor, settings.eleventyOGDescription, 'eleventyOGDescription', body)
-        stateOnBody(editor, settings.eleventyPageData, 'eleventyPageData', body)
-        stateOnBody(editor, settings.eleventyPermalink, 'eleventyPermalink', body)
-      }
-    })
-    config.addSettings({
-      id: 'cms',
-      label: 'CMS',
-      render: (settings: Silex11tyPluginWebsiteSettings) => {
-        setTimeout(() => {
-          // Update the settings form when the selection changed without recreating the form
-          (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
-            .forEach((input: HTMLInputElement) => {
-              switch (input.type) {
-              case 'checkbox':
-                input.checked = !!settings[input.name]
-                break
-              default:
-                input.value = settings[input.name] ?? ''
-              }
-            })
-        })
-        return html`
+/**
+ * Set the state on the body component
+ * This is only useful to build the GraphQL query
+ */
+function updateBodyStates(editor: DataSourceEditor, page: Page) {
+  paginationWarning.value?.classList.add('silex-hidden')
+  if (page) {
+    const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined
+    if (settings) {
+      const body = page.getMainComponent()
+      stateOnBody(editor, settings.eleventySeoTitle, 'eleventySeoTitle', body)
+      stateOnBody(editor, settings.eleventySeoDescription, 'eleventySeoDescription', body)
+      stateOnBody(editor, settings.eleventyFavicon, 'eleventyFavicon', body)
+      stateOnBody(editor, settings.eleventyOGImage, 'eleventyOGImage', body)
+      stateOnBody(editor, settings.eleventyOGTitle, 'eleventyOGTitle', body)
+      stateOnBody(editor, settings.eleventyOGDescription, 'eleventyOGDescription', body)
+      stateOnBody(editor, settings.eleventyPageData, 'eleventyPageData', body)
+      stateOnBody(editor, settings.eleventyPermalink, 'eleventyPermalink', body)
+    }
+  }
+}
+
+/**
+ * Render the settings form
+ */
+function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) {
+  setTimeout(() => {
+    // Update the settings form when the selection changed without recreating the form
+    (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
+      .forEach((input: HTMLInputElement) => {
+        switch (input.type) {
+        case 'checkbox':
+          input.checked = !!settings[input.name]
+          break
+        default:
+          input.value = settings[input.name] ?? ''
+        }
+      })
+  })
+  return html`
     <style>
       form.silex-form input[type="checkbox"] {
         width: 20px;
@@ -94,9 +115,21 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             name="eleventyPageData"
             value=${settings.eleventyPageData ?? ''}
             .editor=${config.getEditor()}
+            @change=${() => {
+    paginationWarning.value?.classList.remove('silex-hidden')
+  }}
+            no-states
+            no-filters
           >
             <label slot="label">Data</label>
           </state-editor>
+          <div
+            ${ref(paginationWarning)}
+            class="silex-warning silex-hidden"
+            style="margin-top: 10px; padding: 10px; background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; border: 1px solid transparent; border-radius: .25rem;"
+            >
+            <p>Pagination data changed. Please click <strong>Apply</strong> and reload Silex. This will make it possible to set the permalink with the latest available data.</p>
+          </div>
           <label class="silex-form__element">Size
             <input type="number" name="eleventyPageSize" .value=${settings.eleventyPageSize ?? 1}/>
           </label>
@@ -192,7 +225,4 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       </div>
     </div>
     `
-      }
-    }, 'page')
-  })
 }

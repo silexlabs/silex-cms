@@ -21,6 +21,14 @@ import { Page } from 'grapesjs'
 // This is because it breakes the tests since lit-html is a peer dependency (?)
 jest.mock('lit-html', () => ({}))
 
+const PAGE_TEST = {
+  getName: () => 'page name example',
+  getId: () => 'page id example',
+  getMainComponent: () => ({
+    ccid: 'ccidtest',
+  }),
+} as unknown as Page
+
 const PAGE_DATA_TEST = `[{
   "options": { "filter": "{}" },
   "type": "property",
@@ -44,8 +52,8 @@ const PAGE_DATA_FIXED_TEST = `[{
 
 
 test('Front matter of a simple page', () => {
-  expect(() => getFrontMatter({}, 'page-1', '')).not.toThrow()
-  expect(getFrontMatter({}, 'page-1', '')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, {}, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, {}, 'page-1', '')).toEqual(dedent`
   ---
   permalink: "/page-1/index.html"
   \n---\n`)
@@ -55,8 +63,8 @@ test('Front matter of a collection page', () => {
   const settings = {
     eleventyPageData: PAGE_DATA_TEST,
   }
-  expect(() => getFrontMatter(settings, 'page-1', 'collectionTest')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', 'collectionTest')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
     data: datasourceIdTest.continents
@@ -69,8 +77,8 @@ test('Front matter of a collection page backward compatibility', () => {
   const settings = {
     eleventyPageData: PAGE_DATA_TEST,
   }
-  expect(() => getFrontMatter(settings, 'page-1', 'collectionTest')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', 'collectionTest')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
     data: datasourceIdTest.continents
@@ -86,13 +94,13 @@ test('Permalink', () => {
     eleventyPageData,
     eleventyPermalink,
   }
-  expect(() => getFrontMatter(settings, 'page-1', '')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', '')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, settings, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
     data: datasourceIdTest.continents
     size: 1
-  permalink: "{% assign var_global_1 = datasourceIdTest.continents %}{{ var_global_1 }}"
+  permalink: "{% assign var_ccidtest_1 = datasourceIdTest.continents %}{{ var_ccidtest_1 }}"
   \n---\n`)
 })
 
@@ -103,8 +111,8 @@ test('Permalink with fixed string expression', () => {
     eleventyPageData,
     eleventyPermalink,
   }
-  expect(() => getFrontMatter(settings, 'page-1', '')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', '')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, settings, 'page-1', '')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
     data: datasourceIdTest.continents
@@ -119,8 +127,8 @@ test('With languages', () => {
     silexLanguagesList: 'fr,en',
     silexLanguagesDefault: 'en',
   }
-  expect(() => getFrontMatter(settings, 'page-1', '', 'fr')).not.toThrow()
-  expect(getFrontMatter(settings, 'page-1', '', 'fr')).toEqual(dedent`
+  expect(() => getFrontMatter(PAGE_TEST, settings, 'page-1', '', 'fr')).not.toThrow()
+  expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '', 'fr')).toEqual(dedent`
   ---
   pagination:
     data: directus.posts
@@ -170,10 +178,6 @@ test('getDataFile', () => {
       throw new Error(`Unit test error, unknown name: ${name}`)
     }),
   } as unknown as IDataSourceModel
-  const page = {
-    getName: () => 'page name example',
-    getId: () => 'page id example',
-  } as unknown as Page
   const query = 'query str example'
   const result1 = queryToDataFile(
     dataSource,
@@ -185,7 +189,7 @@ test('getDataFile', () => {
       filters: [],
       fetchPlugin: {},
     },
-    page,
+    PAGE_TEST,
     'fr',
     {},
   )
@@ -225,7 +229,7 @@ test('getDataFile', () => {
       filters: [],
       fetchPlugin: false,
     },
-    page,
+    PAGE_TEST,
     'fr',
     false,
   )
@@ -242,7 +246,7 @@ test('getDataFile', () => {
       view: {},
       filters: [],
     },
-    page,
+    PAGE_TEST,
     'fr',
     false,
   )
