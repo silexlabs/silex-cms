@@ -19,7 +19,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     config.addSettings({
       id: 'cms',
       label: 'CMS',
-      render: (settings: Silex11tyPluginWebsiteSettings) => render(settings, config),
+      render: (settings: Silex11tyPluginWebsiteSettings, page: Page) => render(settings, config, page),
     }, 'page')
   })
 }
@@ -76,7 +76,7 @@ function updateBodyStates(editor: DataSourceEditor, page: Page) {
 /**
  * Render the settings form
  */
-function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) {
+function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, page: Page) {
   setTimeout(() => {
     // Update the settings form when the selection changed without recreating the form
     (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
@@ -90,6 +90,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
         }
       })
   })
+  const body = page.getMainComponent()
   return html`
     <style>
       form.silex-form input[type="checkbox"] {
@@ -115,6 +116,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyPageData"
             value=${settings.eleventyPageData ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
             @change=${() => {
     paginationWarning.value?.classList.remove('silex-hidden')
   }}
@@ -141,6 +143,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyPermalink"
             value=${settings.eleventyPermalink ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">Permalink</label>
           </state-editor>
@@ -176,6 +179,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventySeoTitle"
             value=${settings.eleventySeoTitle ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">Title</label>
           </state-editor>
@@ -184,6 +188,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventySeoDescription"
             value=${settings.eleventySeoDescription ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">Description</label>
           </state-editor>
@@ -192,6 +197,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyFavicon"
             value=${settings.eleventyFavicon ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">Favicon</label>
           </state-editor>
@@ -203,6 +209,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyOGImage"
             value=${settings.eleventyOGImage ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">OG Image</label>
           </state-editor>
@@ -211,6 +218,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyOGTitle"
             value=${settings.eleventyOGTitle ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">OG Title</label>
           </state-editor>
@@ -219,6 +227,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig) 
             name="eleventyOGDescription"
             value=${settings.eleventyOGDescription ?? ''}
             .editor=${config.getEditor()}
+            .selected=${body}
           >
             <label slot="label">OG Description</label>
           </state-editor>
