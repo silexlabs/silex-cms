@@ -1,6 +1,7 @@
 import { Field, Filter, Options, State, getContext, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 import { html } from 'lit-html'
+import { Component } from 'grapesjs'
 
 export default function(config, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
@@ -53,8 +54,7 @@ export default function(config, opts: EleventyPluginOptions): void {
       sizes: '',
       widths: '',
     },
-    optionsForm: (input: Field | null, options: Options) => {
-      const selected = config.getEditor().getSelected()
+    optionsForm: (selected: Component, input: Field | null, options: Options) => {
       const states = getContext(selected, config.getEditor().DataSourceManager.getDataTree()) as State[]
       return html`
           <details>
@@ -107,7 +107,7 @@ export default function(config, opts: EleventyPluginOptions): void {
       locale: '',
     },
     quotedOptions: ['locale'],
-    optionsForm: (input: Field | null, options: Options) => html`
+    optionsForm: (selected: Component, input: Field | null, options: Options) => html`
       <label>Locale
         <input type="text" name="locale" value="${options.locale}" />
       </label>
