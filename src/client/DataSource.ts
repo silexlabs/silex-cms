@@ -10,7 +10,9 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
     if(opts.enable11ty) {
-      const eleventyDs = dm.add(new EleventyDataSource(), {merge: false})
+      // Add the 11ty data source
+      // Use silent: true to avoid triggering a save
+      const eleventyDs = dm.add(new EleventyDataSource(), {merge: false, silent: true})
       // FIXME: Workaround: the added instance is not a Backbone model
       eleventyDs.isConnected = eleventyDs.get('isConnected')
       eleventyDs.getQuery = eleventyDs.get('getQuery')
@@ -20,7 +22,8 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       eleventyDs.id = eleventyDs.get('id')
       eleventyDs.cid = eleventyDs.get('cid')
       eleventyDs.hidden = eleventyDs.get('hidden')
-      eleventyDs.set('url', '')
+      eleventyDs.attributes.url = ''
+      // No, this triggers a save: eleventyDs.set('url', '')
     }
   })
 }
