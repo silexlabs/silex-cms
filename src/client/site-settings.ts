@@ -37,8 +37,8 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
               class="silex-button add-ds-btn"
               title="Add a new data source"
               @click=${() => {
-                editor.DataSourceManager.add(createDataSource())
-              }}>
+    editor.DataSourceManager.add(createDataSource())
+  }}>
                 +
               </button>
           </div>
@@ -68,7 +68,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         </div>
       </div>
       `
-    }
+      }
     }, 'site')
   })
 }
