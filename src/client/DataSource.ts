@@ -3,16 +3,27 @@ import { EleventyPluginOptions } from '../client'
 import Backbone from 'backbone'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 
+//import { cmdPauseAutoSave } from '@silexlabs/silex/src/ts/client/grapesjs/storage'
+const cmdPauseAutoSave = 'pause-auto-save'
+
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
-    const dm = (config.getEditor() as DataSourceEditor).DataSourceManager
+    const editor = config.getEditor() as DataSourceEditor
+    const dm = editor.DataSourceManager
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
+    console.log('EleventyDataSource', dm, opts.enable11ty)
     if(opts.enable11ty) {
       // Add the 11ty data source
       // Use silent: true to avoid triggering a save
-      const eleventyDs = dm.add(new EleventyDataSource(), {merge: false, silent: true})
+      const ds = new EleventyDataSource()
+      editor.runCommand(cmdPauseAutoSave)
+      const eleventyDs = dm.add(ds, {merge: false/*, silent: true */})
+      // Wait for the next tick to avoid triggering a save
+      setTimeout(() => {
+        editor.stopCommand(cmdPauseAutoSave)
+      })
       // FIXME: Workaround: the added instance is not a Backbone model
       eleventyDs.isConnected = eleventyDs.get('isConnected')
       eleventyDs.getQuery = eleventyDs.get('getQuery')

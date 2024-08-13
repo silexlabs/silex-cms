@@ -2,11 +2,8 @@ import { DataSourceEditor, removeState, setState, toExpression } from '@silexlab
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 //import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
-import { html } from 'lit'
+import { html, TemplateResult } from 'lit-html'
 import { Page } from 'grapesjs'
-import {ref, createRef, Ref} from 'lit/directives/ref.js'
-
-const paginationWarning: Ref<HTMLElement> = createRef()
 
 /**
  * Main function to add the settings to the page
@@ -51,12 +48,20 @@ function stateOnBody(editor, value, name, body) {
   }
 }
 
+function showWarningDirty() {
+  document.getElementById('pageination-data-changed')?.classList.remove('silex-hidden')
+}
+
+function hideWarningDirty() {
+  document.getElementById('pageination-data-changed')?.classList.add('silex-hidden')
+}
+
 /**
  * Set the state on the body component
  * This is only useful to build the GraphQL query
  */
 function updateBodyStates(editor: DataSourceEditor, page: Page) {
-  paginationWarning.value?.classList.add('silex-hidden')
+  hideWarningDirty()
   if (page) {
     const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined
     if (settings) {
@@ -76,7 +81,7 @@ function updateBodyStates(editor: DataSourceEditor, page: Page) {
 /**
  * Render the settings form
  */
-function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, page: Page) {
+function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, page: Page): TemplateResult {
   setTimeout(() => {
     // Update the settings form when the selection changed without recreating the form
     (document.querySelectorAll('#settings-cms input') as NodeListOf<HTMLInputElement>)
@@ -93,12 +98,14 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
   const body = page.getMainComponent()
   return html`
     <style>
-      form.silex-form input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-      }
-      .settings-dialog > div .silex-form__element > label {
-        border: none;
+      .silex-warning {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: var(--ds-primary);
+        border-color: var(--ds-button-color);
+        color: #721c24;
+        border: 1px solid transparent;
+        border-radius: .25rem;
       }
     </style>
     <div id="settings-cms" class="silex-hideable silex-hidden">
@@ -118,7 +125,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
             .editor=${config.getEditor()}
             .selected=${body}
             @change=${() => {
-    paginationWarning.value?.classList.remove('silex-hidden')
+    showWarningDirty()
   }}
             no-states
             no-filters
@@ -126,11 +133,11 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
             <label slot="label">Data</label>
           </state-editor>
           <div
-            ${ref(paginationWarning)}
+            id="pageination-data-changed"
             class="silex-warning silex-hidden"
-            style="margin-top: 10px; padding: 10px; background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; border: 1px solid transparent; border-radius: .25rem;"
             >
-            <p>Pagination data changed. Please click <strong>Apply</strong> and reload Silex. This will make it possible to set the permalink with the latest available data.</p>
+            <!-- Reloading silex will make it possible to set the permalink with the latest available data -->
+            <p>\u26A0\uFE0F Pagination data changed. Please click "<strong>apply</strong>" then <strong>reload</strong> Silex.</p>
           </div>
           <label class="silex-form__element">Size
             <input type="number" name="eleventyPageSize" .value=${settings.eleventyPageSize ?? 1}/>
@@ -177,7 +184,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventySeoTitle"
             name="eleventySeoTitle"
-            value=${settings.eleventySeoTitle ?? ''}
+            .value=${settings.eleventySeoTitle ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >
@@ -186,7 +193,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventySeoDescription"
             name="eleventySeoDescription"
-            value=${settings.eleventySeoDescription ?? ''}
+            .value=${settings.eleventySeoDescription ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >
@@ -195,7 +202,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventyFavicon"
             name="eleventyFavicon"
-            value=${settings.eleventyFavicon ?? ''}
+            .value=${settings.eleventyFavicon ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >
@@ -207,7 +214,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventyOGImage"
             name="eleventyOGImage"
-            value=${settings.eleventyOGImage ?? ''}
+            .value=${settings.eleventyOGImage ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >
@@ -216,7 +223,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventyOGTitle"
             name="eleventyOGTitle"
-            value=${settings.eleventyOGTitle ?? ''}
+            .value=${settings.eleventyOGTitle ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >
@@ -225,7 +232,7 @@ function render(settings: Silex11tyPluginWebsiteSettings, config: ClientConfig, 
           <state-editor
             id="eleventyOGDescription"
             name="eleventyOGDescription"
-            value=${settings.eleventyOGDescription ?? ''}
+            .value=${settings.eleventyOGDescription ?? ''}
             .editor=${config.getEditor()}
             .selected=${body}
           >

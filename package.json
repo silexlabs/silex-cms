@@ -42,7 +42,7 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@silexlabs/silex": "^3.0.0-alpha.153",
+    "@silexlabs/silex": "*",
     "grapesjs": "^0.21.10",
     "lit-html": "^3.0.2"
   },
