@@ -13,7 +13,6 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
-    console.log('EleventyDataSource', dm, opts.enable11ty)
     if(opts.enable11ty) {
       // Add the 11ty data source
       // Use silent: true to avoid triggering a save
