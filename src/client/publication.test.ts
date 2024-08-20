@@ -201,7 +201,7 @@ test('getDataFile', () => {
 
 
   try {
-    result['${dataSourceId}'] = (await EleventyFetch(\`http://localhost:8055\`, {
+    const json = await EleventyFetch(\`http://localhost:8055\`, {
     ...{},
     type: 'json',
     fetchOptions: {
@@ -213,7 +213,8 @@ test('getDataFile', () => {
       query: \`${query}\`,
     }),
     }
-    })).data
+    })
+    result['${dataSourceId}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')
     throw e
@@ -256,7 +257,7 @@ test('getDataFile', () => {
 
 
   try {
-    result['${dataSourceId}'] = (await (await fetch(\`http://localhost:8055\`, {
+    const response = await fetch(\`http://localhost:8055\`, {
 
     headers: {
       'content-type': \`application/json\`,
@@ -265,7 +266,9 @@ test('getDataFile', () => {
     body: JSON.stringify({
       query: \`${query}\`,
     })
-    })).json()).data
+    })
+    const json = await response.json()
+    result['${dataSourceId}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')
     throw e

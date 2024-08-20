@@ -415,14 +415,16 @@ export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, 
 export function makeFetchCall(options: {key: string, url: string, method: string, headers: string, query: string}): string {
   return dedent`
   try {
-    result['${options.key}'] = (await (await fetch(\`${options.url}\`, {
+    const response = await fetch(\`${options.url}\`, {
 
     headers: {
       ${options.headers}
     },
     method: '${options.method}',
     body: ${options.query}
-    })).json()).data
+    })
+    const json = await response.json()
+    result['${options.key}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
     throw e
@@ -433,7 +435,7 @@ export function makeFetchCall(options: {key: string, url: string, method: string
 export function makeFetchCallEleventy(options: {key: string, url: string, method: string, headers: string, query: string}, fetchPlugin: object): string {
   return dedent`
   try {
-    result['${options.key}'] = (await EleventyFetch(\`${options.url}\`, {
+    const json = await EleventyFetch(\`${options.url}\`, {
     ...${JSON.stringify(fetchPlugin)},
     type: 'json',
     fetchOptions: {
@@ -443,7 +445,8 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
       method: '${options.method}',
       body: ${options.query},
     }
-    })).data
+    })
+    result['${options.key}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
     throw e
