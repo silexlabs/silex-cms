@@ -177,6 +177,7 @@ export function getFrontMatter(page: Page, settings: Silex11tyPluginWebsiteSetti
 
   return dedent`---
     ${data && data.length > 0 ? `pagination:
+      addAllPagesToCollections: true
       data: ${data}
       size: ${settings.eleventyPageSize ? settings.eleventyPageSize : '1'}
       ${settings.eleventyPageReverse ? 'reverse: true' : ''}
