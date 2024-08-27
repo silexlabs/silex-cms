@@ -67,6 +67,7 @@ test('Front matter of a collection page', () => {
   expect(getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
+    addAllPagesToCollections: true
     data: datasourceIdTest.continents
     size: 1
   collection: "collectionTest"
@@ -81,6 +82,7 @@ test('Front matter of a collection page backward compatibility', () => {
   expect(getFrontMatter(PAGE_TEST, settings, 'page-1', 'collectionTest')).toEqual(dedent`
   ---
   pagination:
+    addAllPagesToCollections: true
     data: datasourceIdTest.continents
     size: 1
   collection: "collectionTest"
@@ -98,6 +100,7 @@ test('Permalink', () => {
   expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
+    addAllPagesToCollections: true
     data: datasourceIdTest.continents
     size: 1
   permalink: "{% assign var_ccidtest_1 = datasourceIdTest.continents %}{{ var_ccidtest_1 }}"
@@ -115,6 +118,7 @@ test('Permalink with fixed string expression', () => {
   expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '')).toEqual(dedent`
   ---
   pagination:
+    addAllPagesToCollections: true
     data: datasourceIdTest.continents
     size: 1
   permalink: "/test/"
@@ -131,6 +135,7 @@ test('With languages', () => {
   expect(getFrontMatter(PAGE_TEST, settings, 'page-1', '', 'fr')).toEqual(dedent`
   ---
   pagination:
+    addAllPagesToCollections: true
     data: directus.posts
     size: 1
   lang: "fr"
