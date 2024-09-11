@@ -219,6 +219,11 @@ test('getDataFile', () => {
     }),
     }
     })
+
+    if (json.errors) {
+      throw new Error(\`GraphQL error: \\n> \${json.errors.map(e => e.message).join('\\n> ')}\`)
+    }
+
     result['${dataSourceId}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')
@@ -272,7 +277,17 @@ test('getDataFile', () => {
       query: \`${query}\`,
     })
     })
+
+    if (!response.ok) {
+      throw new Error(\`Error fetching graphql data: HTTP status code \${response.status}, HTTP status text: \${response.statusText}\`)
+    }
+
     const json = await response.json()
+
+    if (json.errors) {
+      throw new Error(\`GraphQL error: \\n> \${json.errors.map(e => e.message).join('\\n> ')}\`)
+    }
+
     result['${dataSourceId}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${dataSourceId}', 'http://localhost:8055')

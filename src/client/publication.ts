@@ -424,7 +424,17 @@ export function makeFetchCall(options: {key: string, url: string, method: string
     method: '${options.method}',
     body: ${options.query}
     })
+
+    if (!response.ok) {
+      throw new Error(\`Error fetching graphql data: HTTP status code \${response.status}, HTTP status text: \${response.statusText}\`)
+    }
+
     const json = await response.json()
+
+    if (json.errors) {
+      throw new Error(\`GraphQL error: \\n> \${json.errors.map(e => e.message).join('\\n> ')}\`)
+    }
+
     result['${options.key}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
@@ -447,6 +457,11 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
       body: ${options.query},
     }
     })
+
+    if (json.errors) {
+      throw new Error(\`GraphQL error: \\n> \${json.errors.map(e => e.message).join('\\n> ')}\`)
+    }
+
     result['${options.key}'] = json.data
   } catch (e) {
     console.error('11ty plugin for Silex: error fetching graphql data', e, '${options.key}', '${options.url}')
