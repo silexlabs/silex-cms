@@ -26,7 +26,15 @@ enum ClientSideFileType {
   ASSET = 'asset',
   OTHER = 'other',
 }
+
 const ATTRIBUTE_MULTIPLE_VALUES = ['class', 'style']
+
+/**
+ * A memoization mechanism to avoid rendering the same component multiple times
+ * The cache is cleared every time the publication is done
+ * This is a workaround because grapesjs editor.getHtml will call each component's toHtml method multiple times
+ */
+const cache = new Map<string, string>()
 
 /**
  * A state with the real tokens instead of the stored tokens
@@ -65,6 +73,7 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
       // FIXME: should this be in the publication transformers
       editor.on('silex:publish:page', data => withNotification(() => transformPage(editor, data), editor, null))
       editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor, options, data), editor, null))
+      editor.on('silex:publish:end', () => cache.clear())
     }
   })
 }
@@ -557,10 +566,15 @@ function withNotification<T>(cbk: () => T, editor: DataSourceEditor, componentId
     throw e
   }
 }
+
 /**
  * Render the components when they are published
  */
 function renderComponent(config: ClientConfig, component: Component, toHtml: () => string): string | undefined {
+  if(cache.has(component.getId())) {
+    return cache.get(component.getId())
+  }
+
   const editor = config.getEditor() as DataSourceEditor
 
   const dataTree = editor.DataSourceManager.getDataTree()
@@ -636,16 +650,23 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         }))
       )
       if (unwrap) {
-        return `${before}${innerHtml}${after}`
+        const html = `${before}${innerHtml}${after}`
+        cache.set(component.getId(), html)
+        return html
+      } else {
+        const html = `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
+        cache.set(component.getId(), html)
+        return html
       }
-      return `${before}<${tagName}${attributes ? ` ${attributes}` : ''}>${innerHtml}</${tagName}>${after}`
     } else {
       // Not a real component
       // FIXME: understand why
       throw new Error('Why no tagName?')
     }
   } else {
-    return toHtml()
+    const html = toHtml()
+    cache.set(component.getId(), html)
+    return html
   }
 }
 
