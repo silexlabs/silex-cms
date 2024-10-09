@@ -72,7 +72,7 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
       // Generate 11ty data files
       // FIXME: should this be in the publication transformers
       editor.on('silex:publish:page', data => withNotification(() => transformPage(editor, data), editor, null))
-      editor.on('silex:publish:data', data => withNotification(() => transformFiles(editor, options, data), editor, null))
+      editor.on('silex:publish:data', ({ data/*, preventDefault, publicationManager */ }) => withNotification(() => transformFiles(editor, options, data), editor, null))
       editor.on('silex:publish:end', () => cache.clear())
     }
   })
