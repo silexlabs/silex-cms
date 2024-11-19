@@ -10,6 +10,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "postinstall": "$npm_execpath run build",
     "start": "silex --client-config ./dist/client.js --server-config `pwd`/dist/server.js",
     "dev": "SILEX_CLIENT_CONFIG=./client-test.js SILEX_SERVER_CONFIG=`pwd`/dist/server.js SILEX_PORT=3002 SILEX_DEBUG=true SILEX_EXPRESS_JSON_LIMIT=1gb SILEX_FS_ROOT=`pwd`/11ty-test/storage SILEX_FS_HOSTING_ROOT=`pwd`/11ty-test/hosting nodemon `node_modules @silexlabs/silex`/@silexlabs/silex & $npm_execpath run build:watch",
     "build": "$npm_execpath run build:client && $npm_execpath run build:server",
