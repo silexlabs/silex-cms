@@ -7,7 +7,9 @@
   "files": [
     "dist",
     "src",
-    "LICENSE"
+    "LICENSE",
+    "rollup.client.config.mjs",
+    "rollup.server.config.mjs"
   ],
   "scripts": {
     "postinstall": "$npm_execpath run build",
