@@ -26,11 +26,6 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-eslint": "^9.0.5",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-typescript": "^11.1.6",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "eslint": "^8.57.0",
@@ -38,11 +33,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "node_modules-path": "^2.0.8",
     "nodemon": "^3.1.0",
-    "rollup": "^4.14.3",
-    "rollup-plugin-tslint": "^0.2.2",
-    "ts-jest": "^29.1.2",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.5"
+    "ts-jest": "^29.1.2"
   },
   "peerDependencies": {
     "@silexlabs/silex": "*",
@@ -50,6 +41,15 @@
     "lit-html": "^3.0.2"
   },
   "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-eslint": "^9.0.5",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.14.3",
+    "rollup-plugin-tslint": "^0.2.2",
+    "typescript": "^5.4.5",
+    "tslib": "^2.6.2",
     "@humanwhocodes/retry": "^0.3.0",
     "@silexlabs/grapesjs-data-source": "^0.0.122",
     "dedent": "^1.5.3",
