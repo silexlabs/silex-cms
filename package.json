@@ -9,7 +9,9 @@
     "src",
     "LICENSE",
     "rollup.client.config.mjs",
-    "rollup.server.config.mjs"
+    "rollup.server.config.mjs",
+    "tsconfig.client.json",
+    "tsconfig.server.json"
   ],
   "scripts": {
     "postinstall": "$npm_execpath run build",
