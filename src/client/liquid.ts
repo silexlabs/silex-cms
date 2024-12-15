@@ -311,7 +311,7 @@ function handleFilterOption(filter: Filter, key: string, value: string): string 
         .join('.')
       return filter.quotedOptions?.includes(key) ? quote(result) : result
     }
-  } catch (e) {
+  } catch {
     // Ignore
   }
   return filter.quotedOptions?.includes(key) ? quote(value) : value
