@@ -20,6 +20,7 @@ export default {
     //nodeResolve(), // Import modules from node_modules
     commonjs(), // Convert CommonJS modules to ES6 when importing node_modules
     resolve({
+      preferBuiltins: true,
       customResolveOptions: {
         moduleDirectories: [
           'node_modules',
