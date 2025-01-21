@@ -1,7 +1,6 @@
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
-import { EleventyPluginOptions } from '../client'
 
-export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
+export default function(config: ClientConfig/*, opts: EleventyPluginOptions*/): void {
   // After the editor is ready
   config.on('silex:grapesjs:end', () => {
     const editor = config.getEditor()
@@ -124,43 +123,5 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
         },
       },
     })
-  })
-  // After the website is loaded (because we need its settings)
-  config.on('silex:startup:end', () => {
-    const editor = config.getEditor()
-    // Image web component
-    if(opts.imagePlugin || config.getEditor().getModel().get('settings')?.eleventyImage) {
-      // Add the block
-      editor.BlockManager.add('eleventy-img', {
-        label: 'eleventy-img',
-        category: 'Eleventy',
-        attributes: { class: 'fa fa-image' },
-        id: 'eleventy-img',
-        content: { type: 'eleventy-img' },
-        // The component `image` is activatable (shows the Asset Manager).
-        activate: true,
-        // select: true, // Default with `activate: true`
-      })
-      // Add an attribute for the webc version
-      const attributes = opts.imagePlugin === 'webc' ? { 'webc:is': 'eleventy-image' } : {}
-      // Add the component type
-      editor.DomComponents.addType('eleventy-img', {
-        extend: 'image',
-        model: {
-          defaults: {
-            traits: [
-              ...(editor.DomComponents.getType('image')?.model.prototype.defaults.traits || []),
-              {
-                type: 'text',
-                label: 'Width',
-                name: 'width',
-                placeholder: '100, 200',
-              },
-            ],
-            attributes,
-          },
-        },
-      })
-    }
   })
 }

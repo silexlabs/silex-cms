@@ -47,7 +47,7 @@
   "peerDependencies": {
     "@silexlabs/silex": "*",
     "grapesjs": "^0.21.10",
-    "lit-html": "^3.0.2"
+    "lit-html": "*"
   },
   "dependencies": {
     "@humanwhocodes/retry": "^0.4.1",

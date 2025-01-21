@@ -4,6 +4,7 @@ import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html, TemplateResult } from 'lit-html'
 import { Page } from 'grapesjs'
+import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 
 /**
  * Main function to add the settings to the page
@@ -16,7 +17,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     config.addSettings({
       id: 'cms',
       label: 'CMS',
-      render: (settings: Silex11tyPluginWebsiteSettings, page: Page) => render(settings, config, page),
+      render: (settings: WebsiteSettings, page: Backbone.Model) => render(settings, config, page as Page),
     }, 'page')
   })
 }

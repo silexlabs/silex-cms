@@ -89,49 +89,20 @@ npx @silexlabs/silex --client-config=silex-client.js --server-config=`pwd`/silex
 
 ### 11ty configuration
 
-Install required 11ty packages:
+By default you don't need to configure 11ty, but you can customize the 11ty configuration by creating a `.eleventy.js` file where the silex website is being published.
 
-```sh
-$ npm install  @11ty/eleventy @11ty/eleventy-fetch @11ty/eleventy-img
-```
-
-You need to add a `.eleventy.js` file to your project, with the following content:
+For example to enable the 11ty fetch plugin:
 
 ```js
-const { EleventyI18nPlugin } = require("@11ty/eleventy");
-const Image = require("@11ty/eleventy-img");
-  
 module.exports = function(eleventyConfig) {
-  // Serve CSS along with the site
-  eleventyConfig.addPassthroughCopy({"silex/hosting/css/*.css": "css"});
-
-  // For the fetch plugin
-  eleventyConfig.watchIgnores.add('**/.cache/**')
-
-  // i18n plugin
-  eleventyConfig.addPlugin(EleventyI18nPlugin, {
-    // any valid BCP 47-compatible language tag is supported
-    defaultLanguage: "en", 
-  });
-
-  // Image plugin
-  eleventyConfig.addShortcode("image", async function(src, alt, sizes) {
-    let metadata = await Image(src, {
-      widths: [300, 600],
-      formats: ["avif", "jpeg"]
-    });
-    let imageAttributes = {
-      alt,
-      sizes,
-      loading: "lazy",
-      decoding: "async",
-    };
-
-    // You bet we throw an error on a missing alt (alt="" works okay)
-    return Image.generateHTML(metadata, imageAttributes);
-  });
-};
+  eleventyConfig.addPlugin(require('@11ty/eleventy-plugin-fetch'), {
+    duration: '1d',
+  })
+}
 ```
+
+Then in the website settings, you can enable the fetch plugin from the settings > CMS screen.
+
 
 ## Options
 
@@ -144,9 +115,8 @@ Here are additional options specific to this plugin:
 | `dataSources` and other data source options | An array of data sources to use in the CMS. Check [Data Source plugin optsion](https://github.com/silexlabs/grapesjs-data-source?tab=readme-ov-file#options) | `[]` |
 | `enable11ty` | Enable the 11ty integration. If false, the publication will not publish to 11ty and do not display 11ty data. | `true` |
 | `cacheBuster` | Add cache buster to graphql queries | `false` |
-|`fetchPlugin`|Options to pass to [11ty fetch plugin](https://www.11ty.dev/docs/plugins/fetch/)|`{ duration: '1d' }`|
-|`imagePlugin`|Enable the 11ty image block and an `image` filter, both assume that your eleventy site has the [11ty image plugin installed](https://www.11ty.dev/docs/plugins/image/). Values can be `false` (off), `webc` or `transform` (check 11ty image docs)|`false`|
-|`i18nPlugin`|Enable filters which assume that your eleventy site has the [11ty i18n plugin installed](https://www.11ty.dev/docs/plugins/i18n/)|`false`|
+|`fetchPlugin`|Options to pass to [11ty fetch plugin](https://www.11ty.dev/docs/plugins/fetch/)|`false` and can be activated by the website config|
+|`i18nPlugin`|Enable filters which assume that your eleventy site has the [11ty i18n plugin installed](https://www.11ty.dev/docs/plugins/i18n/)|`false` and can be activated by the website config|
 |`dir`|An object with options to define 11ty directory structure|`{}`|
 |`dir.input`|Directory for 11ty input files, Silex will publish your site in this folder|`` (empty string)|
 |`dir.silex`|Directory for Silex files, Silex will publish your site in this folder. This is relative to the `input` directory|`silex`|
@@ -157,7 +127,7 @@ Here are additional options specific to this plugin:
 |`urls.css`|Url of the folder containing the CSS files, Silex will use this to generate links to the CSS files.|`css`|
 |`urls.assets`|Url of the folder containing the assets files, Silex will use this to generate links to the assets files.|`assets`|
 
-> Note that `fetchPlugin`, `imagePlugin` and `i18nPlugin` can be activated on a per-site basis in the website settings.
+> Note that `fetchPlugin` and `i18nPlugin` can be activated on a per-site basis in the website settings.
 
 ## Dev notes
 

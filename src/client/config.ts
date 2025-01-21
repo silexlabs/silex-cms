@@ -48,11 +48,8 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     // Enable 11ty publication and filters
     enable11ty: true,
     // 11ty plugins
-    fetchPlugin: {
-      duration: '1s',
-    },
-    imagePlugin: 'transform',
-    i18nPlugin: true,
+    // fetchPlugin: { cache: 'no-cache' },
+    // i18nPlugin: true,
     // Default publication paths
     dir: {
       input: '',

@@ -26,15 +26,9 @@ export interface EleventyPluginOptions extends DataSourceEditorOptions {
   cacheBuster?: boolean,
   // 11ty fetch plugin options
   // https://www.11ty.dev/docs/plugins/fetch/
-  // Default: { duration: '1d' }
-  fetchPlugin?: object | false,
-  // Image plugin enabled to add specific filters
-  // https://www.11ty.dev/docs/plugins/image/
-  // Default: 'transform'
-  imagePlugin?: false | 'webc' | 'transform',
+  fetchPluginSettings?: object | false,
   // Internationalization plugin enabled to add specific filters
   // https://www.11ty.dev/docs/plugins/i18n/
-  // Default: false
   i18nPlugin?: boolean,
   // Publication paths based on 11ty file structure
   dir?: {

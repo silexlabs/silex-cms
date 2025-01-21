@@ -1,4 +1,4 @@
-import { Field, Filter, Options, State, getContext, getPersistantId, getStateVariableName } from '@silexlabs/grapesjs-data-source'
+import { Field, Filter, Options } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
 import { html } from 'lit-html'
 import { Component } from 'grapesjs'
@@ -9,10 +9,8 @@ export default function(config, opts: EleventyPluginOptions): void {
     if(!dm) {
       throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
     }
-    if (opts.imagePlugin || config.getEditor().getModel().get('settings')?.eleventyImage) {
-      dm.filters.push(...imageFilters)
-    }
-    if (opts.i18nPlugin || config.getEditor().getModel().get('settings')?.eleventyI18n) {
+    const enable11ty = config.getEditor().getModel().get('settings')?.eleventyI18n
+    if (opts.i18nPlugin || (typeof opts.i18nPlugin === 'undefined' && enable11ty)) {
       dm.filters.push(...i18nFilters)
     }
     // Eleventy provided filters: https://www.11ty.dev/docs/filters/#eleventy-provided-filters
@@ -40,61 +38,6 @@ export default function(config, opts: EleventyPluginOptions): void {
     })
   })
 
-  const imageFilters: Filter[] = [{
-    type: 'filter',
-    id: 'image',
-    label: 'image (11ty)',
-    validate: (input: Field | null) => !!input?.typeIds.map(t => t.toLowerCase()).includes('string'),
-    apply: (input: unknown, options: Options) => `<img src="${input?.toString() ?? ''}" alt="${options.alt}" sizes="${options.sizes}" />`,
-    output: (input: Field | null/*, options: Options*/) => ({ ...(input || {} as Field), typeIds: ['String'] }),
-    quotedOptions: ['alt'],
-    optionsKeys: ['alt', 'sizes', 'widths'],
-    options: {
-      alt: '',
-      sizes: '',
-      widths: '',
-    },
-    optionsForm: (selected: Component, input: Field | null, options: Options) => {
-      const states = getContext(selected, config.getEditor().DataSourceManager.getDataTree()) as State[]
-      return html`
-          <details>
-            <summary>Help</summary>
-            Check <a href="https://www.11ty.dev/docs/plugins/image/" target="_blank">11ty's docs about image plugin</a> for more information.
-          </details>
-          <label>Alt (select a custom state)
-            <select name="alt">
-              ${
-  states
-    .filter(token => token.type === 'state' && token.exposed)
-    .map((state: State) => {
-      const value = getStateVariableName(state.componentId, state.storedStateId)
-      const component = (() => {
-        let c = selected
-        while(c) {
-          if(getPersistantId(c) === state.componentId) return c
-          c = c.parent()
-        }
-        return null
-      })()
-      if(!component) {
-        console.warn(`Could not find component with persistent ID ${state.componentId}`, { state })
-        return ''
-      }
-      return `<option selected="${options.alt === value}" value="${value}">${component.getName()}'s ${state.label}</option>`
-    })
-    .join('\n')
-}
-          </select>
-        </label>
-        <label>Sizes attribute
-          <input type="text" name="sizes" value="${options.sizes}" />
-        </label>
-        <label>Widths (JSON)
-          <input type="text" name="widths" value="${options.widths}" />
-        </label>
-      `
-    },
-  }]
 
   const i18nFilters: Filter[] = [{
     type: 'filter',

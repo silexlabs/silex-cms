@@ -51,17 +51,13 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
             <div class="silex-help">
               <p>⚠️ You need to reload Silex for these settings to take effect.</p>
             </div>
-            <label for="silex-form__element">
-              <span>I18N Plugin</span>
-              <input type="checkbox" name="eleventyI18n" ?checked=${settings.eleventyI18n || opts.i18nPlugin} ?disabled=${!!opts.i18nPlugin}>
+            <label>
+              I18N Plugin
+              <input id="i18n-checkbox" type="checkbox" name="eleventyI18n" ?checked=${settings.eleventyI18n || opts.i18nPlugin} ?disabled=${typeof opts.i18nPlugin !== 'undefined'}>
             </label>
-            <label for="silex-form__element">
-              <span>Fetch Plugin</span>
-              <input type="checkbox" name="eleventyFetch" ?checked=${settings.eleventyFetch || opts.fetchPlugin} ?disabled=${!!opts.fetchPlugin}>
-            </label>
-            <label for="silex-form__element">
-              <span>Image Plugin</span>
-              <input type="checkbox" name="eleventyImage" ?checked=${settings.eleventyImage || opts.imagePlugin} ?disabled=${!!opts.imagePlugin}>
+            <label>
+              Fetch Plugin
+              <input type="checkbox" name="eleventyFetch" ?checked=${settings.eleventyFetch || !!opts.fetchPluginSettings} ?disabled=${typeof opts.fetchPluginSettings !== 'undefined'}>
             </label>
           <div class="silex-form__group col2">
           </div>

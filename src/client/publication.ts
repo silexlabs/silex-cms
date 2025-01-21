@@ -46,10 +46,10 @@ interface RealState {
 }
 
 function getFetchPluginOptions(options: EleventyPluginOptions, settings: Silex11tyPluginWebsiteSettings): object | false {
-  if(settings.eleventyFetch) {
-    return options.fetchPlugin || {}
+  if(typeof options.fetchPluginSettings !== 'undefined') {
+    return options.fetchPluginSettings
   }
-  return options.fetchPlugin ?? false
+  return settings.eleventyFetch ? { duration: '1s' } : false
 }
 
 export default function (config: ClientConfig, options: EleventyPluginOptions) {
