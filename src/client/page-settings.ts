@@ -17,7 +17,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
     config.addSettings({
       id: 'cms',
       label: 'CMS',
-      render: (settings: WebsiteSettings, page: Backbone.Model) => render(settings, config, page as Page),
+      render: (settings: WebsiteSettings, page: Backbone.Model) => render(settings, config, page as unknown as Page), // FIXME: make sure Page is a Backbone.Model
     }, 'page')
   })
 }
