@@ -18,22 +18,32 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       // Use silent: true to avoid triggering a save
       const ds = new EleventyDataSource()
       editor.runCommand(cmdPauseAutoSave)
-      const eleventyDs = dm.add(ds, {merge: false/*, silent: true */})
+      const eleventyDs = dm.add(ds, {merge: true/*, silent: true */}) as EleventyDataSource
+      // FIXME: Workaround: the added instance is not a Backbone model
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.isConnected = eleventyDs.get('isConnected')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.getQuery = eleventyDs.get('getQuery')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.getTypes = eleventyDs.get('getTypes')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.getQueryables = eleventyDs.get('getQueryables')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.connect = eleventyDs.get('connect')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.id = eleventyDs.get('id')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.cid = eleventyDs.get('cid')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.hidden = eleventyDs.get('hidden')
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.attributes.url = ''
+      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
+      eleventyDs.readonly = eleventyDs.get('readonly')
       // Wait for the next tick to avoid triggering a save
       setTimeout(() => {
         editor.stopCommand(cmdPauseAutoSave)
       })
-      // FIXME: Workaround: the added instance is not a Backbone model
-      eleventyDs.isConnected = eleventyDs.get('isConnected')
-      eleventyDs.getQuery = eleventyDs.get('getQuery')
-      eleventyDs.getTypes = eleventyDs.get('getTypes')
-      eleventyDs.getQueryables = eleventyDs.get('getQueryables')
-      eleventyDs.connect = eleventyDs.get('connect')
-      eleventyDs.id = eleventyDs.get('id')
-      eleventyDs.cid = eleventyDs.get('cid')
-      eleventyDs.hidden = eleventyDs.get('hidden')
-      eleventyDs.attributes.url = ''
-      // No, this triggers a save: eleventyDs.set('url', '')
     }
   })
 }
@@ -50,9 +60,10 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
    * Unique identifier of the data source
    * This is used to retrieve the data source from the editor
    */
-  id = EleventyDataSourceId
-  label = 'Eleventy'
-  hidden = true
+  public id = EleventyDataSourceId
+  public label = 'Eleventy'
+  public hidden = true
+  public readonly = true
 
   /**
    * Implement IDatasource
