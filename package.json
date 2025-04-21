@@ -59,7 +59,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@silexlabs/grapesjs-data-source": "^0.0.128",
+    "@silexlabs/grapesjs-data-source": "^0.0.130",
     "dedent": "^1.5.3",
     "deepmerge": "^4.3.1",
     "rollup": "^4.32.1",

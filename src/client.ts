@@ -11,6 +11,7 @@ import filters from './client/filters'
 import merge from 'deepmerge'
 import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 import blocks from './client/blocks'
+import buttons from './client/buttons'
 import traits from './client/traits'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
@@ -107,6 +108,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
     filters as Plugin,
     publication as Plugin,
     blocks as Plugin,
+    buttons as Plugin,
     traits as Plugin,
   ], opts)
 
