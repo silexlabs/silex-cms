@@ -61,6 +61,5 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
       assets: '/assets',
       css: '/css',
     },
-    commands: { refresh: 'refresh' },
   }
 }
