@@ -2,7 +2,7 @@
  * @fileoverview DataSource configuration with defaults
  */
 
-import DataSourcePlugin from '@silexlabs/grapesjs-data-source'
+import DataSourcePlugin, { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions } from '../client'
 import { Editor, EditorConfig } from 'grapesjs'
@@ -15,7 +15,7 @@ const settingsEl = document.createElement('div')
 export function optionsToGrapesJsConfig(options: EleventyPluginOptions): EditorConfig {
   return {
     plugins: [
-      DataSourcePlugin as (editor: Editor, options) => void,
+      DataSourcePlugin as (editor: Editor, options: DataSourceEditorOptions) => void,
     ],
     pluginsOpts: {
       [DataSourcePlugin.toString()]: {
@@ -60,6 +60,9 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     urls: {
       assets: '/assets',
       css: '/css',
+    },
+    commands: {
+      refresh: 'data-source:refresh',
     },
   }
 }

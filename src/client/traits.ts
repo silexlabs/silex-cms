@@ -28,6 +28,7 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
                 label: LABEL,
                 type: UNWRAP_ID,
                 name: UNWRAP_ID,
+                //type: 'checkbox',
               },
             ]
           }
@@ -37,14 +38,33 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions */):
 
     function doRender(el: HTMLElement, remove: boolean) {
       render(html`
-      <label for=${UNWRAP_ID} class="gjs-one-bg silex-label">${LABEL_DETAILS}</label>
-      <input
-        type="checkbox"
-        id=${UNWRAP_ID}
-        @change=${event => doRender(el, event.target.checked)}
-        ?checked=${remove}
-        style="appearance: auto; width: 20px; height: 20px;"
-      >
+        <label
+            for=${UNWRAP_ID}
+            class="gjs-field gjs-field-checkbox silex-label"
+            title=${LABEL_DETAILS}
+            style="width: 100%; background: var(--primaryColor);"
+        >
+          <input
+            type="checkbox"
+            id=${UNWRAP_ID}
+            @change=${(event: Event) => doRender(el, (event.target as HTMLInputElement)?.checked)}
+            ?checked=${remove}
+            style="
+              display: initial;
+              appearance: none;
+              width: 20px;
+              height: 20px;
+              position: absolute;
+            "
+        >
+          <i
+            class="gjs-chk-icon"
+            style="
+              position: absolute;
+              z-index: 1;
+            "
+          ></i>
+        </label>
     `, el)
     }
     function doRenderCurrent(el: HTMLElement) {
