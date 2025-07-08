@@ -48,7 +48,6 @@ export default function(config: ClientConfig/*, opts: EleventyPluginOptions*/): 
       attributes: { title: 'Refresh data sources' },
     })
     editor.on(DATA_SOURCE_CHANGED, () => {
-      console.log('Data source changed')
       const button = editor.Panels.getButton('options', 'refresh-data-sources')
       if (button) {
         button.set('className', `${REFRESH_BUTTON_BASE_CLASS} fa-refresh`)

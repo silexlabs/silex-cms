@@ -38,7 +38,7 @@ export default function (config, options = {}) {
     // i18nPlugin: false,
     // fetchPlugin: false,
     filters: [
-      'generic',
+      // 'generic',
       'liquid',
       {
         type: 'filter',

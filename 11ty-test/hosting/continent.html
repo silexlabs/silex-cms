@@ -1,0 +1,39 @@
+---
+pagination:
+  addAllPagesToCollections: true
+  data: ds-1.continents
+  size: 1
+permalink: "{% assign var_ix5nl_67 = pagination.items | first %}{% assign var_ix5nl_68 = var_ix5nl_67.name | slugify | prepend: \"/\" | append: \"/index.html\" %}{{ var_ix5nl_68 }}"
+collection: "Continent"
+
+---
+{% assign state_ix5nl-8234_pagination = pagination %}
+{% assign state_ix5nl-8234_items = pagination.items %}
+{% assign state_ix5nl-8234_pages = pagination.pages %}<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="/css/continent-5670e11f0bdc9530c5ca0589b8772580f647fcfa0d3a2be7cb78121e51253686.css" />
+
+
+
+
+
+<link href="https://fonts.googleapis.com" rel="preconnect" ><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin ></head>
+<body id="ix5nl"><h1 id="izx2f" class="">{% liquid
+    assign var_izx2f_57 = state_ix5nl-8234_items | first
+	assign var_izx2f_58 = var_izx2f_57.name
+    echo var_izx2f_58
+  %}</h1>{% liquid
+    assign var_idew6_60 = state_ix5nl-8234_items | first
+	assign var_idew6_61 = var_idew6_60.countries
+    %}
+    {% for state_idew6-3977___data in var_idew6_61 %}
+  <a id="idew6" href="{% liquid
+    assign var_idew6_62 = state_idew6-3977___data.name | slugify | prepend: "/countries/" | append: "/"
+    echo var_idew6_62
+  %}" class="">{% liquid
+    assign var_idew6_59 = state_idew6-3977___data.name
+    echo var_idew6_59
+  %}</a>{% endfor %}</body>
+</html>

@@ -1,22 +1,27 @@
 ---
-pagination:
-  data: ds_39ihty.languages
-  size: 1
-permalink: "{% assign var_global_0 = state_iuth-9752_items | first %}{% assign var_global_1 = var_global_0.name | slugify %}{{ var_global_1 }}"
+permalink: "/index.html"
 
 ---
-{% assign state_iuth-9752_pagination = pagination %}
-{% assign state_iuth-9752_items = pagination.items %}
-{% assign state_iuth-9752_pages = pagination.pages %}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/css/index-e2804d3545ffe54e432cb403b1cd1c5da5557b216bd6a64f1dbda7e43071faff.css" />
+<link rel="stylesheet" href="/css/index-eabccd570c6d87dffd82ef9250914649266102ab4bcbc0a9b7da2c845cc570bd.css" />
 
 
 
 
 
 <link href="https://fonts.googleapis.com" rel="preconnect" ><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin ></head>
-<body id="ijqc"><div id="inue">Insert your text here</div></body>
+<body id="ivjl">{% liquid
+    assign var_ihi8_55 = ds-1.continents
+    %}
+    {% for state_ihi8-522___data in var_ihi8_55 %}
+  <a id="ihi8" href="{% liquid
+    assign var_ihi8_56 = state_ihi8-522___data.name | slugify | prepend: "/" | append: "/"
+    echo var_ihi8_56
+  %}" style="padding:10px;" class="">{% liquid
+    assign var_ihi8_54 = state_ihi8-522___data.name
+    echo var_ihi8_54
+  %}</a>{% endfor %}</body>
 </html>

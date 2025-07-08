@@ -1,13 +1,12 @@
-// .eleventy.js
-const { EleventyI18nPlugin } = require("@11ty/eleventy");
-const Image = require("@11ty/eleventy-img");
+import { EleventyI18nPlugin } from "@11ty/eleventy";
+import Image from "@11ty/eleventy-img";
 
-module.exports = function(eleventyConfig) {
+export default function(eleventyConfig) {
   // Serve CSS along with the site
   eleventyConfig.addPassthroughCopy({"hosting/css/*.css": "css"});
 
   // For the fetch plugin
-  eleventyConfig.watchIgnores.add('**/.cache/**')
+  eleventyConfig.watchIgnores.add('**/.cache/**');
 
   // i18n plugin
   eleventyConfig.addPlugin(EleventyI18nPlugin, {
@@ -31,4 +30,11 @@ module.exports = function(eleventyConfig) {
     // You bet we throw an error on a missing alt (alt="" works okay)
     return Image.generateHTML(metadata, imageAttributes);
   });
-};
+
+  return {
+    dir: {
+      input: "hosting",
+      output: "_site"
+    }
+  };
+}

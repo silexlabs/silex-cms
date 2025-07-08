@@ -308,6 +308,11 @@ class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implement
     //  dataSourceId: 'eleventy',
     }]
   }
+
+  fetchValues(query: string): Promise<unknown> {
+    console.log('fetch', {query})
+    throw new Error('not implemented yet')
+  }
 }
 
 export class EleventyDataSourceTest extends EleventyDataSource {
