@@ -1,7 +1,7 @@
 /*
  * @jest-environment jsdom
  */
-import { Filter, Property, State, getOrCreatePersistantId, DataTree, Field, UnariOperator, BinariOperator } from '@silexlabs/grapesjs-data-source'
+import { Filter, Property, State, getOrCreatePersistantId, Field, UnariOperator, BinariOperator } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, getLiquidBlock, getLiquidStatement, getLiquidStatementProperties, ifBlock, loopBlock } from './liquid'
 import { expressionList, expressionListWithWhere, expressionWithFirst, expressionWithState, simpleExpression } from './liquid.mock'
 import grapesjs from 'grapesjs'
@@ -185,17 +185,10 @@ test('assign block', () => {
 
 test('loop block', () => {
   const editor = grapesjs.init({ headless: true })
-  const dataTree = {
-    filters: [],
-    dataSources: [],
-    getType() {
-      return null
-    },
-  } as unknown as DataTree
   const component = editor.addComponents('test')[0]
   getOrCreatePersistantId(component)
   const { expression } = expressionList
-  const [start] = loopBlock(dataTree, component, expression)
+  const [start] = loopBlock(component, expression)
   expect(start.split('\n')).toHaveLength(5)
   expect(start.split('\n')[0]).toBe('{% liquid')
   expect(start.split('\n')[1])
@@ -203,11 +196,11 @@ test('loop block', () => {
   expect(start.split('\n')[3])
     .toMatch(/{% for state_\w+-\w+___data in var_\w+ %}/)
 
-  const [start1, end1] = loopBlock(dataTree, component, expressionListWithWhere.expression)
+  const [start1, end1] = loopBlock(component, expressionListWithWhere.expression)
   expect(start1.split('\n')).toHaveLength(5)
   expect(end1).toMatch(/{% endfor %}/)
 
-  const [start2, end2] = loopBlock(dataTree, component, [
+  const [start2, end2] = loopBlock(component, [
     ...expressionWithFirst.expression,
     ...expressionListWithWhere.expression,
   ])

@@ -1,45 +1,23 @@
-import { DataSourceEditor, Field, IDataSource, Type } from '@silexlabs/grapesjs-data-source'
+import { DataSourceType, Field, IDataSource, Type, addDataSource } from '@silexlabs/grapesjs-data-source'
 import { EleventyPluginOptions } from '../client'
-import Backbone from 'backbone'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
+import { Editor } from 'grapesjs'
 
 //import { cmdPauseAutoSave } from '@silexlabs/silex/src/ts/client/grapesjs/storage'
 const cmdPauseAutoSave = 'pause-auto-save'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
-    const editor = config.getEditor() as DataSourceEditor
-    const dm = editor.DataSourceManager
-    if(!dm) {
-      throw new Error('No DataSourceManager found, did you forget to add the DataSource plugin?')
-    }
+    const editor = config.getEditor() as Editor
+
     if(opts.enable11ty) {
-      // Add the 11ty data source
-      // Use silent: true to avoid triggering a save
+      // Add the 11ty data source using the new functional API
       const ds = new EleventyDataSource()
       editor.runCommand(cmdPauseAutoSave)
-      const eleventyDs = dm.add(ds, {merge: true/*, silent: true */}) as EleventyDataSource
-      // FIXME: Workaround: the added instance is not a Backbone model
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.isConnected = eleventyDs.get('isConnected')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.getQuery = eleventyDs.get('getQuery')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.getTypes = eleventyDs.get('getTypes')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.getQueryables = eleventyDs.get('getQueryables')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.connect = eleventyDs.get('connect')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.id = eleventyDs.get('id')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.cid = eleventyDs.get('cid')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.hidden = eleventyDs.get('hidden')
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.attributes.url = ''
-      /* @ts-expect-error Workaround: the added instance is not a Backbone model */
-      eleventyDs.readonly = eleventyDs.get('readonly')
+
+      // Add the data source
+      addDataSource(ds)
+
       // Wait for the next tick to avoid triggering a save
       setTimeout(() => {
         editor.stopCommand(cmdPauseAutoSave)
@@ -50,20 +28,43 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
 
 export const EleventyDataSourceId = 'eleventy'
 
-class EleventyDataSource extends Backbone.Model<EleventyPluginOptions> implements IDataSource {
-  /**
-   * FIXME: this is required because _.uniqueId in backbone gives the same id as the one in the main app (c1), so we probably use a different underscore instance?
-   */
-  cid = EleventyDataSourceId
-
+class EleventyDataSource implements IDataSource {
   /**
    * Unique identifier of the data source
    * This is used to retrieve the data source from the editor
    */
   public id = EleventyDataSourceId
   public label = 'Eleventy'
+  public url = ''
+  public type = 'graphql' as DataSourceType
+  public method = 'POST'
+  public headers = {}
   public hidden = true
   public readonly = true
+
+  private eventListeners: Record<string, ((...args: unknown[]) => void)[]> = {}
+
+  // Simple event handling
+  on(event: string, callback: (...args: unknown[]) => void): void {
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = []
+    }
+    this.eventListeners[event].push(callback)
+  }
+
+  off(event: string, callback?: (...args: unknown[]) => void): void {
+    if (!this.eventListeners[event]) return
+    if (callback) {
+      this.eventListeners[event] = this.eventListeners[event].filter(cb => cb !== callback)
+    } else {
+      this.eventListeners[event] = []
+    }
+  }
+
+  trigger(event: string, ...args: unknown[]): void {
+    if (!this.eventListeners[event]) return
+    this.eventListeners[event].forEach(callback => callback(...args))
+  }
 
   /**
    * Implement IDatasource

@@ -1,11 +1,12 @@
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html } from 'lit-html'
-import { DataSourceEditor, createDataSource } from '@silexlabs/grapesjs-data-source'
+import { createDataSource, addDataSource } from '@silexlabs/grapesjs-data-source'
+import { Editor } from 'grapesjs'
 
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   config.on('silex:startup:end', () => {
-    const editor = config.getEditor() as DataSourceEditor
+    const editor = config.getEditor() as Editor
     config.addSettings({
       id: 'cms',
       label: 'CMS',
@@ -37,7 +38,7 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
               class="silex-button add-ds-btn"
               title="Add a new data source"
               @click=${() => {
-    editor.DataSourceManager.add(createDataSource())
+    addDataSource(createDataSource())
   }}>
                 +
               </button>

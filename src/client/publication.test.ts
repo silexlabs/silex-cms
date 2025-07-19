@@ -5,7 +5,7 @@
 import dedent from 'dedent'
 import { expect, jest, test } from '@jest/globals'
 import { buildAttributes, getFrontMatter, isAttribute, queryToDataFile } from './publication'
-import { IDataSourceModel } from '@silexlabs/grapesjs-data-source'
+import { IDataSource } from '@silexlabs/grapesjs-data-source'
 import { Page } from 'grapesjs'
 //import grapesjs, { Page } from 'grapesjs'
 //import { DataSourceEditor, DataSourceEditorOptions, getState } from '@silexlabs/grapesjs-data-source'
@@ -169,20 +169,20 @@ test('getDataFile', () => {
   const dataSourceId = 'data source id example'
   const dataSource = {
     id: dataSourceId,
-    get: jest.fn((name) => {
-      switch (name) {
-      case 'type': return 'graphql'
-      case 'serverToServer': return {
-        url: 'http://localhost:8055',
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-      }
-      throw new Error(`Unit test error, unknown name: ${name}`)
-    }),
-  } as unknown as IDataSourceModel
+    type: 'graphql',
+    url: 'http://localhost:8055',
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    serverToServer: {
+      url: 'http://localhost:8055',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+    },
+  } as unknown as IDataSource
   const query = 'query str example'
   const result1 = queryToDataFile(
     dataSource,

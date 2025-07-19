@@ -1,9 +1,9 @@
-import { DataSourceEditor, removeState, setState, toExpression } from '@silexlabs/grapesjs-data-source'
+import { removeState, setState, toExpression } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 //import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { html, TemplateResult } from 'lit-html'
-import { Page } from 'grapesjs'
+import { Page, Editor } from 'grapesjs'
 import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 
 /**
@@ -12,7 +12,7 @@ import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 export default function(config: ClientConfig, opts: EleventyPluginOptions): void {
   if(!opts.enable11ty) return // Do not add the settings if 11ty is disabled
   config.on('silex:startup:end', () => {
-    const editor = config.getEditor() as DataSourceEditor
+    const editor = config.getEditor() as Editor
     editor.on(/* ClientEvent.SETT(INGS_SAVE_START */'silex:settings:save:start', (page: Page) => updateBodyStates(editor, page))
     config.addSettings({
       id: 'cms',
@@ -61,7 +61,7 @@ function hideWarningDirty() {
  * Set the state on the body component
  * This is only useful to build the GraphQL query
  */
-function updateBodyStates(editor: DataSourceEditor, page: Page) {
+function updateBodyStates(editor: Editor, page: Page) {
   hideWarningDirty()
   if (page) {
     const settings = page?.get('settings') as Silex11tyPluginWebsiteSettings | undefined

@@ -7,7 +7,6 @@ import siteSettings from './client/site-settings'
 import { Plugin } from '@silexlabs/silex-plugins'
 import states from './client/states'
 import DataSource from './client/DataSource'
-import filters from './client/filters'
 import merge from 'deepmerge'
 import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 import blocks from './client/blocks'
@@ -105,7 +104,6 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
     pageSettings as Plugin,
     siteSettings as Plugin,
     states as Plugin,
-    filters as Plugin,
     publication as Plugin,
     blocks as Plugin,
     buttons as Plugin,
@@ -113,7 +111,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   ], opts)
 
   // Get the config for the data source plugin
-  const grapesJsConfig = optionsToGrapesJsConfig(opts)
+  const grapesJsConfig = optionsToGrapesJsConfig(config.getEditor(), opts)
 
   // Merge the initial config with GrapesJs config
   // Returns the new config

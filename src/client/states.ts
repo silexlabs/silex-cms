@@ -1,5 +1,6 @@
-import { removeState, setState, COMPONENT_NAME_PREFIX, Property, DataSourceEditor, toExpression } from '@silexlabs/grapesjs-data-source'
+import { removeState, setState, COMPONENT_NAME_PREFIX, Property, toExpression } from '@silexlabs/grapesjs-data-source'
 import { Silex11tyPluginWebsiteSettings } from '../client'
+import { Editor } from 'grapesjs'
 
 export default function(config/*, opts: EleventyPluginOptions */): void {
   config.on('silex:grapesjs:end', () => {
@@ -9,7 +10,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
 }
 
 function update(config) {
-  const editor = config.getEditor() as DataSourceEditor
+  const editor = config.getEditor() as Editor
   const page = editor.Pages.getSelected()
   const body = page?.getMainComponent()
   if (!body) return // This happens when the current page is deleted

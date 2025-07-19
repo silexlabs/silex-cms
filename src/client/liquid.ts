@@ -1,4 +1,4 @@
-import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, DataTree, BinariOperator, UnariOperator, getExpressionResultType, toExpression } from '@silexlabs/grapesjs-data-source'
+import { Expression, FIXED_TOKEN_ID, Filter, Property, State, StateId, Token, getPersistantId, getStateVariableName, BinariOperator, UnariOperator, getExpressionResultType, toExpression } from '@silexlabs/grapesjs-data-source'
 import { Component } from 'grapesjs'
 import { EleventyDataSourceId } from './DataSource'
 
@@ -70,10 +70,10 @@ export function assignBlock(stateId: StateId, component: Component, expression: 
  * Generate liquid instructions which start and end a loop over the provided expression
  * This is used for components states
  */
-export function loopBlock(dataTree: DataTree, component: Component, expression: Expression): [start: string, end: string] {
+export function loopBlock(component: Component, expression: Expression): [start: string, end: string] {
   if (expression.length === 0) throw new Error('Expression is empty')
   // Check data to loop over
-  const field = getExpressionResultType(expression, component, dataTree)
+  const field = getExpressionResultType(expression, component)
   if (!field) throw new Error(`Expression ${expression.map(token => token.label).join(' -> ')} is invalid`)
   if (field.kind !== 'list') throw new Error(`Provided property needs to be a list in order to loop, not a ${field.kind}`)
   const statements = getLiquidBlock(component, expression)

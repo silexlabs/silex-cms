@@ -1,6 +1,6 @@
 import dedent from 'dedent'
-import { Component, Page } from 'grapesjs'
-import { BinariOperator, DataSourceEditor, DataTree, Filter, IDataSourceModel, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression } from '@silexlabs/grapesjs-data-source'
+import { Component, Page, Editor } from 'grapesjs'
+import { BinariOperator, Filter, IDataSource, NOTIFICATION_GROUP, Properties, Property, State, StateId, StoredState, Token, UnariOperator, fromStored, getPersistantId, getState, getStateIds, getStateVariableName, toExpression, getAllDataSources, getPageQuery, getDataSource, GraphQLOptions } from '@silexlabs/grapesjs-data-source'
 import { assignBlock, echoBlock, echoBlock1line, getPaginationData, ifBlock, loopBlock } from './liquid'
 import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { PublicationTransformer } from '@silexlabs/silex/src/ts/client/publication-transformers'
@@ -54,7 +54,7 @@ function getFetchPluginOptions(options: EleventyPluginOptions, settings: Silex11
 
 export default function (config: ClientConfig, options: EleventyPluginOptions) {
   config.on('silex:startup:end', () => {
-    const editor = config.getEditor() as DataSourceEditor
+    const editor = config.getEditor() as Editor
     // Generate the liquid when the site is published
     config.addPublicationTransformers({
       // Render the components when they are published
@@ -81,10 +81,8 @@ export default function (config: ClientConfig, options: EleventyPluginOptions) {
 /**
  * Check if the 11ty publication is enabled
  */
-function enable11ty(editor: DataSourceEditor): boolean {
-  return editor
-    .DataSourceManager
-    .getAll()
+function enable11ty(): boolean {
+  return getAllDataSources()
     .filter(ds => ds.id !== EleventyDataSourceId)
     .length > 0
 }
@@ -93,7 +91,7 @@ function enable11ty(editor: DataSourceEditor): boolean {
  * Make html attribute
  * Quote strings, no values for boolean
  */
-function makeAttribute(key, value): string {
+function makeAttribute(key: string, value: string | boolean): string {
   switch (typeof value) {
   case 'boolean': return value ? key : ''
   default: return `${key}="${value}"`
@@ -104,7 +102,7 @@ function makeAttribute(key, value): string {
  * Comes from silex but didn't manage to import
  * FIXME: expose this from silex
  */
-function transformPaths(editor: DataSourceEditor, path: string, type): string {
+function transformPaths(editor: Editor, path: string, type: ClientSideFileType): string {
   const config = editor.getModel().get('config')
   return config.publicationTransformers.reduce((result: string, transformer: PublicationTransformer) => {
     try {
@@ -232,9 +230,9 @@ export function getBodyStates(page: Page): string {
   return ''
 }
 
-export function transformPage(editor: DataSourceEditor, data: { page, siteSettings, pageSettings }): void {
+export function transformPage(editor: Editor, data: { page, siteSettings, pageSettings }): void {
   // Do nothing if there is no data source, just a static site
-  if(!enable11ty(editor)) return
+  if(!enable11ty()) return
 
   const { pageSettings, page } = data
   const body = page.getMainComponent()
@@ -269,12 +267,9 @@ export function transformPage(editor: DataSourceEditor, data: { page, siteSettin
  * This hook is called just before the files are written to the file system
  * Exported for unit tests
  */
-export function transformFiles(editor: DataSourceEditor, options: EleventyPluginOptions, data: PublicationData): void {
+export function transformFiles(editor: Editor, options: EleventyPluginOptions, data: PublicationData): void {
   // Do nothing if there is no data source, just a static site
-  if(!enable11ty(editor)) return
-
-  // Type safe data source manager
-  const dsm = editor.DataSourceManager
+  if(!enable11ty()) return
 
   editor.Pages.getAll().forEach(page => {
     // Get the page properties
@@ -283,7 +278,7 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
     const languages = settings.silexLanguagesList?.split(',').map(lang => lang.trim()).filter(lang => !!lang)
 
     // Create the data file for this page
-    const query = dsm.getPageQuery(page)
+    const query = getPageQuery(page, editor)
     // Remove empty data source queries
     Object.entries(query).forEach(([key, value]) => {
       if (value.length === 0) {
@@ -293,13 +288,13 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
 
     // Find the page in the published data
     if (!data.files) throw new Error('No files in publication data')
-    const path = transformPaths(editor, `/${slug}.html`, 'html')
+    const path = transformPaths(editor, `/${slug}.html`, ClientSideFileType.HTML)
     const pageData = data.files.find(file => file.path === path) as ClientSideFileWithContent | undefined
     if (!pageData) throw new Error(`No file for path ${path}`)
     if (pageData.type !== ClientSideFileType.HTML) throw new Error(`File for path ${path} is not HTML`)
     const dataFile = Object.keys(query).length > 0 ? {
       type: ClientSideFileType.OTHER,
-      path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.mjs`, 'html'),
+      path: transformPaths(editor, `/${slugify(page.getName() || 'index')}.11tydata.mjs`, ClientSideFileType.HTML),
       //path: `/${page.getName() || 'index'}.11tydata.mjs`,
       content: getDataFile(editor, page, null, query, options),
     } : null
@@ -361,15 +356,14 @@ export function transformFiles(editor: DataSourceEditor, options: EleventyPlugin
  * - Cache buster
  *
  */
-function getDataFile(editor: DataSourceEditor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
+function getDataFile(editor: Editor, page: Page, lang: string | null, query: Record<string, string>, options: EleventyPluginOptions): string {
   const esModule = options.esModule === true || typeof options.esModule === 'undefined'
   const fetchPlugin = getFetchPluginOptions(options, editor.getModel().get('settings') || {})
   const fetchImportStatement = fetchPlugin ? (esModule ? 'import EleventyFetch from \'@11ty/eleventy-fetch\'' : 'const EleventyFetch = require(\'@11ty/eleventy-fetch\')') : ''
   const exportStatement = esModule ? 'export default' : 'module.exports ='
-  const dsm = editor.DataSourceManager
 
   const content = Object.entries(query).map(([dataSourceId, queryStr]) => {
-    const dataSource = dsm.get(dataSourceId)
+    const dataSource = getDataSource(dataSourceId)
     if (dataSource) {
       return queryToDataFile(dataSource, queryStr, options, page, lang, fetchPlugin)
     } else {
@@ -394,16 +388,16 @@ ${exportStatement} async function (configData) {
 /**
  * Exported for unit tests
  */
-export function queryToDataFile(dataSource: IDataSourceModel, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null, fetchPlugin: object | false): string {
-  if (dataSource.get('type') !== 'graphql') {
+export function queryToDataFile(dataSource: IDataSource, queryStr: string, options: EleventyPluginOptions, page: Page, lang: string | null, fetchPlugin: object | false): string {
+  if (dataSource.type !== 'graphql') {
     console.info('not graphql', dataSource)
     return ''
   }
-  const s2s = dataSource.get('serverToServer')
-  const url = s2s ? s2s.url : dataSource.get('url')
+  const s2s = (dataSource as GraphQLOptions).serverToServer
+  const url = s2s ? s2s.url : dataSource.url
   const urlWithCacheBuster = options.cacheBuster ? `${url}${url.includes('?') ? '&' : '?'}page_id_for_cache=${page.getId()}${lang ? `-${lang}` : ''}` : url
-  const method = s2s ? s2s.method : dataSource.get('method')
-  const headers = s2s ? s2s.headers : dataSource.get('headers')
+  const method = s2s ? s2s.method : dataSource.method
+  const headers = s2s ? s2s.headers : dataSource.headers
   if (headers && !Object.keys(headers).find(key => key.toLowerCase() === 'content-type')) {
     console.warn('11ty plugin for Silex: no content-type in headers of the graphql query. I will set it to application/json for you. To avoid this warning, add a header with key "content-type" and value "application/json" in silex config.')
     headers['content-type'] = 'application/json'
@@ -483,7 +477,7 @@ export function makeFetchCallEleventy(options: {key: string, url: string, method
  * Make stored states into real states
  * Filter out hidden states and empty expressions
  */
-function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: StoredState }[]): { stateId: StateId, label: string, tokens: State[] }[] {
+function getRealStates(states: { stateId: StateId, state: StoredState }[]): { stateId: StateId, label: string, tokens: State[] }[] {
   return states
     .filter(({ state }) => !state.hidden)
     .filter(({ state }) => state.expression.length > 0)
@@ -493,7 +487,7 @@ function getRealStates(dataTree: DataTree, states: { stateId: StateId, state: St
       label: state.label || stateId,
       tokens: state.expression.map(token => {
         const componentId = state.expression[0].type === 'state' ? state.expression[0].componentId : null
-        return fromStored(token, dataTree, componentId)
+        return fromStored(token, componentId)
       }),
     }))
 }
@@ -553,7 +547,7 @@ export function buildAttributes(originalAttributes: Record<string, string>, attr
     .join(' ')
 }
 
-function withNotification<T>(cbk: () => T, editor: DataSourceEditor, componentId: string | null): T {
+function withNotification<T>(cbk: () => T, editor: Editor, componentId: string | null): T {
   try {
     return cbk()
   } catch (e) {
@@ -575,17 +569,15 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
     return cache.get(component.getId())
   }
 
-  const editor = config.getEditor() as DataSourceEditor
+  const editor = config.getEditor() as Editor
 
-  const dataTree = editor.DataSourceManager.getDataTree()
-
-  const statesPrivate = withNotification(() => getRealStates(dataTree, getStateIds(component, false)
+  const statesPrivate = withNotification(() => getRealStates(getStateIds(component, false)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, false)!,
     }))), editor, component.getId())
 
-  const statesPublic = withNotification(() => getRealStates(dataTree, getStateIds(component, true)
+  const statesPublic = withNotification(() => getRealStates(getStateIds(component, true)
     .map(stateId => ({
       stateId,
       state: getState(component, stateId, true)!,
@@ -627,7 +619,7 @@ function renderComponent(config: ClientConfig, component: Component, toHtml: () 
         expression: statesObj.condition.tokens,
         operator,
       }) : []
-      const [forStart, forEnd] = hasData ? loopBlock(dataTree, component, statesObj.__data.tokens) : []
+      const [forStart, forEnd] = hasData ? loopBlock(component, statesObj.__data.tokens) : []
       const states = statesPublic
         .map(({ stateId, tokens }) => assignBlock(stateId, component, tokens))
         .join('\n')
@@ -677,9 +669,9 @@ function toPath(path: (string | undefined)[]) {
     .join('/')
 }
 
-function transformPermalink(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPermalink(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
-  if(!enable11ty(editor)) return path
+  if(!enable11ty()) return path
 
   switch (type) {
   case 'html':
@@ -703,9 +695,9 @@ function transformPermalink(editor: DataSourceEditor, path: string, type: string
   }
 }
 
-function transformPath(editor: DataSourceEditor, path: string, type: string, options: EleventyPluginOptions): string {
+function transformPath(editor: Editor, path: string, type: string, options: EleventyPluginOptions): string {
   // Do nothing if there is no data source, just a static site
-  if(!enable11ty(editor)) return path
+  if(!enable11ty()) return path
 
   switch (type) {
   case 'html':

@@ -2,17 +2,27 @@
  * @fileoverview DataSource configuration with defaults
  */
 
-import DataSourcePlugin, { DataSourceEditorOptions } from '@silexlabs/grapesjs-data-source'
+import DataSourcePlugin, { DataSourceEditorOptions, getLiquidFilters } from '@silexlabs/grapesjs-data-source'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { EleventyPluginOptions } from '../client'
 import { Editor, EditorConfig } from 'grapesjs'
+import { eleventyFilters, i18nFilters } from './filters'
 
 const settingsEl = document.createElement('div')
 
 /**
  * Get the config for the data source plugin out of the client config
  */
-export function optionsToGrapesJsConfig(options: EleventyPluginOptions): EditorConfig {
+export function optionsToGrapesJsConfig(editor: Editor, options: EleventyPluginOptions): EditorConfig {
+  // Build filters array based on options
+  const filters = [
+    ...eleventyFilters,
+    // Add i18n filters if enabled
+    ...(options.i18nPlugin || options.view?.['eleventyI18n'] ? i18nFilters : []),
+    // Add liquid filters
+    ...getLiquidFilters(editor),
+  ]
+
   return {
     plugins: [
       DataSourcePlugin as (editor: Editor, options: DataSourceEditorOptions) => void,
@@ -20,6 +30,7 @@ export function optionsToGrapesJsConfig(options: EleventyPluginOptions): EditorC
     pluginsOpts: {
       [DataSourcePlugin.toString()]: {
         ...options,
+        filters,
       },
     },
   }
@@ -41,8 +52,8 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
       disableAttributes: false,
       disableProperties: false,
     },
-    // Liquid filters
-    filters: 'liquid',
+    // Liquid filters - will be set by optionsToGrapesJsConfig
+    filters: [],
     // Default data source
     dataSources: [],
     // Enable 11ty publication and filters
