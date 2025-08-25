@@ -1,6 +1,6 @@
 import { removeState, setState, COMPONENT_NAME_PREFIX, Property, toExpression } from '@silexlabs/grapesjs-data-source'
 import { Silex11tyPluginWebsiteSettings } from '../client'
-import { Editor } from 'grapesjs'
+import { Component, Editor } from 'grapesjs'
 
 export default function(config/*, opts: EleventyPluginOptions */): void {
   config.on('silex:grapesjs:end', () => {
@@ -12,7 +12,7 @@ export default function(config/*, opts: EleventyPluginOptions */): void {
 function update(config) {
   const editor = config.getEditor() as Editor
   const page = editor.Pages.getSelected()
-  const body = page?.getMainComponent()
+  const body: Component = page?.getMainComponent() as Component
   if (!body) return // This happens when the current page is deleted
   // Do not show "Body's " prefix for states on the body
   body.set(COMPONENT_NAME_PREFIX, '')

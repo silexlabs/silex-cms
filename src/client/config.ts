@@ -52,6 +52,7 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
       disableAttributes: false,
       disableProperties: false,
     },
+    previewActive: true,
     // Liquid filters - will be set by optionsToGrapesJsConfig
     filters: [],
     // Default data source
@@ -71,9 +72,6 @@ export function getZeroConfig(config: ClientConfig): EleventyPluginOptions {
     urls: {
       assets: '/assets',
       css: '/css',
-    },
-    commands: {
-      refresh: 'data-source:refresh',
     },
   }
 }
