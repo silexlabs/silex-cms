@@ -12,7 +12,7 @@ import { WebsiteSettings } from '@silexlabs/silex/src/ts/types'
 import blocks from './client/blocks'
 import buttons from './client/buttons'
 import traits from './client/traits'
-import itemsPreviewControl from './client/items-preview-control'
+import collectionPages from './client/collection-pages'
 
 export interface EleventyPluginOptions extends DataSourceEditorOptions {
   // Enable the publication to 11ty version > 2
@@ -104,12 +104,12 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
     DataSource as Plugin,
     pageSettings as Plugin,
     siteSettings as Plugin,
+    collectionPages as Plugin,
     states as Plugin,
     publication as Plugin,
     blocks as Plugin,
     buttons as Plugin,
     traits as Plugin,
-    itemsPreviewControl as Plugin,
   ], opts)
 
   // Get the config for the data source plugin
