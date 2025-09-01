@@ -113,7 +113,7 @@ export default function (config: ClientConfig, options: Partial<EleventyPluginOp
   ], opts)
 
   // Get the config for the data source plugin
-  const grapesJsConfig = optionsToGrapesJsConfig(config.getEditor(), opts)
+  const grapesJsConfig = optionsToGrapesJsConfig(opts)
 
   // Merge the initial config with GrapesJs config
   // Returns the new config

@@ -21,7 +21,7 @@ export const eleventyFilters: Filter[] = [{
   validate: (field: Field | null) => !!field && field.typeIds.map(t => t.toLowerCase()).includes('string') && field.kind === 'scalar',
   output: type => type,
   apply: (str) => {
-    return str.toString().toLowerCase().replace(/\s+/g, '-')
+    return str?.toString().toLowerCase().replace(/\s+/g, '-')
   },
   options: {},
 }]

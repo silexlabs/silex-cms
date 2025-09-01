@@ -3,7 +3,7 @@
  */
 
 import dedent from 'dedent'
-import { expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { buildAttributes, getFrontMatter, isAttribute, queryToDataFile } from './publication'
 import { IDataSource } from '@silexlabs/grapesjs-data-source'
 import { Page } from 'grapesjs'
@@ -17,9 +17,7 @@ import { Page } from 'grapesjs'
 //  }
 //})
 
-// Prevent lit-html from being imported
-// This is because it breakes the tests since lit-html is a peer dependency (?)
-jest.mock('lit-html', () => ({}))
+// lit-html is now mocked globally in Jest configuration
 
 const PAGE_TEST = {
   getName: () => 'page name example',

@@ -1,0 +1,375 @@
+{
+  "frames": [
+    {
+      "component": {
+        "attributes": {
+          "id": "i9pi"
+        },
+        "components": [
+          {
+            "attributes": {
+              "id": "ix9zx"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "i2khi-5149",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "name",
+                    "kind": "scalar",
+                    "label": "name",
+                    "options": {
+                      "lang": ""
+                    },
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "tagName": "H1",
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "i3sn7"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "i2khi-5149",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "continent",
+                    "kind": "object",
+                    "label": "continent",
+                    "options": {},
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "Continent"
+                    ]
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "name",
+                    "kind": "scalar",
+                    "label": "name",
+                    "options": {},
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "ii6r2"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "i2khi-5149",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "emoji",
+                    "kind": "scalar",
+                    "label": "emoji",
+                    "options": {},
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "izrt4"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "id-plugin-data-source": "izrt4-8497",
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "izrt4-8497",
+                    "exposed": false,
+                    "forceKind": "object",
+                    "label": "Loop data (Language)",
+                    "previewIndex": 0,
+                    "storedStateId": "__data",
+                    "type": "state"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "name",
+                    "kind": "scalar",
+                    "label": "name",
+                    "options": {},
+                    "previewIndex": 0,
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              },
+              {
+                "expression": [
+                  {
+                    "componentId": "i2khi-5149",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "previewIndex": 0,
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "languages",
+                    "kind": "list",
+                    "label": "languages",
+                    "options": {},
+                    "previewIndex": 0,
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "Language"
+                    ]
+                  }
+                ],
+                "id": "__data"
+              }
+            ],
+            "type": "text"
+          }
+        ],
+        "docEl": {
+          "tagName": "html"
+        },
+        "head": {
+          "type": "head"
+        },
+        "id-plugin-data-source": "i2khi-5149",
+        "nameForDataSource": "",
+        "publicStates": [
+          {
+            "expression": [
+              {
+                "dataSourceId": "eleventy",
+                "fieldId": "pagination",
+                "kind": "object",
+                "label": "Unused pagination label",
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "pagination"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "pagination",
+            "label": "pagination"
+          },
+          {
+            "expression": [
+              {
+                "dataSourceId": "ds-1",
+                "fieldId": "countries",
+                "kind": "list",
+                "label": "countries",
+                "options": {
+                  "filter": "{}"
+                },
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "Country"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "items",
+            "label": "pagination.items"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventySeoTitle",
+            "label": "eleventySeoTitle"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventySeoDescription",
+            "label": "eleventySeoDescription"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyFavicon",
+            "label": "eleventyFavicon"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGImage",
+            "label": "eleventyOGImage"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGTitle",
+            "label": "eleventyOGTitle"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGDescription",
+            "label": "eleventyOGDescription"
+          },
+          {
+            "expression": [
+              {
+                "dataSourceId": "ds-1",
+                "fieldId": "countries",
+                "kind": "list",
+                "label": "countries",
+                "options": {
+                  "filter": "{}"
+                },
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "Country"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "eleventyPageData",
+            "label": "eleventyPageData"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyPermalink",
+            "label": "eleventyPermalink"
+          }
+        ],
+        "stylable": [
+          "background",
+          "background-color",
+          "background-image",
+          "background-repeat",
+          "background-attachment",
+          "background-position",
+          "background-size"
+        ],
+        "type": "wrapper"
+      },
+      "id": "VWmhYQ6Htmlromz7"
+    }
+  ],
+  "id": "Fd9xYXK0rrcEvAkXP",
+  "name": "Country",
+  "settings": {
+    "eleventyFavicon": "[]",
+    "eleventyOGDescription": "[]",
+    "eleventyOGImage": "[]",
+    "eleventyOGTitle": "[]",
+    "eleventyPageData": "[{\"options\":{\"filter\":\"{}\"},\"type\":\"property\",\"propType\":\"field\",\"fieldId\":\"countries\",\"label\":\"countries\",\"typeIds\":[\"Country\"],\"dataSourceId\":\"ds-1\",\"kind\":\"list\"}]",
+    "eleventyPermalink": "[{\"type\":\"state\",\"storedStateId\":\"items\",\"previewIndex\":8888,\"label\":\"pagination.items\",\"componentId\":\"i2khi-5149\",\"exposed\":true},{\"type\":\"filter\",\"id\":\"first\",\"label\":\"first\",\"options\":{}},{\"type\":\"property\",\"propType\":\"field\",\"fieldId\":\"code\",\"label\":\"code\",\"typeIds\":[\"ID\"],\"dataSourceId\":\"ds-1\",\"kind\":\"scalar\",\"options\":{}}]",
+    "eleventySeoDescription": "[]",
+    "eleventySeoTitle": "[]",
+    "head": "",
+    "name": "Country"
+  }
+}

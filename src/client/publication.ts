@@ -406,7 +406,7 @@ export function queryToDataFile(dataSource: IDataSource, queryStr: string, optio
 
   const fetchOptions = {
     key: dataSource.id as string,
-    method,
+    method: method || 'POST',
     url: urlWithCacheBuster,
     headers: headersStr,
     query: `JSON.stringify({

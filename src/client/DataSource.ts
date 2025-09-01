@@ -1,7 +1,9 @@
-import { DataSourceType, Field, IDataSource, Type, addDataSource } from '@silexlabs/grapesjs-data-source'
-import { EleventyPluginOptions } from '../client'
+import { DataSourceType, Field, IDataSource, Type, addDataSource, addFilters, removeFilters } from '@silexlabs/grapesjs-data-source'
+import { EleventyPluginOptions, Silex11tyPluginWebsiteSettings } from '../client'
 import { ClientConfig } from '@silexlabs/silex/src/ts/client/config'
 import { Editor } from 'grapesjs'
+// import { ClientEvent } from '@silexlabs/silex/src/ts/client/events'
+import { i18nFilters } from './filters'
 
 //import { cmdPauseAutoSave } from '@silexlabs/silex/src/ts/client/grapesjs/storage'
 const cmdPauseAutoSave = 'pause-auto-save'
@@ -10,6 +12,13 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
   config.on('silex:startup:end', () => {
     const editor = config.getEditor() as Editor
 
+    editor.on(`
+      ${ /* ClientEvent.SETTINGS_SAVE_END */ 'silex:settings:save:end' }
+      storage:after:load
+    `, () => {
+      updateFilters(editor, opts)
+    })
+    updateFilters(editor, opts)
     if(opts.enable11ty) {
       // Add the 11ty data source using the new functional API
       const ds = new EleventyDataSource()
@@ -24,6 +33,15 @@ export default function(config: ClientConfig, opts: EleventyPluginOptions): void
       })
     }
   })
+}
+
+function updateFilters(editor: Editor, opts: EleventyPluginOptions) {
+  const settings = (editor.getModel().get('settings') || {}) as Silex11tyPluginWebsiteSettings
+  if(settings.eleventyI18n) {
+    addFilters(i18nFilters)
+  } else if (!opts.i18nPlugin) {
+    removeFilters(i18nFilters)
+  }
 }
 
 export const EleventyDataSourceId = 'eleventy'

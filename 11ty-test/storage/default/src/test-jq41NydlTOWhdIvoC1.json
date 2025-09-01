@@ -1,0 +1,58 @@
+{
+  "frames": [
+    {
+      "component": {
+        "attributes": {
+          "id": "icgkf"
+        },
+        "components": [
+          {
+            "attributes": {
+              "id": "igb15"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "iuz8a"
+            },
+            "components": [
+              {
+                "content": "Insert your text here aaa",
+                "type": "textnode"
+              }
+            ],
+            "type": "text"
+          }
+        ],
+        "docEl": {
+          "tagName": "html"
+        },
+        "head": {
+          "type": "head"
+        },
+        "nameForDataSource": "",
+        "publicStates": [],
+        "stylable": [
+          "background",
+          "background-color",
+          "background-image",
+          "background-repeat",
+          "background-attachment",
+          "background-position",
+          "background-size"
+        ],
+        "type": "wrapper"
+      },
+      "id": "hGn7y5wWFMZK1Cvg"
+    }
+  ],
+  "id": "jq41NydlTOWhdIvoC1",
+  "name": "test"
+}

@@ -1,0 +1,348 @@
+{
+  "frames": [
+    {
+      "component": {
+        "attributes": {
+          "id": "ivjl"
+        },
+        "components": [
+          {
+            "attributes": {
+              "id": "iuj9w"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "id-plugin-data-source": "iuj9w-8597",
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "previewIndex": 0
+                  }
+                ],
+                "id": "__data"
+              },
+              {
+                "expression": [
+                  {
+                    "componentId": "ivjl-3765",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "name",
+                    "kind": "scalar",
+                    "label": "name",
+                    "options": {},
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "tagName": "H1",
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "ilc2i"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "ivjl-3765",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "code",
+                    "kind": "scalar",
+                    "label": "code",
+                    "options": {},
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "ID"
+                    ]
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "attributes": {
+              "id": "izt1v"
+            },
+            "components": [
+              {
+                "content": "Insert your text here",
+                "type": "textnode"
+              }
+            ],
+            "id-plugin-data-source": "izt1v-4283",
+            "privateStates": [
+              {
+                "expression": [
+                  {
+                    "componentId": "ivjl-3765",
+                    "exposed": true,
+                    "label": "pagination.items",
+                    "previewIndex": 8888,
+                    "storedStateId": "items",
+                    "type": "state"
+                  },
+                  {
+                    "id": "first",
+                    "label": "first",
+                    "options": {},
+                    "previewIndex": 0,
+                    "type": "filter"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "countries",
+                    "kind": "list",
+                    "label": "countries",
+                    "options": {},
+                    "previewIndex": 0,
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "Country"
+                    ]
+                  }
+                ],
+                "id": "__data"
+              },
+              {
+                "expression": [
+                  {
+                    "componentId": "izt1v-4283",
+                    "exposed": false,
+                    "forceKind": "object",
+                    "label": "Loop data (Country)",
+                    "storedStateId": "__data",
+                    "type": "state"
+                  },
+                  {
+                    "dataSourceId": "ds-1",
+                    "fieldId": "name",
+                    "kind": "scalar",
+                    "label": "name",
+                    "options": {
+                      "lang": ""
+                    },
+                    "propType": "field",
+                    "type": "property",
+                    "typeIds": [
+                      "String"
+                    ]
+                  },
+                  {
+                    "id": "append",
+                    "label": "append",
+                    "options": {
+                      "value": "[]"
+                    },
+                    "type": "filter"
+                  }
+                ],
+                "id": "innerHTML"
+              }
+            ],
+            "type": "text"
+          }
+        ],
+        "docEl": {
+          "tagName": "html"
+        },
+        "head": {
+          "type": "head"
+        },
+        "id-plugin-data-source": "ivjl-3765",
+        "nameForDataSource": "",
+        "publicStates": [
+          {
+            "expression": [
+              {
+                "dataSourceId": "eleventy",
+                "fieldId": "pagination",
+                "kind": "object",
+                "label": "Unused pagination label",
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "pagination"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "pagination",
+            "label": "pagination"
+          },
+          {
+            "expression": [
+              {
+                "dataSourceId": "ds-1",
+                "fieldId": "continents",
+                "kind": "list",
+                "label": "continents",
+                "options": {
+                  "filter": "{}"
+                },
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "Continent"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "items",
+            "label": "pagination.items"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventySeoTitle",
+            "label": "eleventySeoTitle"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventySeoDescription",
+            "label": "eleventySeoDescription"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyFavicon",
+            "label": "eleventyFavicon"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGImage",
+            "label": "eleventyOGImage"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGTitle",
+            "label": "eleventyOGTitle"
+          },
+          {
+            "expression": [],
+            "hidden": true,
+            "id": "eleventyOGDescription",
+            "label": "eleventyOGDescription"
+          },
+          {
+            "expression": [
+              {
+                "dataSourceId": "ds-1",
+                "fieldId": "continents",
+                "kind": "list",
+                "label": "continents",
+                "options": {
+                  "filter": "{}"
+                },
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "Continent"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "eleventyPageData",
+            "label": "eleventyPageData"
+          },
+          {
+            "expression": [
+              {
+                "fieldId": "fixed",
+                "kind": "scalar",
+                "label": "Fixed value",
+                "options": {
+                  "value": "/index.html"
+                },
+                "propType": "field",
+                "type": "property",
+                "typeIds": [
+                  "String"
+                ]
+              }
+            ],
+            "hidden": true,
+            "id": "eleventyPermalink",
+            "label": "eleventyPermalink"
+          }
+        ],
+        "stylable": [
+          "background",
+          "background-color",
+          "background-image",
+          "background-repeat",
+          "background-attachment",
+          "background-position",
+          "background-size"
+        ],
+        "type": "wrapper"
+      },
+      "id": "o40Yj6t5y4FBESDR"
+    }
+  ],
+  "id": "2i5hPVpymlikQabU",
+  "name": "Continent",
+  "settings": {
+    "eleventyFavicon": "[]",
+    "eleventyOGDescription": "[]",
+    "eleventyOGImage": "[]",
+    "eleventyOGTitle": "[]",
+    "eleventyPageData": "[{\"options\":{\"filter\":\"{}\"},\"type\":\"property\",\"propType\":\"field\",\"fieldId\":\"continents\",\"label\":\"continents\",\"typeIds\":[\"Continent\"],\"dataSourceId\":\"ds-1\",\"kind\":\"list\"}]",
+    "eleventyPermalink": "[{\"type\":\"state\",\"storedStateId\":\"items\",\"previewIndex\":8888,\"label\":\"pagination.items\",\"componentId\":\"ivjl-3765\",\"exposed\":true},{\"type\":\"filter\",\"id\":\"first\",\"label\":\"first\",\"options\":{}},{\"type\":\"property\",\"propType\":\"field\",\"fieldId\":\"code\",\"label\":\"code\",\"typeIds\":[\"ID\"],\"dataSourceId\":\"ds-1\",\"kind\":\"scalar\",\"options\":{}}]",
+    "eleventySeoDescription": "[]",
+    "eleventySeoTitle": "[]",
+    "head": "",
+    "name": "Continent"
+  },
+  "type": "main"
+}
