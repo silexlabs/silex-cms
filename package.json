@@ -12,11 +12,8 @@
   "files": [
     "dist",
     "src",
-    "LICENSE",
-    "rollup.client.config.mjs",
-    "rollup.server.config.mjs",
-    "tsconfig.client.json",
-    "tsconfig.server.json"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "postinstall": "$npm_execpath run build",
@@ -69,7 +66,7 @@
     "typescript": "^5.7.3"
   },
   "author": "lexoyo",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "keywords": [
     "silex",
     "silex-plugin",
