@@ -65,7 +65,10 @@
     "tslib": "^2.8.1",
     "typescript": "^5.7.3"
   },
-  "author": "lexoyo",
+  "author": {
+    "name": "Alex Hoyau",
+    "url": "https://lexoyo.me/"
+  },
   "license": "AGPL-3.0",
   "keywords": [
     "silex",
